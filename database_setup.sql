@@ -153,17 +153,20 @@ CREATE TABLE public.assets (
   notes TEXT
 );
 
--- 2.9 TIME ENTRIES (depends on projects, profiles)
+-- 2.9 TIME ENTRIES (depends on projects, tasks, profiles)
 CREATE TABLE public.time_entries (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   created_at TIMESTAMPTZ DEFAULT NOW(),
-  user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   project_id UUID REFERENCES public.projects(id) ON DELETE SET NULL,
-  date DATE NOT NULL,
-  hours NUMERIC NOT NULL,
-  description TEXT,
+  task_id UUID REFERENCES public.tasks(id) ON DELETE SET NULL,
+  profile_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  start_time TIMESTAMPTZ,
+  end_time TIMESTAMPTZ,
+  duration_minutes INTEGER,
   status public.time_status DEFAULT 'submitted',
-  billable BOOLEAN DEFAULT true
+  rejection_reason TEXT,
+  billable BOOLEAN DEFAULT true,
+  billed_in_invoice_id UUID REFERENCES public.financial_documents(id) ON DELETE SET NULL
 );
 
 -- 2.10 FINANCIAL DOCUMENTS (depends on clients, profiles)
@@ -216,6 +219,8 @@ CREATE INDEX idx_projects_client_id ON public.projects(client_id);
 CREATE INDEX idx_tasks_project_id ON public.tasks(project_id);
 CREATE INDEX idx_assets_project_id ON public.assets(project_id);
 CREATE INDEX idx_time_entries_project_id ON public.time_entries(project_id);
+CREATE INDEX idx_time_entries_profile_id ON public.time_entries(profile_id);
+CREATE INDEX idx_time_entries_task_id ON public.time_entries(task_id);
 CREATE INDEX idx_service_pricing_module ON public.service_pricing(service_module_id);
 CREATE INDEX idx_notifications_user ON public.notifications(user_id);
 
@@ -359,11 +364,19 @@ USING (public.is_internal());
 -- TIME ENTRIES: Users can view own, admins can view all
 CREATE POLICY "Users can view own time entries" 
 ON public.time_entries FOR SELECT 
-USING (user_id = auth.uid() OR public.is_internal());
+USING (profile_id = auth.uid() OR public.is_internal());
 
-CREATE POLICY "Users can manage own time entries" 
-ON public.time_entries FOR ALL 
-USING (user_id = auth.uid() OR public.is_internal());
+CREATE POLICY "Users can insert own time entries" 
+ON public.time_entries FOR INSERT 
+WITH CHECK (profile_id = auth.uid());
+
+CREATE POLICY "Users can update own time entries" 
+ON public.time_entries FOR UPDATE 
+USING (profile_id = auth.uid() OR public.is_internal());
+
+CREATE POLICY "Users can delete own time entries" 
+ON public.time_entries FOR DELETE 
+USING (profile_id = auth.uid() OR public.is_internal());
 
 -- FINANCIAL DOCUMENTS: Internal users only
 CREATE POLICY "Internal users can view financial documents" 
