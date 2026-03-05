@@ -4,7 +4,6 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { queryClient } from './lib/queryClient';
-import { testSupabaseConnection } from './lib/test-connection';
 import { AuthProvider, useAuth } from './lib/AuthContext';
 import { PresenceProvider } from './lib/PresenceContext';
 import { Login } from './components/Login';
@@ -38,20 +37,6 @@ const MainApp: React.FC = () => {
 
   // Initialize Realtime subscriptions
   useRealtime();
-
-  // Test Supabase connection on mount (only when authenticated)
-  useEffect(() => {
-    if (user) {
-      testSupabaseConnection().then((result) => {
-        if (result.success) {
-          toast.success('✅ Supabase connected successfully!');
-          console.log('Connection test result:', result);
-        } else {
-          toast.error(`❌ Supabase connection failed: ${result.error}`);
-        }
-      });
-    }
-  }, [user]);
 
   const handleNavigate = (newView: View) => {
     setView(newView);

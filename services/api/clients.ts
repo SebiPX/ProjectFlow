@@ -1,42 +1,18 @@
-import { supabase } from '../../lib/supabase';
+import { fetchApi } from './client';
 import type { Client } from '../../types/supabase';
 
 /**
  * Get all clients with their contacts
  */
 export async function getClients(): Promise<Client[]> {
-  const { data, error } = await supabase
-    .from('clients')
-    .select(`
-      *,
-      contacts:client_contacts(*)
-    `)
-    .order('company_name', { ascending: true });
-
-  if (error) {
-    console.error('Error fetching clients:', error);
-    throw new Error(`Failed to fetch clients: ${error.message}`);
-  }
-
-  return data || [];
+  return await fetchApi('/api/clients');
 }
 
 /**
  * Get a single client by ID
  */
 export async function getClientById(id: string): Promise<Client | null> {
-  const { data, error } = await supabase
-    .from('clients')
-    .select('*')
-    .eq('id', id)
-    .single();
-
-  if (error) {
-    console.error('Error fetching client:', error);
-    throw new Error(`Failed to fetch client: ${error.message}`);
-  }
-
-  return data;
+  return await fetchApi(`/api/clients/${id}`);
 }
 
 /**
@@ -45,18 +21,10 @@ export async function getClientById(id: string): Promise<Client | null> {
 export async function createClient(
   clientData: Omit<Client, 'id' | 'created_at'>
 ): Promise<Client> {
-  const { data, error } = await supabase
-    .from('clients')
-    .insert(clientData)
-    .select()
-    .single();
-
-  if (error) {
-    console.error('Error creating client:', error);
-    throw new Error(`Failed to create client: ${error.message}`);
-  }
-
-  return data;
+  return await fetchApi('/api/clients', {
+    method: 'POST',
+    body: JSON.stringify(clientData),
+  });
 }
 
 /**
@@ -66,31 +34,19 @@ export async function updateClient(
   id: string,
   updates: Partial<Omit<Client, 'id' | 'created_at'>>
 ): Promise<Client> {
-  const { data, error } = await supabase
-    .from('clients')
-    .update(updates)
-    .eq('id', id)
-    .select()
-    .single();
-
-  if (error) {
-    console.error('Error updating client:', error);
-    throw new Error(`Failed to update client: ${error.message}`);
-  }
-
-  return data;
+  return await fetchApi(`/api/clients/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(updates),
+  });
 }
 
 /**
  * Delete a client
  */
 export async function deleteClient(id: string): Promise<void> {
-  const { error } = await supabase.from('clients').delete().eq('id', id);
-
-  if (error) {
-    console.error('Error deleting client:', error);
-    throw new Error(`Failed to delete client: ${error.message}`);
-  }
+  await fetchApi(`/api/clients/${id}`, {
+    method: 'DELETE',
+  });
 }
 
 /**
@@ -98,70 +54,60 @@ export async function deleteClient(id: string): Promise<void> {
  * Returns the storage path (not URL)
  */
 export async function uploadClientLogo(clientId: string, file: File): Promise<string> {
-  const fileExt = file.name.split('.').pop();
-  const fileName = `client-${clientId}-${Date.now()}.${fileExt}`;
-  const filePath = `client-logos/${fileName}`;
+  const formData = new FormData();
+  formData.append('file', file);
 
-  const { error } = await supabase.storage
-    .from('AgencyStorage')
-    .upload(filePath, file, {
-      cacheControl: '3600',
-      upsert: true,
-    });
-
-  if (error) {
-    console.error('Error uploading client logo:', error);
-    throw new Error(`Failed to upload logo: ${error.message}`);
+  const sessionStr = localStorage.getItem('agency_session');
+  const headers: Record<string, string> = {};
+  if (sessionStr) {
+    try {
+      const session = JSON.parse(sessionStr);
+      headers['Authorization'] = `Bearer ${session.access_token}`;
+    } catch (e) {}
   }
 
-  return filePath;
+  const response = await fetch(`${import.meta.env.VITE_API_URL}/api/storage/clients`, {
+    method: 'POST',
+    headers,
+    body: formData,
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to upload logo');
+  }
+
+  const data = await response.json();
+  return data.path || data.url || '';
 }
 
 /**
  * Get signed URL for client logo
  */
 export async function getClientLogoSignedUrl(storagePath: string): Promise<string> {
-  const { data, error } = await supabase.storage
-    .from('AgencyStorage')
-    .createSignedUrl(storagePath, 3600); // 1 hour expiry
-
-  if (error || !data?.signedUrl) {
-    console.error('Error getting signed URL for client logo:', error);
-    throw new Error(`Failed to get logo URL: ${error?.message || 'Unknown error'}`);
-  }
-
-  return data.signedUrl;
+  // Replace with backend generated signed URL or direct CDN link if bucket is public
+  return await fetchApi(`/api/storage/signed-url?path=${encodeURIComponent(storagePath)}`)
+    .then(res => res.url || storagePath)
+    .catch(() => storagePath);
 }
 
 /**
  * Update client logo_url in database
  */
 export async function updateClientLogo(clientId: string, logoPath: string): Promise<Client> {
-  const { data, error } = await supabase
-    .from('clients')
-    .update({ logo_url: logoPath })
-    .eq('id', clientId)
-    .select()
-    .single();
-
-  if (error) {
-    console.error('Error updating client logo:', error);
-    throw new Error(`Failed to update client logo: ${error.message}`);
-  }
-
-  return data;
+  return await updateClient(clientId, { logo_url: logoPath });
 }
 
 /**
  * Delete old client logo from storage
  */
 export async function deleteClientLogo(storagePath: string): Promise<void> {
-  const { error } = await supabase.storage
-    .from('AgencyStorage')
-    .remove([storagePath]);
-
-  if (error) {
+  try {
+    await fetchApi(`/api/storage/delete`, {
+      method: 'POST',
+      body: JSON.stringify({ path: storagePath })
+    });
+  } catch (error) {
     console.error('Error deleting old client logo:', error);
-    // Don't throw - old logo deletion is not critical
   }
 }
+

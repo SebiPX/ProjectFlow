@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
-import { supabase } from '../lib/supabase';
 import { useAuth } from '../lib/AuthContext';
 import { getNotifications, markNotificationAsRead, markAllNotificationsAsRead } from '../services/api/notifications';
 import { Icon } from './ui/Icon';

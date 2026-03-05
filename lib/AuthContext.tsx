@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { supabase } from './supabase';
-import type { User, Session } from '@supabase/supabase-js';
+import type { User, Session } from '../types/auth';
 import type { Profile } from '../types/supabase';
 
 interface AuthContextType {
@@ -15,96 +14,118 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Fetch user profile from database
-  const fetchProfile = async (userId: string) => {
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single();
-
-      if (error) {
-        console.error('Error fetching profile:', error);
-        return null;
-      }
-
-      return data as Profile;
-    } catch (error) {
-      console.error('Error in fetchProfile:', error);
-      return null;
-    }
+  // We no longer need to fetch the profile separately.
+  // The custom backend returns the profile fields (full_name, avatar_url) directly inside the user object from /auth/login and /auth/me.
+  const fetchProfile = async (userId: string, token: string) => {
+    return null; // Deprecated
   };
 
-  // Initialize auth state
   useEffect(() => {
-    // Check active session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
+    const initializeAuth = async () => {
+      try {
+        const storedSessionStr = localStorage.getItem('agency_session');
+        if (storedSessionStr) {
+          const storedSession = JSON.parse(storedSessionStr) as Session;
+          
+          // Verify with backend (optional but good practice)
+          const response = await fetch(`${API_URL}/auth/me`, {
+            headers: {
+              'Authorization': `Bearer ${storedSession.access_token}`
+            }
+          });
 
-      if (session?.user) {
-        fetchProfile(session.user.id).then((profile) => {
-          setProfile(profile);
-          setLoading(false);
-        });
-      } else {
+          if (response.ok) {
+            const data = await response.json();
+            // `data` from /auth/me contains id, email, full_name, avatar_url, role
+            
+            // Merge user data with the token for valid session
+            const newSession = { ...storedSession, user: { ...storedSession.user, ...data } };
+            setSession(newSession);
+            setUser(newSession.user);
+            
+            // In our custom backend, the user object IS the profile
+            setProfile(data as unknown as Profile);
+          } else {
+            // Invalid session
+            localStorage.removeItem('agency_session');
+          }
+        }
+      } catch (error) {
+        console.error('Failed to restore session', error);
+      } finally {
         setLoading(false);
       }
-    });
+    };
 
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-
-      if (session?.user) {
-        fetchProfile(session.user.id).then((profile) => {
-          setProfile(profile);
-        });
-      } else {
-        setProfile(null);
-      }
-    });
-
-    return () => subscription.unsubscribe();
+    initializeAuth();
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
+    const response = await fetch(`${API_URL}/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email, password })
     });
 
-    if (error) {
-      throw error;
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || 'Login failed');
     }
 
-    if (data.user) {
-      const profile = await fetchProfile(data.user.id);
-      setProfile(profile);
+    const data = await response.json();
+    const newSession: Session = {
+      access_token: data.token || data.access_token,
+      user: data.user
+    };
+
+    localStorage.setItem('agency_session', JSON.stringify(newSession));
+    setSession(newSession);
+    setUser(newSession.user);
+
+    // Profile is just the user object from our backend
+    if (newSession.user) {
+      setProfile(newSession.user as unknown as Profile);
     }
   };
 
   const refreshProfile = async () => {
-    if (user) {
-      const profile = await fetchProfile(user.id);
-      setProfile(profile);
+    if (user && session) {
+      const response = await fetch(`${API_URL}/auth/me`, {
+        headers: { 'Authorization': `Bearer ${session.access_token}` }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setProfile(data as unknown as Profile);
+        setUser(data);
+      }
     }
   };
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
-
+    if (session) {
+      try {
+        await fetch(`${API_URL}/auth/logout`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`
+          }
+        });
+      } catch (err) {
+        console.error('Logout API failed, continuing client logout', err);
+      }
+    }
+    
+    localStorage.removeItem('agency_session');
     setUser(null);
     setProfile(null);
     setSession(null);

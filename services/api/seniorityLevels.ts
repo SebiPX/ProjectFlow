@@ -1,37 +1,18 @@
-import { supabase } from '../../lib/supabase';
+import { fetchApi } from './client';
 import type { SeniorityLevel } from '../../types/supabase';
 
 /**
  * Fetch all seniority levels, ordered by level_order
  */
 export async function getSeniorityLevels(): Promise<SeniorityLevel[]> {
-  const { data, error } = await supabase
-    .from('seniority_levels')
-    .select('*')
-    .order('level_order', { ascending: true });
-
-  if (error) {
-    throw new Error(`Failed to fetch seniority levels: ${error.message}`);
-  }
-
-  return data || [];
+  return await fetchApi('/api/seniority-levels');
 }
 
 /**
  * Fetch a single seniority level by ID
  */
 export async function getSeniorityLevelById(id: string): Promise<SeniorityLevel | null> {
-  const { data, error } = await supabase
-    .from('seniority_levels')
-    .select('*')
-    .eq('id', id)
-    .single();
-
-  if (error) {
-    throw new Error(`Failed to fetch seniority level: ${error.message}`);
-  }
-
-  return data;
+  return await fetchApi(`/api/seniority-levels/${id}`);
 }
 
 /**
@@ -40,17 +21,10 @@ export async function getSeniorityLevelById(id: string): Promise<SeniorityLevel 
 export async function createSeniorityLevel(
   data: Omit<SeniorityLevel, 'id' | 'created_at'>
 ): Promise<SeniorityLevel> {
-  const { data: newLevel, error } = await supabase
-    .from('seniority_levels')
-    .insert([data])
-    .select()
-    .single();
-
-  if (error) {
-    throw new Error(`Failed to create seniority level: ${error.message}`);
-  }
-
-  return newLevel;
+  return await fetchApi('/api/seniority-levels', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
 }
 
 /**
@@ -60,30 +34,18 @@ export async function updateSeniorityLevel(
   id: string,
   updates: Partial<SeniorityLevel>
 ): Promise<SeniorityLevel> {
-  const { data, error } = await supabase
-    .from('seniority_levels')
-    .update(updates)
-    .eq('id', id)
-    .select()
-    .single();
-
-  if (error) {
-    throw new Error(`Failed to update seniority level: ${error.message}`);
-  }
-
-  return data;
+  return await fetchApi(`/api/seniority-levels/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(updates),
+  });
 }
 
 /**
  * Delete a seniority level (CASCADE deletes pricing entries)
  */
 export async function deleteSeniorityLevel(id: string): Promise<void> {
-  const { error } = await supabase
-    .from('seniority_levels')
-    .delete()
-    .eq('id', id);
-
-  if (error) {
-    throw new Error(`Failed to delete seniority level: ${error.message}`);
-  }
+  await fetchApi(`/api/seniority-levels/${id}`, {
+    method: 'DELETE',
+  });
 }
+

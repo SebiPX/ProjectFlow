@@ -49,8 +49,7 @@ export const ClientEditModal: React.FC<ClientEditModalProps> = ({ isOpen, onClos
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [currentLogoUrl, setCurrentLogoUrl] = useState<string | null>(null);
 
-  // Fetch existing contacts
-  const { data: existingContacts = [] } = useQuery({
+  const { data: existingContacts } = useQuery({
     queryKey: ['clientContacts', client.id],
     queryFn: () => getClientContacts(client.id),
     enabled: isOpen,
@@ -72,28 +71,30 @@ export const ClientEditModal: React.FC<ClientEditModalProps> = ({ isOpen, onClos
 
   // Load existing contacts
   useEffect(() => {
-    if (existingContacts.length > 0) {
-      setContacts(existingContacts.map(c => ({
-        id: c.id,
-        full_name: c.full_name,
-        position: c.position || '',
-        email: c.email || '',
-        phone: c.phone || '',
-        is_primary: c.is_primary || false,
-        notes: c.notes || '',
-        isNew: false,
-      })));
-    } else {
-      // If no contacts exist, show one empty form
-      setContacts([{
-        full_name: '',
-        position: '',
-        email: '',
-        phone: '',
-        is_primary: true,
-        notes: '',
-        isNew: true,
-      }]);
+    if (existingContacts) {
+      if (existingContacts.length > 0) {
+        setContacts(existingContacts.map(c => ({
+          id: c.id,
+          full_name: c.full_name,
+          position: c.position || '',
+          email: c.email || '',
+          phone: c.phone || '',
+          is_primary: c.is_primary || false,
+          notes: c.notes || '',
+          isNew: false,
+        })));
+      } else {
+        // If no contacts exist, show one empty form
+        setContacts([{
+          full_name: '',
+          position: '',
+          email: '',
+          phone: '',
+          is_primary: true,
+          notes: '',
+          isNew: true,
+        }]);
+      }
     }
   }, [existingContacts]);
 

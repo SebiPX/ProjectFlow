@@ -1,118 +1,64 @@
-import { supabase } from '../../lib/supabase';
+import { fetchApi } from './client';
 import type { Asset } from '../../types/supabase';
 
 /**
  * Get all assets with uploader and project data
  */
 export async function getAssets(): Promise<Asset[]> {
-  const { data, error } = await supabase
-    .from('assets')
-    .select(`
-      *,
-      uploader:profiles(*)
-    `)
-    .order('created_at', { ascending: false });
-
-  if (error) {
-    console.error('Error fetching assets:', error);
-    throw new Error(`Failed to fetch assets: ${error.message}`);
-  }
-
-  return data || [];
+  return await fetchApi('/api/assets');
 }
 
 /**
  * Get assets by project ID
  */
 export async function getAssetsByProject(projectId: string): Promise<Asset[]> {
-  const { data, error } = await supabase
-    .from('assets')
-    .select(`
-      *,
-      uploader:profiles(*)
-    `)
-    .eq('project_id', projectId)
-    .order('created_at', { ascending: false });
-
-  if (error) {
-    console.error('Error fetching assets by project:', error);
-    throw new Error(`Failed to fetch assets by project: ${error.message}`);
-  }
-
-  return data || [];
+  return await fetchApi(`/api/projects/${projectId}/assets`);
 }
 
 /**
  * Get a single asset by ID
  */
 export async function getAssetById(id: string): Promise<Asset | null> {
-  const { data, error } = await supabase
-    .from('assets')
-    .select(`
-      *,
-      uploader:profiles(*)
-    `)
-    .eq('id', id)
-    .single();
-
-  if (error) {
-    console.error('Error fetching asset:', error);
-    throw new Error(`Failed to fetch asset: ${error.message}`);
-  }
-
-  return data;
+  return await fetchApi(`/api/assets/${id}`);
 }
 
 /**
- * Upload a file to Supabase Storage and create asset record
+ * Upload a file to API Storage and create asset record
  */
 export async function uploadAsset(
   file: File,
   metadata: Omit<Asset, 'id' | 'created_at' | 'uploader' | 'storage_path' | 'file_size' | 'file_type'>
 ): Promise<Asset> {
-  try {
-    // 1. Upload file to Supabase Storage
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${metadata.project_id}/${Date.now()}-${Math.random()
-      .toString(36)
-      .substring(7)}.${fileExt}`;
-
-    const { data: uploadData, error: uploadError } = await supabase.storage
-      .from('AgencyStorage')
-      .upload(fileName, file);
-
-    if (uploadError) {
-      throw new Error(`Failed to upload file: ${uploadError.message}`);
+  const formData = new FormData();
+  formData.append('file', file);
+  
+  // Append metadata
+  Object.entries(metadata).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) {
+      formData.append(key, value.toString());
     }
+  });
 
-    // 2. Create asset record in database
-    const assetData = {
-      ...metadata,
-      storage_path: uploadData.path,
-      file_size: file.size,
-      file_type: file.type,
-    };
-
-    const { data, error } = await supabase
-      .from('assets')
-      .insert(assetData)
-      .select(`
-        *,
-        uploader:profiles(*)
-      `)
-      .single();
-
-    if (error) {
-      // If database insert fails, try to clean up uploaded file
-      await supabase.storage.from('AgencyStorage').remove([fileName]);
-      throw new Error(`Failed to create asset record: ${error.message}`);
-    }
-
-    return data;
-  } catch (error) {
-    console.error('Error uploading asset:', error);
-    throw error;
+  const sessionStr = localStorage.getItem('agency_session');
+  const headers: Record<string, string> = {};
+  if (sessionStr) {
+    try {
+      const session = JSON.parse(sessionStr);
+      headers['Authorization'] = `Bearer ${session.access_token}`;
+    } catch (e) {}
   }
+
+  const response = await fetch(`${import.meta.env.VITE_API_URL}/api/assets`, {
+    method: 'POST',
+    headers,
+    body: formData,
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to upload asset');
+  }
+
+  return response.json();
 }
 
 /**
@@ -122,62 +68,19 @@ export async function updateAsset(
   id: string,
   updates: Partial<Omit<Asset, 'id' | 'created_at' | 'uploader' | 'storage_path' | 'file_size' | 'file_type'>>
 ): Promise<Asset> {
-  const { data, error } = await supabase
-    .from('assets')
-    .update(updates)
-    .eq('id', id)
-    .select(`
-      *,
-      uploader:profiles(*)
-    `)
-    .single();
-
-  if (error) {
-    console.error('Error updating asset:', error);
-    throw new Error(`Failed to update asset: ${error.message}`);
-  }
-
-  return data;
+  return await fetchApi(`/api/assets/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(updates),
+  });
 }
 
 /**
  * Delete an asset (removes file from storage and database record)
  */
 export async function deleteAsset(id: string): Promise<void> {
-  try {
-    // 1. Get asset to find storage path
-    const { data: asset, error: fetchError } = await supabase
-      .from('assets')
-      .select('storage_path')
-      .eq('id', id)
-      .single();
-
-    if (fetchError) {
-      throw new Error(`Failed to fetch asset: ${fetchError.message}`);
-    }
-
-    // 2. Delete file from storage if it exists
-    if (asset.storage_path) {
-      const { error: storageError } = await supabase.storage
-        .from('AgencyStorage')
-        .remove([asset.storage_path]);
-
-      if (storageError) {
-        console.warn('Failed to delete file from storage:', storageError);
-        // Continue with database deletion even if storage deletion fails
-      }
-    }
-
-    // 3. Delete database record
-    const { error } = await supabase.from('assets').delete().eq('id', id);
-
-    if (error) {
-      throw new Error(`Failed to delete asset: ${error.message}`);
-    }
-  } catch (error) {
-    console.error('Error deleting asset:', error);
-    throw error;
-  }
+  await fetchApi(`/api/assets/${id}`, {
+    method: 'DELETE',
+  });
 }
 
 /**
@@ -185,11 +88,9 @@ export async function deleteAsset(id: string): Promise<void> {
  * Note: Returns a public URL. If the bucket is not public, use getAssetSignedUrl instead.
  */
 export function getAssetUrl(storagePath: string): string {
-  const { data } = supabase.storage
-    .from('AgencyStorage')
-    .getPublicUrl(storagePath);
-
-  return data.publicUrl;
+  // Static cdn url strategy
+  const baseUrl = import.meta.env.VITE_PUBLIC_STORAGE_URL || import.meta.env.VITE_API_URL;
+  return `${baseUrl}/${storagePath}`;
 }
 
 /**
@@ -197,37 +98,32 @@ export function getAssetUrl(storagePath: string): string {
  * URL is valid for 1 hour
  */
 export async function getAssetSignedUrl(storagePath: string): Promise<string> {
-  const { data, error } = await supabase.storage
-    .from('AgencyStorage')
-    .createSignedUrl(storagePath, 3600); // 1 hour expiry
-
-  if (error) {
-    console.error('Error creating signed URL:', error);
-    throw new Error(`Failed to create signed URL: ${error.message}`);
-  }
-
-  return data.signedUrl;
+  return await fetchApi(`/api/storage/signed-url?path=${encodeURIComponent(storagePath)}`)
+    .then((res: any) => res.url || storagePath)
+    .catch(() => storagePath);
 }
 
 /**
  * Download an asset file
  */
 export async function downloadAsset(storagePath: string, fileName: string): Promise<void> {
-  const { data, error } = await supabase.storage
-    .from('AgencyStorage')
-    .download(storagePath);
-
-  if (error) {
+  try {
+    const url = await getAssetSignedUrl(storagePath);
+    const response = await fetch(url);
+    if (!response.ok) throw new Error('Download failed');
+    const blob = await response.blob();
+    
+    // Create download link
+    const objectUrl = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = objectUrl;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(objectUrl);
+  } catch (error: any) {
     throw new Error(`Failed to download asset: ${error.message}`);
   }
-
-  // Create download link
-  const url = URL.createObjectURL(data);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = fileName;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
 }
+

@@ -1,5 +1,5 @@
 import React from 'react';
-import { supabase } from '../../lib/supabase';
+import { getAvatarSignedUrl } from '../../services/api/profileSettings';
 
 interface AvatarProps {
   src?: string | null;
@@ -33,12 +33,13 @@ export const Avatar: React.FC<AvatarProps> = ({
         setSignedUrl(avatarPath);
       } else {
         const getUrl = async () => {
-          const { data } = await supabase.storage
-            .from('AgencyStorage') // Check if bucket name is correct in your context
-            .createSignedUrl(avatarPath, 3600); // 1 hour
-
-          if (data) {
-            setSignedUrl(data.signedUrl);
+          try {
+            const url = await getAvatarSignedUrl(avatarPath);
+            if (url) {
+              setSignedUrl(url);
+            }
+          } catch (e) {
+            console.error('Failed to get signed URL for avatar', e);
           }
         };
         getUrl();

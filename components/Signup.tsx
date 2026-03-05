@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { supabase } from '../lib/supabase';
 import { toast } from 'react-toastify';
 
 interface SignupProps {
   onSwitchToLogin: () => void;
 }
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 export const Signup: React.FC<SignupProps> = ({ onSwitchToLogin }) => {
   const [fullName, setFullName] = useState('');
@@ -35,22 +36,25 @@ export const Signup: React.FC<SignupProps> = ({ onSwitchToLogin }) => {
     setLoading(true);
 
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            full_name: fullName.trim(),
-          }
-        }
+      const response = await fetch(`${API_URL}/api/auth/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email,
+          password,
+          full_name: fullName.trim()
+        })
       });
 
-      if (error) throw error;
-
-      if (data.user) {
-        toast.success('Account created successfully! Please log in.');
-        onSwitchToLogin();
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to create account');
       }
+
+      toast.success('Account created successfully! Please log in.');
+      onSwitchToLogin();
     } catch (error: any) {
       console.error('Signup error:', error);
       toast.error(error.message || 'Failed to create account');

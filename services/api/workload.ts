@@ -1,5 +1,5 @@
-import { supabase } from '../../lib/supabase';
-import type { Profile, Task, Project } from '../../types/supabase';
+import { fetchApi } from './client';
+import type { Profile } from '../../types/supabase';
 
 export interface WorkloadData {
   profile_id: string;
@@ -16,59 +16,7 @@ export interface WorkloadData {
  * Calculate workload for a specific user based on assigned tasks
  */
 export async function getUserWorkload(userId: string): Promise<WorkloadData | null> {
-  try {
-    // Get user profile with weekly hours
-    const { data: profile, error: profileError } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single();
-
-    if (profileError || !profile) {
-      throw new Error(`Failed to fetch profile: ${profileError?.message}`);
-    }
-
-    // Get all tasks assigned to this user
-    const { data: tasks, error: tasksError } = await supabase
-      .from('tasks')
-      .select('*, project:projects(*)')
-      .eq('assigned_to', userId);
-
-    if (tasksError) {
-      throw new Error(`Failed to fetch tasks: ${tasksError.message}`);
-    }
-
-    // Calculate total planned time
-    const totalPlannedMinutes = (tasks || []).reduce(
-      (sum, task) => sum + (task.planned_minutes || 0),
-      0
-    );
-
-    // Get unique projects this user is assigned to
-    const uniqueProjects = new Set((tasks || []).map(t => t.project_id));
-
-    // Weekly capacity in hours (default 40 if not set)
-    const weeklyCapacityHours = profile.weekly_hours || 40;
-
-    // Calculate utilization percentage
-    // Assuming we're looking at workload per week
-    const totalPlannedHours = totalPlannedMinutes / 60;
-    const utilizationPercentage = (totalPlannedHours / weeklyCapacityHours) * 100;
-
-    return {
-      profile_id: userId,
-      profile,
-      total_planned_minutes: totalPlannedMinutes,
-      total_planned_hours: totalPlannedHours,
-      weekly_capacity_hours: weeklyCapacityHours,
-      utilization_percentage: utilizationPercentage,
-      assigned_projects: uniqueProjects.size,
-      assigned_tasks: (tasks || []).length,
-    };
-  } catch (error: any) {
-    console.error('Error calculating user workload:', error);
-    throw error;
-  }
+  return await fetchApi(`/api/workload/users/${userId}`);
 }
 
 /**
@@ -77,22 +25,13 @@ export async function getUserWorkload(userId: string): Promise<WorkloadData | nu
 export async function getMultipleUsersWorkload(
   userIds: string[]
 ): Promise<Map<string, WorkloadData>> {
-  const workloadMap = new Map<string, WorkloadData>();
-
-  // Fetch workload for each user
-  const promises = userIds.map(async (userId) => {
-    try {
-      const workload = await getUserWorkload(userId);
-      if (workload) {
-        workloadMap.set(userId, workload);
-      }
-    } catch (error) {
-      console.error(`Failed to get workload for user ${userId}:`, error);
-    }
+  const results = await fetchApi('/api/workload/users/batch', {
+    method: 'POST',
+    body: JSON.stringify({ userIds }),
   });
-
-  await Promise.all(promises);
-  return workloadMap;
+  
+  // Convert object mapped by ID back to a Map
+  return new Map(Object.entries(results));
 }
 
 /**
@@ -104,60 +43,7 @@ export async function getProjectWorkload(projectId: string): Promise<{
   project_duration_weeks: number;
   weekly_effort_required: number;
 }> {
-  try {
-    // Get project details
-    const { data: project, error: projectError } = await supabase
-      .from('projects')
-      .select('*')
-      .eq('id', projectId)
-      .single();
-
-    if (projectError) {
-      throw new Error(`Failed to fetch project: ${projectError.message}`);
-    }
-
-    // Get all tasks for this project
-    const { data: tasks, error: tasksError } = await supabase
-      .from('tasks')
-      .select('*')
-      .eq('project_id', projectId);
-
-    if (tasksError) {
-      throw new Error(`Failed to fetch tasks: ${tasksError.message}`);
-    }
-
-    // Calculate total planned time
-    const totalPlannedMinutes = (tasks || []).reduce(
-      (sum, task) => sum + (task.planned_minutes || 0),
-      0
-    );
-    const totalPlannedHours = totalPlannedMinutes / 60;
-
-    // Calculate project duration in weeks
-    let projectDurationWeeks = 4; // Default to 4 weeks if no dates set
-    if (project.start_date && project.deadline) {
-      const startDate = new Date(project.start_date);
-      const endDate = new Date(project.deadline);
-      const durationDays = Math.ceil(
-        (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
-      );
-      projectDurationWeeks = Math.ceil(durationDays / 7);
-    }
-
-    // Calculate weekly effort required
-    const weeklyEffortRequired =
-      projectDurationWeeks > 0 ? totalPlannedHours / projectDurationWeeks : totalPlannedHours;
-
-    return {
-      total_planned_minutes: totalPlannedMinutes,
-      total_planned_hours: totalPlannedHours,
-      project_duration_weeks: projectDurationWeeks,
-      weekly_effort_required: weeklyEffortRequired,
-    };
-  } catch (error: any) {
-    console.error('Error calculating project workload:', error);
-    throw error;
-  }
+  return await fetchApi(`/api/workload/projects/${projectId}`);
 }
 
 /**
@@ -207,3 +93,4 @@ export async function canAssignUserToProject(
     };
   }
 }
+
