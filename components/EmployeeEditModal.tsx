@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { updateProfile } from '../services/api/profiles';
-import type { Profile } from '../types/supabase';
+import { Profile, UserRole } from '../types/supabase';
 import { Icon } from './ui/Icon';
 
 interface EmployeeEditModalProps {
@@ -16,7 +16,7 @@ export const EmployeeEditModal: React.FC<EmployeeEditModalProps> = ({ isOpen, on
   const [formData, setFormData] = useState({
     full_name: employee.full_name || '',
     email: employee.email || '',
-    role: employee.role || 'employee',
+    role: employee.role || UserRole.Creative,
     weekly_hours: employee.weekly_hours?.toString() || '40',
     billable_hourly_rate: employee.billable_hourly_rate?.toString() || '0',
     internal_cost_per_hour: employee.internal_cost_per_hour?.toString() || '0',
@@ -26,7 +26,7 @@ export const EmployeeEditModal: React.FC<EmployeeEditModalProps> = ({ isOpen, on
     setFormData({
       full_name: employee.full_name || '',
       email: employee.email || '',
-      role: employee.role || 'employee',
+      role: employee.role || UserRole.Creative,
       weekly_hours: employee.weekly_hours?.toString() || '40',
       billable_hourly_rate: employee.billable_hourly_rate?.toString() || '0',
       internal_cost_per_hour: employee.internal_cost_per_hour?.toString() || '0',
@@ -71,7 +71,7 @@ export const EmployeeEditModal: React.FC<EmployeeEditModalProps> = ({ isOpen, on
     updateMutation.mutate({
       full_name: formData.full_name.trim() || null,
       email: formData.email.trim() || null,
-      role: formData.role as 'admin' | 'employee' | 'freelancer' | 'client',
+      role: formData.role as UserRole,
       weekly_hours: weeklyHours,
       billable_hourly_rate: billableRate,
       internal_cost_per_hour: internalCost,
@@ -144,9 +144,11 @@ export const EmployeeEditModal: React.FC<EmployeeEditModalProps> = ({ isOpen, on
               className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               disabled={updateMutation.isPending}
             >
-              <option value="employee">Employee</option>
-              <option value="freelancer">Freelancer</option>
               <option value="admin">Admin</option>
+              <option value="pjm">PJM</option>
+              <option value="creative">Creative</option>
+              <option value="client">Client</option>
+              <option value="guest">Guest</option>
             </select>
           </div>
 
