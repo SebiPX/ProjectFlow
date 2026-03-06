@@ -173,7 +173,7 @@ Relationships: `clients ← client_contacts`, `clients ← projects ← tasks/as
 Important enums:
 
 ```typescript
-UserRole: "admin" | "employee" | "freelancer" | "client";
+UserRole: "admin" | "pjm" | "creative" | "client" | "guest";
 ProjectStatus: "planned" | "active" | "on_hold" | "completed" | "cancelled";
 TaskStatus: "todo" | "in_progress" | "review" | "done";
 AssetStatus: "upload" |
@@ -468,7 +468,7 @@ export async function getProjectsByStatus(status: ProjectStatus) {
   - Displays: Weekly hours, billable rate, internal cost per hour
   - Click card to edit employee details
 - **EmployeeEditModal.tsx**: Edit team member details
-  - Fields: Full Name, Email, Role (Employee/Freelancer/Admin)
+  - Fields: Full Name, Email, Role (PJM/Creative/Admin/Client/Guest)
   - Required numeric fields with validation:
     - Weekly Hours (1-168, step 0.5)
     - Billable Hourly Rate (€, min 0, step 0.01)

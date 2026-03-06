@@ -117,12 +117,16 @@ export const EmployeeList: React.FC<EmployeeListProps> = ({ searchQuery = '' }) 
                 <span
                   className={`px-3 py-1 text-xs font-semibold rounded-full mb-4 ${employee.role === 'admin'
                     ? 'bg-purple-500/20 text-purple-400'
-                    : employee.role === 'freelancer'
-                      ? 'bg-blue-500/20 text-blue-400'
-                      : 'bg-gray-500/20 text-gray-300'
+                    : employee.role === 'pjm'
+                      ? 'bg-green-500/20 text-green-400'
+                      : employee.role === 'creative'
+                        ? 'bg-blue-500/20 text-blue-400'
+                        : employee.role === 'client'
+                          ? 'bg-orange-500/20 text-orange-400'
+                          : 'bg-gray-500/20 text-gray-400'
                     }`}
                 >
-                  {employee.role?.replace('_', ' ')}
+                  {employee.role?.toUpperCase() || 'GUEST'}
                 </span>
 
                 {/* Stats - ONLY VISIBLE TO ADMINS */}

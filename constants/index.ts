@@ -10,9 +10,9 @@ export const MOCK_CLIENTS: Client[] = [
 
 export const MOCK_PROFILES: Profile[] = [
   { id: '101', full_name: 'Alex Meier', email: 'alex@agency.com', role: UserRole.Admin, avatar_url: 'https://picsum.photos/seed/alex/100/100' },
-  { id: '102', full_name: 'Julia Weber', email: 'julia@agency.com', role: UserRole.Employee, avatar_url: 'https://picsum.photos/seed/julia/100/100' },
-  { id: '103', full_name: 'Tom Schmidt', email: 'tom@agency.com', role: UserRole.Employee, avatar_url: 'https://picsum.photos/seed/tom/100/100' },
-  { id: '104', full_name: 'Sandra Klein', email: 'sandra@agency.com', role: UserRole.Freelancer, avatar_url: 'https://picsum.photos/seed/sandra/100/100' },
+  { id: '102', full_name: 'Julia Weber', email: 'julia@agency.com', role: UserRole.Creative, avatar_url: 'https://picsum.photos/seed/julia/100/100' },
+  { id: '103', full_name: 'Tom Schmidt', email: 'tom@agency.com', role: UserRole.PJM, avatar_url: 'https://picsum.photos/seed/tom/100/100' },
+  { id: '104', full_name: 'Sandra Klein', email: 'sandra@agency.com', role: UserRole.Guest, avatar_url: 'https://picsum.photos/seed/sandra/100/100' },
   { id: '201', full_name: 'Dr. Eva Lang', email: 'eva.lang@innovate.de', role: UserRole.Client, client_id: '1', avatar_url: 'https://picsum.photos/seed/eva/100/100' },
 ];
 

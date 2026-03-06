@@ -1,9 +1,10 @@
 
 export enum UserRole {
   Admin = 'admin',
-  Employee = 'employee',
-  Freelancer = 'freelancer',
+  PJM = 'pjm',
+  Creative = 'creative',
   Client = 'client',
+  Guest = 'guest',
 }
 
 export interface Notification {
