@@ -22,7 +22,14 @@ export const Reports: React.FC = () => {
 
     const sortedStats = React.useMemo(() => {
         if (!stats) return [];
-        return [...stats].sort((a, b) => {
+        return [...stats].map(s => ({
+            ...s,
+            margin_percent: parseFloat(s.margin_percent as unknown as string) || 0,
+            profit: parseFloat(s.profit as unknown as string) || 0,
+            revenue: parseFloat(s.revenue as unknown as string) || 0,
+            cost: parseFloat(s.cost as unknown as string) || 0,
+            hours_tracked: parseFloat(s.hours_tracked as unknown as string) || 0,
+        })).sort((a, b) => {
             if (sortBy === 'margin') return b.margin_percent - a.margin_percent;
             return b[sortBy] - a[sortBy];
         });
