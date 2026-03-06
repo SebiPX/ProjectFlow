@@ -341,7 +341,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
                   <div className="bg-gray-800 p-4 rounded-lg border border-gray-700">
                     <h3 className="text-gray-400 text-sm mb-1">Billable Hours Value</h3>
                     <p className="text-2xl font-bold text-blue-400">€{billableValue.toLocaleString()}</p>
-                    <p className="text-xs text-gray-500 mt-1">{billableData?.billableHours.toFixed(1) || 0}h tracked</p>
+                    <p className="text-xs text-gray-500 mt-1">{billableData?.billableHours?.toFixed(1) || 0}h tracked</p>
                   </div>
                   <div className="bg-gray-800 p-4 rounded-lg border border-gray-700">
                     <h3 className="text-gray-400 text-sm mb-1">Remaining Budget</h3>
@@ -576,7 +576,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {teamMembers.map((member) => (
                   <div
-                    key={`member-${member.project_id}-${member.user_id || member.profile_id}-${Math.random()}`}
+                    key={`member-${member.project_id}-${member.profile_id}-${Math.random()}`}
                     className="bg-gray-800 rounded-lg p-4 border border-gray-700 hover:border-gray-600 transition-colors"
                   >
                     <div className="flex items-start justify-between mb-3">
