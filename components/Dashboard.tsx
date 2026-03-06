@@ -144,8 +144,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProject }) => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card className="lg:col-span-2">
           <h3 className="text-lg font-semibold text-white">Budget Overview</h3>
-          <div className="h-80 mt-4">
-            <ResponsiveContainer width="100%" height="100%">
+          <div className="h-80 mt-4 w-full relative">
+            <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
               <BarChart data={budgetData}>
                 <XAxis dataKey="name" stroke="#9ca3af" fontSize={12} tickLine={false} axisLine={false} />
                 <YAxis stroke="#9ca3af" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `€${Number(value) / 1000}k`} />
@@ -159,8 +159,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProject }) => {
         </Card>
         <Card>
           <h3 className="text-lg font-semibold text-white">Project Status</h3>
-          <div className="h-80 mt-4">
-            <ResponsiveContainer width="100%" height="100%">
+          <div className="h-80 mt-4 w-full relative">
+            <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
               <PieChart>
                 <Pie data={statusData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} label>
                   {statusData.map((entry, index) => (

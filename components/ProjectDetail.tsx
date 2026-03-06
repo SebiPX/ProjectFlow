@@ -576,7 +576,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {teamMembers.map((member) => (
                   <div
-                    key={member.profile_id}
+                    key={`member-${member.project_id}-${member.user_id || member.profile_id}-${Math.random()}`}
                     className="bg-gray-800 rounded-lg p-4 border border-gray-700 hover:border-gray-600 transition-colors"
                   >
                     <div className="flex items-start justify-between mb-3">
@@ -663,7 +663,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
         <nav className="flex space-x-8 px-8" aria-label="Tabs">
           {visibleTabs.map((tab) => (
             <button
-              key={tab.id}
+              key={`tab-${tab.id}`}
               onClick={() => setActiveTab(tab.id)}
               className={`
                     ${tab.id === activeTab ? 'border-blue-500 text-blue-500' : 'border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500'}
