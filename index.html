@@ -1,49 +1,54 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AgencyFlow - Project Management</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <style>
-    body {
-      font-family: 'Inter', sans-serif;
-    }
-    .kanban-column {
+  <head>
+    <meta charset="UTF-8" />
+    <title>PX Studio</title>
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23101622'/><text x='50%25' y='50%25' dominant-baseline='central' text-anchor='middle' font-family='Arial Black,sans-serif' font-weight='900' font-size='13' fill='%23135bec'>PX</text></svg>"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      .kanban-column {
         scrollbar-width: thin;
         scrollbar-color: #4a5568 #2d3748;
-    }
-    .kanban-column::-webkit-scrollbar {
+      }
+      .kanban-column::-webkit-scrollbar {
         width: 6px;
-    }
-    .kanban-column::-webkit-scrollbar-track {
+      }
+      .kanban-column::-webkit-scrollbar-track {
         background: #2d3748;
-    }
-    .kanban-column::-webkit-scrollbar-thumb {
+      }
+      .kanban-column::-webkit-scrollbar-thumb {
         background-color: #4a5568;
         border-radius: 10px;
         border: 3px solid #2d3748;
-    }
-  </style>
-<script type="importmap">
-{
-  "imports": {
-    "react/": "https://esm.sh/react@^19.2.3/",
-    "react": "https://esm.sh/react@^19.2.3",
-    "recharts": "https://esm.sh/recharts@^3.6.0",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/"
-  }
-}
-</script>
-<link rel="stylesheet" href="/index.css">
-</head>
-<body class="bg-gray-900 text-gray-100">
-  <div id="root"></div>
-<script type="module" src="/index.tsx"></script>
-</body>
+      }
+    </style>
+    <script type="importmap">
+      {
+        "imports": {
+          "react/": "https://esm.sh/react@^19.2.3/",
+          "react": "https://esm.sh/react@^19.2.3",
+          "recharts": "https://esm.sh/recharts@^3.6.0",
+          "react-dom/": "https://esm.sh/react-dom@^19.2.3/"
+        }
+      }
+    </script>
+    <link rel="stylesheet" href="/index.css" />
+  </head>
+  <body class="bg-gray-900 text-gray-100">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
 </html>
