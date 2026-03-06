@@ -274,7 +274,7 @@ export const TaskList: React.FC<TaskListProps> = ({ onSelectProject, searchQuery
               <option value="all">All Assignees</option>
               <option value="unassigned">Unassigned</option>
               {uniqueAssignees.map(assignee => (
-                <option key={assignee.id} value={assignee.id}>
+                <option key={assignee.id || `unknown-assignee-${Math.random()}`} value={assignee.id}>
                   {assignee.name}
                 </option>
               ))}
