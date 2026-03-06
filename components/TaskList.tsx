@@ -61,8 +61,9 @@ export const TaskList: React.FC<TaskListProps> = ({ onSelectProject, searchQuery
   // Filter Logic
   const filterTasks = (tasks: Task[]): Task[] => {
     return tasks.filter(task => {
+      const taskAssigneeId = task.assignee_id || task.assigned_to;
       // Only Me filter
-      if (onlyMe && task.assigned_to !== user?.id) return false;
+      if (onlyMe && taskAssigneeId !== user?.id) return false;
 
       // Search Query Filter
       if (searchQuery) {
@@ -74,8 +75,8 @@ export const TaskList: React.FC<TaskListProps> = ({ onSelectProject, searchQuery
 
       if (filters.status !== 'all' && task.status !== filters.status) return false;
       if (filters.projectId !== 'all' && task.project_id !== filters.projectId) return false;
-      if (filters.assigneeId === 'unassigned' && task.assigned_to !== null) return false;
-      if (filters.assigneeId !== 'all' && filters.assigneeId !== 'unassigned' && task.assigned_to !== filters.assigneeId) return false;
+      if (filters.assigneeId === 'unassigned' && taskAssigneeId != null) return false;
+      if (filters.assigneeId !== 'all' && filters.assigneeId !== 'unassigned' && taskAssigneeId !== filters.assigneeId) return false;
       return true;
     });
   };
@@ -128,9 +129,9 @@ export const TaskList: React.FC<TaskListProps> = ({ onSelectProject, searchQuery
 
   // Get unique assignees from tasks
   const uniqueAssignees = Array.from(
-    new Set(tasks.filter(t => t.assignee).map(t => t.assigned_to))
+    new Set(tasks.filter(t => t.assignee).map(t => t.assignee_id || t.assigned_to))
   ).map(assigneeId => {
-    const assignee = tasks.find(t => t.assigned_to === assigneeId)?.assignee;
+    const assignee = tasks.find(t => (t.assignee_id || t.assigned_to) === assigneeId)?.assignee;
     return { id: assigneeId, name: assignee?.full_name || 'Unknown' };
   });
 

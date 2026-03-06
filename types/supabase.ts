@@ -211,6 +211,7 @@ export interface Task {
   status?: TaskStatus;
   position?: number; // NUMERIC
   assigned_to?: string | null; // UUID
+  assignee_id?: string | null; // UUID (from SQL response)
   start_date?: string; // TIMESTAMPTZ
   due_date?: string | null; // TIMESTAMPTZ
   planned_minutes?: number;
