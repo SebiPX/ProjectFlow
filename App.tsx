@@ -7,8 +7,7 @@ import { queryClient } from './lib/queryClient';
 import { AuthProvider, useAuth } from './lib/AuthContext';
 import { PresenceProvider } from './lib/PresenceContext';
 import { Login } from './components/Login';
-import { Sidebar } from './components/Sidebar';
-import { Header } from './components/Header';
+import { Navigation } from './components/Navigation';
 import { Dashboard } from './components/Dashboard';
 import { ClientDashboard } from './components/ClientDashboard';
 import { useRealtime } from './lib/useRealtime';
@@ -105,19 +104,16 @@ const MainApp: React.FC = () => {
 
   // Show main app if authenticated
   return (
-    <div className="flex h-screen bg-gray-900 text-gray-100">
-      <Sidebar currentView={view} onNavigate={handleNavigate} />
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <Header
-          currentView={view}
-          onNavigate={handleNavigate}
-          searchQuery={searchQuery}
-          onSearch={setSearchQuery}
-        />
-        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-900">
-          {renderContent()}
-        </main>
-      </div>
+    <div className="flex flex-col h-screen bg-[#101622] text-gray-100 overflow-hidden font-display">
+      <Navigation 
+        currentView={view} 
+        onNavigate={handleNavigate} 
+        searchQuery={searchQuery}
+        onSearch={setSearchQuery}
+      />
+      <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-900 border-t border-white/5">
+        {renderContent()}
+      </main>
     </div>
   );
 };
