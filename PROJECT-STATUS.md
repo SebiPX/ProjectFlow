@@ -1,8 +1,8 @@
 # AgencyFlow - Project Status Report
 
-**Last Updated:** March 6, 2026
-**Status:** ✅ Production Ready
-**Version:** 2.0.0
+**Last Updated:** March 6, 2026 (Evening)
+**Status:** ✅ Production Ready (Self-Hosted PSQL + Express.js)
+**Version:** 2.1.0
 
 ---
 
@@ -14,11 +14,11 @@
 - Task tracking with Kanban boards and "Only Me" personal filters
 - **Task-level service integration with Plan vs Actual variance tracking**
 - Asset management with approval workflows, preview modals, and "Only Me" filters
-- **Finance management with cost tracking and billable hours calculation**
+- **Finance management with cost tracking and actualized billable value calculations (100% Fixed CTE Joins)**
 - **Employee management with hourly rates and availability tracking (admin-only)**
 - **Service catalog v2 with seniority-based pricing matrix**
-- **Project margin calculation with automatic profitability tracking**
-- Time tracking and financial management
+- **Project margin calculation with automatic profitability tracking (Plan vs Actual service breakdown)**
+- Time tracking and financial management logic perfectly wired via Express.js Backend.
 - Role-based access control (Admin, Employee, Freelancer, Client)
 
 ---
