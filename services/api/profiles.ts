@@ -49,6 +49,6 @@ export async function getInternalProfiles(): Promise<Profile[]> {
  * Get secure team directory (For non-admins)
  */
 export async function getTeamDirectory(): Promise<Profile[]> {
-  return await fetchApi('/api/team-directory');
+  return await fetchApi('/api/profiles/team-directory');
 }
 
