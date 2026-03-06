@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { useAuth } from '../lib/AuthContext';
 import { Icon } from './ui/Icon';
@@ -10,7 +10,9 @@ import {
   updateUserProfile,
   deleteOldAvatar,
   getAvatarSignedUrl,
+  adminResetPassword,
 } from '../services/api/profileSettings';
+import { getProfiles } from '../services/api/profiles';
 
 export const Settings: React.FC = () => {
   const { profile, user, refreshProfile } = useAuth();
@@ -31,15 +33,31 @@ export const Settings: React.FC = () => {
   const [avatarDisplayUrl, setAvatarDisplayUrl] = useState<string | null>(null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
+  // Admin password reset state
+  const [selectedUserId, setSelectedUserId] = useState('');
+  const [adminNewPassword, setAdminNewPassword] = useState('');
+  const [adminConfirmPassword, setAdminConfirmPassword] = useState('');
+
+  // Fetch profiles for admin
+  const { data: profiles } = useQuery({
+    queryKey: ['profiles-for-admin-settings'],
+    queryFn: getProfiles,
+    enabled: profile?.role === 'admin',
+  });
+
   // Load avatar signed URL when profile changes
   React.useEffect(() => {
     if (profile?.avatar_url && !avatarPreview) {
-      getAvatarSignedUrl(profile.avatar_url)
-        .then(url => setAvatarDisplayUrl(url))
-        .catch(err => {
-          console.error('Error loading avatar URL:', err);
-          setAvatarDisplayUrl(null);
-        });
+      if (profile.avatar_url.startsWith('http')) {
+        setAvatarDisplayUrl(profile.avatar_url);
+      } else {
+        getAvatarSignedUrl(profile.avatar_url)
+          .then(url => setAvatarDisplayUrl(url))
+          .catch(err => {
+            console.error('Error loading avatar URL:', err);
+            setAvatarDisplayUrl(profile.avatar_url); // Fallback to raw URL instead of null
+          });
+      }
     }
   }, [profile?.avatar_url, avatarPreview]);
 
@@ -119,7 +137,6 @@ export const Settings: React.FC = () => {
     },
   });
 
-  // Change password mutation
   const changePasswordMutation = useMutation({
     mutationFn: async () => {
       if (newPassword !== confirmPassword) {
@@ -143,6 +160,33 @@ export const Settings: React.FC = () => {
     },
   });
 
+  // Admin reset password mutation
+  const adminResetPasswordMutation = useMutation({
+    mutationFn: async () => {
+      if (!selectedUserId) {
+         throw new Error('Please select a user');
+      }
+      if (adminNewPassword !== adminConfirmPassword) {
+        throw new Error('Passwords do not match');
+      }
+
+      if (adminNewPassword.length < 6) {
+        throw new Error('Password must be at least 6 characters');
+      }
+
+      return adminResetPassword(selectedUserId, adminNewPassword);
+    },
+    onSuccess: () => {
+      toast.success('User password reset successfully!');
+      setSelectedUserId('');
+      setAdminNewPassword('');
+      setAdminConfirmPassword('');
+    },
+    onError: (error: any) => {
+      toast.error(`Failed to reset user password: ${error.message}`);
+    },
+  });
+
   const handleProfileSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     updateProfileMutation.mutate();
@@ -151,6 +195,11 @@ export const Settings: React.FC = () => {
   const handlePasswordSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     changePasswordMutation.mutate();
+  };
+
+  const handleAdminPasswordSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    adminResetPasswordMutation.mutate();
   };
 
   const handleAvatarUpload = () => {
@@ -376,6 +425,103 @@ export const Settings: React.FC = () => {
             </div>
           </div>
         </div>
+
+        {/* Administrative Actions (Admin Only) */}
+        {profile?.role === 'admin' && (
+          <div className="bg-red-900 bg-opacity-20 rounded-lg p-6 border border-red-800">
+            <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+              <Icon path="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" className="w-5 h-5 text-red-500" />
+              Administrative Actions
+            </h2>
+            <form onSubmit={handleAdminPasswordSubmit} className="space-y-4">
+              <p className="text-sm text-gray-400">
+                As an administrator, you can force reset the password for any user in the system.
+              </p>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Select User
+                </label>
+                <select
+                  value={selectedUserId}
+                  onChange={(e) => setSelectedUserId(e.target.value)}
+                  className="w-full bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-red-500 focus:border-red-500 p-2.5"
+                  required
+                >
+                  <option value="" disabled>Select a user to reset password</option>
+                  {profiles?.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.full_name || p.email} ({p.role})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  New Password for User
+                </label>
+                <input
+                  type="password"
+                  value={adminNewPassword}
+                  onChange={(e) => setAdminNewPassword(e.target.value)}
+                  placeholder="Enter new password"
+                  className="w-full bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-red-500 focus:border-red-500 p-2.5"
+                  required
+                  minLength={6}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Confirm New Password
+                </label>
+                <input
+                  type="password"
+                  value={adminConfirmPassword}
+                  onChange={(e) => setAdminConfirmPassword(e.target.value)}
+                  placeholder="Confirm new password"
+                  className="w-full bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-red-500 focus:border-red-500 p-2.5"
+                  required
+                  minLength={6}
+                />
+              </div>
+
+              {adminNewPassword && adminConfirmPassword && adminNewPassword !== adminConfirmPassword && (
+                <p className="text-sm text-red-400">Passwords do not match</p>
+              )}
+
+              <div className="flex justify-end">
+                <button
+                  type="submit"
+                  disabled={
+                    adminResetPasswordMutation.isPending ||
+                    !selectedUserId ||
+                    !adminNewPassword ||
+                    !adminConfirmPassword ||
+                    adminNewPassword !== adminConfirmPassword
+                  }
+                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors disabled:opacity-50 flex items-center gap-2"
+                >
+                  {adminResetPasswordMutation.isPending ? (
+                    <>
+                      <Icon
+                        path="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        className="w-4 h-4 animate-spin"
+                      />
+                      Resetting...
+                    </>
+                  ) : (
+                    <>
+                      <Icon path="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" className="w-5 h-5" />
+                      Force Reset Password
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
       </div>
     </div>
   );

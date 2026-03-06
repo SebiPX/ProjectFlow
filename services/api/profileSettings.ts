@@ -63,6 +63,19 @@ export async function changePassword(
 }
 
 /**
+ * Admin: Change another user's password
+ */
+export async function adminResetPassword(
+  userId: string,
+  newPassword: string
+): Promise<void> {
+  await fetchApi('/auth/admin/reset-password', {
+    method: 'PATCH',
+    body: JSON.stringify({ user_id: userId, new_password: newPassword }),
+  });
+}
+
+/**
  * Update user profile information
  */
 export async function updateUserProfile(
