@@ -134,7 +134,7 @@ export const ServiceModuleCard: React.FC<ServiceModuleCardProps> = ({
                           {pricing.seniority_level?.level_name || 'N/A'}
                         </td>
                         <td className="py-3 px-3 text-right text-white">
-                          {pricing.rate.toFixed(2)} €/{getUnitText(module.default_unit).toLowerCase()}
+                          {pricing.rate.toFixed(2)} €/{getUnitText(module.default_unit)?.toLowerCase() || ''}
                         </td>
                         <td className="py-3 px-3 text-right text-gray-400">
                           {(pricing.internal_cost || 0).toFixed(2)} €
