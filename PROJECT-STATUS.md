@@ -1,14 +1,15 @@
 # AgencyFlow - Project Status Report
 
-**Last Updated:** January 20, 2026 (11:30)
+**Last Updated:** March 6, 2026
 **Status:** ✅ Production Ready
-**Version:** 1.11.0
+**Version:** 2.0.0
 
 ---
 
 ## 🎯 Project Overview
 
 **AgencyFlow** is a complete project management system for creative agencies, featuring:
+
 - Client and project management with company logos
 - Task tracking with Kanban boards and "Only Me" personal filters
 - **Task-level service integration with Plan vs Actual variance tracking**
@@ -25,14 +26,15 @@
 ## ✅ What's Working (Completed)
 
 ### 1. Backend Infrastructure (100%)
-- ✅ Supabase project configured
-- ✅ PostgreSQL database with complete schema
-- ✅ Row-Level Security (RLS) policies implemented correctly
-- ✅ Trigger-based profile creation
-- ✅ Helper functions for access control
-- ✅ Storage bucket for asset uploads
+
+- ✅ Custom Node.js Express Backend (`labs-api`)
+- ✅ Shared PostgreSQL database (`labs_db`) with prefixed schema (`agency_*`)
+- ✅ Role-based access control implemented via API middleware
+- ✅ Dedicated API routes for all models
+- ✅ Local file storage mapping for asset uploads
 
 ### 2. Authentication System (100%)
+
 - ✅ User registration with Signup component
 - ✅ Login/logout functionality
 - ✅ Session management with AuthContext
@@ -42,6 +44,7 @@
 - ✅ Role-based access (4 roles: admin, employee, freelancer, client)
 
 ### 3. Frontend Components (100%)
+
 - ✅ Dashboard with KPIs and statistics
 - ✅ Project list (card view)
 - ✅ Project detail (tabs: tasks, finances, assets with preview)
@@ -58,6 +61,7 @@
 - ✅ Time tracking modal with timer persistence
 
 ### 4. Data Layer (100%)
+
 - ✅ Supabase client configured
 - ✅ React Query for caching and state management
 - ✅ All components use live data (no mock data)
@@ -65,6 +69,7 @@
 - ✅ Toast notifications for user feedback
 
 ### 5. Documentation (100%)
+
 - ✅ Comprehensive guides for setup and development
 - ✅ Authentication troubleshooting guide
 - ✅ RLS best practices documented
@@ -75,71 +80,52 @@
 
 ## 📊 Component Status
 
-| Component | Status | Data Source | Notes |
-|-----------|--------|-------------|-------|
-| Login | ✅ Complete | Supabase Auth | Working perfectly |
-| Signup | ✅ Complete | Supabase Auth | Captures full_name |
-| Dashboard | ✅ Complete | Supabase | Live data with statistics |
-| ProjectList | ✅ Complete | Supabase | Card view with real financial data, deadlines, "Only Me" filter |
-| ProjectDetail | ✅ Complete | Supabase | Tabs: tasks, finances with cost tracking, assets with preview |
-| KanbanBoard | ✅ Complete | Supabase | Drag-and-drop (mock only) |
-| TaskList | ✅ Complete | Supabase | Modern grid layout with filters, sorting & "Only Me" filter |
-| AssetList | ✅ Complete | Supabase | Modern grid layout with filters, sorting, preview & "Only Me" filter |
-| AssetPreviewModal | ✅ Complete | Supabase Storage | Multi-format preview (images, PDFs, videos, audio) |
-| AssetStatusModal | ✅ Complete | Supabase | Change asset approval status |
-| ClientList | ✅ Complete | Supabase | With contact management & company logos |
-| ClientFormModal | ✅ Complete | Supabase | Create client with logo upload |
-| ClientEditModal | ✅ Complete | Supabase | Edit client with contacts & logo replacement |
-| ClientLogo | ✅ Complete | Supabase Storage | Signed URL logo display |
-| AssetUploadModal | ✅ Complete | Supabase Storage | File upload with metadata |
-| CostFormModal | ✅ Complete | Supabase | Add project costs with document upload |
-| CostEditModal | ✅ Complete | Supabase | Edit costs and replace documents |
-| EmployeeList | ✅ Complete | Supabase | Admin-only team management with rates |
-| EmployeeEditModal | ✅ Complete | Supabase | Edit employee rates, hours, and roles |
-| ServiceModuleList | ✅ Complete | Supabase | Admin-only service catalog with expandable cards |
-| ServiceModuleCard | ✅ Complete | Supabase | Expandable card with pricing table |
-| ServiceModuleFormModal | ✅ Complete | Supabase | Create/edit services with inline pricing matrix |
-| ProjectMarginCard | ✅ Complete | Supabase | Finance tab showing revenue, costs, profit, margin |
-| TaskPlanVsActual | ✅ Complete | Supabase | Plan vs Actual variance card for tasks |
-| ProjectServiceBreakdown | ✅ Complete | Supabase | Service breakdown table in project Services tab |
-| TimeTrackingModal | ✅ Complete | Supabase | Timer with persistence + variance invalidation |
-| FileIcon | ✅ Complete | Static | Visual file type indicators |
-| Avatar | ✅ Complete | Supabase Storage | User avatar with signed URLs |
-| Header | ✅ Complete | AuthContext | Profile with name and role |
-| Sidebar | ✅ Complete | AuthContext | Navigation with role-based visibility |
+| Component               | Status      | Data Source      | Notes                                                                |
+| ----------------------- | ----------- | ---------------- | -------------------------------------------------------------------- |
+| Login                   | ✅ Complete | Supabase Auth    | Working perfectly                                                    |
+| Signup                  | ✅ Complete | Supabase Auth    | Captures full_name                                                   |
+| Dashboard               | ✅ Complete | Supabase         | Live data with statistics                                            |
+| ProjectList             | ✅ Complete | Supabase         | Card view with real financial data, deadlines, "Only Me" filter      |
+| ProjectDetail           | ✅ Complete | Supabase         | Tabs: tasks, finances with cost tracking, assets with preview        |
+| KanbanBoard             | ✅ Complete | Supabase         | Drag-and-drop (mock only)                                            |
+| TaskList                | ✅ Complete | Supabase         | Modern grid layout with filters, sorting & "Only Me" filter          |
+| AssetList               | ✅ Complete | Supabase         | Modern grid layout with filters, sorting, preview & "Only Me" filter |
+| AssetPreviewModal       | ✅ Complete | Supabase Storage | Multi-format preview (images, PDFs, videos, audio)                   |
+| AssetStatusModal        | ✅ Complete | Supabase         | Change asset approval status                                         |
+| ClientList              | ✅ Complete | Supabase         | With contact management & company logos                              |
+| ClientFormModal         | ✅ Complete | Supabase         | Create client with logo upload                                       |
+| ClientEditModal         | ✅ Complete | Supabase         | Edit client with contacts & logo replacement                         |
+| ClientLogo              | ✅ Complete | Supabase Storage | Signed URL logo display                                              |
+| AssetUploadModal        | ✅ Complete | Supabase Storage | File upload with metadata                                            |
+| CostFormModal           | ✅ Complete | Supabase         | Add project costs with document upload                               |
+| CostEditModal           | ✅ Complete | Supabase         | Edit costs and replace documents                                     |
+| EmployeeList            | ✅ Complete | Supabase         | Admin-only team management with rates                                |
+| EmployeeEditModal       | ✅ Complete | Supabase         | Edit employee rates, hours, and roles                                |
+| ServiceModuleList       | ✅ Complete | Supabase         | Admin-only service catalog with expandable cards                     |
+| ServiceModuleCard       | ✅ Complete | Supabase         | Expandable card with pricing table                                   |
+| ServiceModuleFormModal  | ✅ Complete | Supabase         | Create/edit services with inline pricing matrix                      |
+| ProjectMarginCard       | ✅ Complete | Supabase         | Finance tab showing revenue, costs, profit, margin                   |
+| TaskPlanVsActual        | ✅ Complete | Supabase         | Plan vs Actual variance card for tasks                               |
+| ProjectServiceBreakdown | ✅ Complete | Supabase         | Service breakdown table in project Services tab                      |
+| TimeTrackingModal       | ✅ Complete | Supabase         | Timer with persistence + variance invalidation                       |
+| FileIcon                | ✅ Complete | Static           | Visual file type indicators                                          |
+| Avatar                  | ✅ Complete | Supabase Storage | User avatar with signed URLs                                         |
+| Header                  | ✅ Complete | AuthContext      | Profile with name and role                                           |
+| Sidebar                 | ✅ Complete | AuthContext      | Navigation with role-based visibility                                |
 
 ---
 
 ## 🔐 Security Status
 
-### RLS Policies: ✅ Correctly Implemented
+### API Security & Authentication: ✅ Correctly Implemented
 
-All tables have Row-Level Security enabled with proper policies:
+The application now uses a custom middleware-based security approach instead of database RLS:
 
-| Table | RLS Status | Policy Summary |
-|-------|------------|----------------|
-| profiles | ✅ Enabled | Users see own profile only; Internal users see all |
-| clients | ✅ Enabled | Internal: all; Clients: own only |
-| client_contacts | ✅ Enabled | Internal: all; Clients: own client's contacts |
-| projects | ✅ Enabled | Internal: all; Clients: own only |
-| tasks | ✅ Enabled | Internal: all; Clients: visible only |
-| assets | ✅ Enabled | Internal: all; Clients: approved only |
-| costs | ✅ Enabled | Internal users: full CRUD access |
-| financial_documents | ✅ Enabled | Internal: all; Clients: sent/paid only |
-| financial_items | ✅ Enabled | Internal: full CRUD; Extended with service_module_id, seniority_level_id |
-| time_entries | ✅ Enabled | Users see own entries |
-| service_modules | ✅ Enabled | All: read; Admin: full CRUD |
-| seniority_levels | ✅ Enabled | All: read; Admin: full CRUD |
-| service_pricing | ✅ Enabled | All: read; Admin: full CRUD |
-| storage.objects | ✅ Enabled | Authenticated users can manage files in AgencyStorage |
-
-**Key Security Features:**
-- ✅ No RLS recursion issues
-- ✅ Helper functions use SECURITY DEFINER
-- ✅ Service role key protected (not in frontend)
-- ✅ Passwords hashed by Supabase
-- ✅ Email-based authentication
-- ✅ JWT session tokens
+- ✅ **Authentication**: JWT-based authentication via `/api/auth/`
+- ✅ **Authorization Middleware**: `requireAuth` and role-checks enforce access control at the route level.
+- ✅ **Data Isolation**: API controllers filter queries by user role (Internal vs Client).
+- ✅ **Passwords**: securely hashed using bcrypt on the backend.
+- ✅ **Admin Controls**: Password resets and profile modifications restricted to `admin` role natively in the API.
 
 ---
 
@@ -147,12 +133,12 @@ All tables have Row-Level Security enabled with proper policies:
 
 ### ✅ All Major Issues Resolved!
 
-| Issue | Status | Solution |
-|-------|--------|----------|
+| Issue                        | Status   | Solution                             |
+| ---------------------------- | -------- | ------------------------------------ |
 | Profile not found (PGRST116) | ✅ Fixed | RLS policies added; script available |
-| Infinite recursion (42P17) | ✅ Fixed | Removed recursive policies |
-| Name shows as "User" | ✅ Fixed | Signup captures full_name |
-| Missing RLS policies | ✅ Fixed | Complete policies in my_schema.txt |
+| Infinite recursion (42P17)   | ✅ Fixed | Removed recursive policies           |
+| Name shows as "User"         | ✅ Fixed | Signup captures full_name            |
+| Missing RLS policies         | ✅ Fixed | Complete policies in my_schema.txt   |
 
 **No Outstanding Bugs** 🎉
 
@@ -161,12 +147,14 @@ All tables have Row-Level Security enabled with proper policies:
 ## 📁 Key Files Reference
 
 ### Schema & Database
+
 - **`my_schema.txt`** ⭐ - Active production schema (USE THIS)
 - ~~`supabase_schema.sql`~~ - Old/deprecated (DON'T USE)
 - `scripts/seed-data-fixed.sql` - Test data for development
 - `scripts/FIX-RLS-NO-RECURSION.sql` - Fix script for RLS issues
 
 ### Documentation
+
 - **`DOCS-INDEX.md`** ⭐ - Master documentation index (START HERE)
 - **`AUTHENTICATION-SETUP-GUIDE.md`** - Complete auth guide
 - **`FINAL-FIX-SUMMARY.md`** - Troubleshooting guide
@@ -176,6 +164,7 @@ All tables have Row-Level Security enabled with proper policies:
 - `PROJECT-STATUS.md` - This file
 
 ### Code Structure
+
 ```
 agencyflow-project-management/
 ├── components/          # React components
@@ -234,6 +223,7 @@ agencyflow-project-management/
 - **Data Fetching:** Fast (< 500ms)
 
 ### Optimization Opportunities
+
 - [ ] Implement pagination for large lists
 - [ ] Add infinite scroll for task/asset lists
 - [ ] Lazy load heavy components
@@ -245,6 +235,7 @@ agencyflow-project-management/
 ## 🎓 Key Learnings
 
 ### 1. RLS Policy Best Practice
+
 **Don't query the same table from within its own RLS policy** - causes infinite recursion!
 
 ```sql
@@ -258,26 +249,30 @@ CREATE POLICY "Own profile only" ON profiles
 ```
 
 ### 2. Two User Tables is Correct
+
 - `auth.users` - Authentication (Supabase managed)
 - `public.profiles` - Extended data (your data)
 - Linked by `id`, synced with trigger
 
 ### 3. Always Include Metadata in Signup
+
 ```typescript
 // ✅ Correct way
 await supabase.auth.signUp({
   email,
   password,
   options: {
-    data: { full_name: 'User Name' }  // ← Required!
-  }
+    data: { full_name: "User Name" }, // ← Required!
+  },
 });
 ```
 
 ### 4. Use Service Role Key for Admin Operations
+
 Don't try to create RLS policies for admin access to all profiles - use service role key in backend operations instead.
 
 ### 5. React Query is Your Friend
+
 - Automatic caching and revalidation
 - Loading and error states handled
 - Optimistic updates easy to implement
@@ -288,6 +283,7 @@ Don't try to create RLS policies for admin access to all profiles - use service 
 ## 🎯 Next Steps (Optional Features)
 
 ### Completed in v1.3.0 ✅
+
 - ✅ **CRUD Operations**: Full create/edit/delete for all entities
 - ✅ **File Upload**: Assets uploaded to Supabase Storage with previews
 - ✅ **Financial Features**: Cost tracking, billable hours, budget calculations
@@ -296,6 +292,7 @@ Don't try to create RLS policies for admin access to all profiles - use service 
 - ✅ **Client Logos**: Company logo upload and display
 
 ### Completed in v1.4.0 ✅ (January 14, 2026)
+
 - ✅ **Service Catalog v2**: Normalized 3-table structure
   - service_modules (master definitions)
   - seniority_levels (Junior, Professional, Senior, Director)
@@ -316,6 +313,7 @@ Don't try to create RLS policies for admin access to all profiles - use service 
 - ✅ **Documentation**: ROADMAP-SERVICE-INTEGRATION.md with Option B planning
 
 ### Completed in v1.6.0 ✅ (January 19, 2026)
+
 - ✅ **Supabase & Storage Setup**: Verified "AgencyStorage" bucket and established robust RLS policies.
 - ✅ **Database Schema Fixes**: Added missing `weekly_hours` column to `profiles` to fix employee editing.
 - ✅ **Task Creation in Projects**: Added inline "Create Task" button in Project Detail view with auto-project pre-selection.
@@ -324,12 +322,14 @@ Don't try to create RLS policies for admin access to all profiles - use service 
 - ✅ **Service Catalog Seeding**: Automated population of Service Modules (TV, Motion, Event) and Seniority Levels via SQL.
 
 ### Completed in v1.7.0 ✅ (January 19, 2026) - DATA MIGRATION & SEARCH PHASE
+
 - ✅ **Global Search**: Context-aware search bar in header filtering content across all major views (Projects, Tasks, Clients, Assets, Team, Services).
 - ✅ **Client Import**: Enhanced CSV import script with contact parsing and "notes" field mapping.
 - ✅ **Employee Import**: Bulk import of employees from CSV with role assignment.
 - ✅ **UI Polish**: Fixed avatar display, unified Task Card design.
 
 ### Completed in v1.8.0 ✅ (January 19, 2026) - FINANCIAL SYSTEM & REAL-TIME UI
+
 - ✅ **Financial Documents System**: Full Create/Read/Update/Delete for Quotes and Invoices.
   - **Service Selection**: Integrated Service Catalog v2 into document items (auto-fills price/description).
   - **Schema Integrity**: Strict UUID handling and nullable service IDs for flexibility.
@@ -341,6 +341,7 @@ Don't try to create RLS policies for admin access to all profiles - use service 
 - ✅ **Documentation**: Added comprehensive guides for RLS and schema fixes.
 
 ### Completed in v1.8.0 ✅ (January 20, 2026) - CLIENT PORTAL & DEPLOYMENT
+
 - ✅ **Asset Drag-and-Drop Kanban**:
   - Fully functional `AssetKanbanBoard` using `dnd-kit`.
   - Drag-and-drop assets between status columns (Internal Review, Client Review, Approved, etc.).
@@ -361,6 +362,7 @@ Don't try to create RLS policies for admin access to all profiles - use service 
 - ✅ **Documentation**: Detailed `DEPLOYMENT.md` guide created.
 
 ### Completed in v1.9.0 ✅ (January 20, 2026) - APPROVALS, NOTIFICATIONS & REPORTS
+
 - ✅ **Reports & Analytics**:
   - **Service Profitability**: Bar chart comparison of Revenue vs Costs per Service Module.
   - **Performance Details**: Detailed table showing profit margins and activity per service.
@@ -382,6 +384,7 @@ Don't try to create RLS policies for admin access to all profiles - use service 
   - **Integrated UI**: Live updates in Team/Employee list.
 
 ### Completed in v1.10.0 ✅ (January 20, 2026) - ADVANCED PLANNING
+
 - ✅ **Advanced Planning Module**:
   - **Calendar View**: Monthly grid visualization of tasks by due date.
   - **Gantt/Timeline View**: Project-based timeline with horizontal task bars.
@@ -393,6 +396,7 @@ Don't try to create RLS policies for admin access to all profiles - use service 
   - **Online Status Toggle**: "Online Only" filter for team presence.
 
 ### Completed in v1.11.0 ✅ (January 20, 2026) - DATA EXPORT
+
 - ✅ **PDF Document Generation**:
   - **Invoices & Quotes**: Professional PDF export with custom layout.
   - **Client-Side Generation**: Using `jspdf` for privacy and speed.
@@ -404,18 +408,25 @@ Don't try to create RLS policies for admin access to all profiles - use service 
   - **Live Synchronization**: Instant updates for tasks, costs, and notifications.
   - **Global Notifications**: Toast alerts and badge counters for assignments.
 
-### High Priority
+### Completed in v2.0.0 ✅ (March 2026) - CUSTOM BACKEND MIGRATION
+
+- ✅ **Moved away from Supabase**: Complete rewrite to use a custom Express.js backend (`labs-api`).
+- ✅ **Shared Database Ecosystem**: Integrated seamlessly into the Visionary PX Studio PostgreSQL database (`labs_db`).
+- ✅ **Prefixed Schema**: Safely prefixed 15+ tables with `agency_` to prevent collisions in the shared DB.
+- ✅ **Admin Password Reset**: Implemented forced password resets for admins directly in the Settings UI.
+- ✅ **API Synchronization**: Built matching REST routes for profiles, costs, financial documents, timesheets, and assets.
+
 1. **Integrations & Export (Phase 2)**
    - [x] Automation email notifications (Edge Functions)
    - [ ] API for external tool integration
    - [x] Resource planning with capacity view
-
 
 ---
 
 ## 📞 Support & Resources
 
 ### Documentation
+
 - 📖 [DOCS-INDEX.md](DOCS-INDEX.md) - Start here
 - 🚀 [DEPLOYMENT.md](DEPLOYMENT.md) - Deployment Guide
 - 🔐 [AUTHENTICATION-SETUP-GUIDE.md](AUTHENTICATION-SETUP-GUIDE.md) - Auth guide
@@ -423,12 +434,14 @@ Don't try to create RLS policies for admin access to all profiles - use service 
 - 👨‍💻 [CONTRIBUTING.md](CONTRIBUTING.md) - Developer guide
 
 ### External Resources
+
 - [Supabase Documentation](https://supabase.com/docs)
 - [React Query Documentation](https://tanstack.com/query/latest)
 - [Tailwind CSS Documentation](https://tailwindcss.com/docs)
 - [Docker Documentation](https://docs.docker.com/)
 
 ### Getting Help
+
 1. Check [DOCS-INDEX.md](DOCS-INDEX.md) for relevant guide
 2. Check [FINAL-FIX-SUMMARY.md](FINAL-FIX-SUMMARY.md) for known issues
 3. Check browser console for errors
@@ -463,6 +476,7 @@ Don't try to create RLS policies for admin access to all profiles - use service 
 - ✅ Comprehensive documentation including Deployment Guide
 
 **What's Next:**
+
 - Deploy to production (Ready!)
 - Build "Integrations & Export" features
 

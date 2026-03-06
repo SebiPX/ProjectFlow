@@ -1,85 +1,76 @@
 # Deploying AgencyFlow
 
-This guide explains how to deploy the AgencyFlow application using Docker and NGINX Proxy Manager.
+This guide explains how to deploy the AgencyFlow frontend application and connect it to the custom `labs-api` backend.
 
 ## 📋 Prerequisites
 
-1.  **Server (VPS)** with Ubuntu/Debian properly secured.
-2.  **Docker** & **Docker Compose** installed.
-3.  **NGINX Proxy Manager** running in a Docker container.
-    *   *Note: AgencyFlow is configured to join an external Docker network named `proxy-netz`. Make sure your NGINX Proxy Manager is also on this network.*
+1.  **Server (VPS)** with Node.js or Docker installed.
+2.  **Running Backend**: The `labs-api` Express.js backend must be running, connected to the `labs_db` PostgreSQL database, and accessible via the internet or internal network.
+3.  **NGINX Proxy Manager** (Optional but recommended).
 
-## 🚀 Installation Steps
+## 🚀 Environment Configuration
 
-1.  **Clone the Repository** (or upload files) to your server:
+Create a `.env.local` or `.env` file in the root directory:
+
+```bash
+# .env
+VITE_API_URL=https://api.labs-schickeria.com
+```
+
+_(Replace the URL with your actual backend URL. Do not include a trailing slash.)_
+
+## 🛠️ Build and Deploy (Static Hosting)
+
+AgencyFlow is a Vite-based React application. It compiles into static HTML/CSS/JS files, meaning it can be hosted on any standard web server.
+
+1.  **Install Dependencies & Build**:
     ```bash
-    git clone <your-repo-url> /opt/docker/agencyflow
-    cd /opt/docker/agencyflow
+    npm install
+    npm run build
+    ```
+2.  **Serve the Setup**:
+    The `dist` folder can now be served using NGINX, Apache, or any static file host.
+
+    Example NGINX configuration block:
+
+    ```nginx
+    server {
+        listen 80;
+        server_name app.agencyflow.com;
+        root /path/to/agencyflow/dist;
+        index index.html;
+
+        # Single Page App routing
+        location / {
+            try_files $uri $uri/ /index.html;
+        }
+    }
     ```
 
-2.  **Configuration**:
-    Create a `.env` file with your Supabase credentials:
-    ```bash
-    # .env
-    VITE_SUPABASE_URL=https://your-project.supabase.co
-    VITE_SUPABASE_ANON_KEY=your-anon-key-here
-    APP_PORT=3002
-    ```
+## 🛠️ Docker Deployment
 
-3.  **Run the Installer**:
-    We have provided an automated script to handle permissions and startup.
-    ```bash
-    chmod +x install.sh
-    ./install.sh
-    ```
+If deploying via Docker Compose alongside NGINX Proxy Manager:
 
-    *If successful, you will see:*
-    > ✅ Installation successful!
-    > 🌐 App is running on localhost:3002
+```yaml
+version: "3.8"
+services:
+  agencyflow-frontend:
+    build: .
+    ports:
+      - "3002:80"
+    restart: always
+    networks:
+      - proxy-netz
 
----
+networks:
+  proxy-netz:
+    external: true
+```
 
-## 🌐 NGINX Proxy Manager Setup
+## ⚙️ Backend Connection Troubleshooting
 
-To make your app accessible from the internet (e.g., `app.agencyflow.com`), configure a Proxy Host in NGINX Proxy Manager.
-
-### 1. Add Proxy Host
-1.  Log in to NGINX Proxy Manager.
-2.  Click **"Proxy Hosts"** -> **"Add Proxy Host"**.
-
-### 2. Details Tab
-*   **Domain Names**: `app.agencyflow.com` (or your chosen domain)
-*   **Scheme**: `http`
-*   **Forward Hostname / IP**: `agencyflow-app`
-    *   *Since both containers are in the `proxy-netz` Docker network, you can use the container name `agencyflow-app` directly.*
-    *   *Alternatively, use the server's local IP (e.g., `172.17.0.1` or server public IP).*
-*   **Forward Port**: `80`
-    *   *Inside the Docker network, the container listens on port 80.*
-*   **Cache Assets**: ✅ Turn On
-*   **Block Common Exploits**: ✅ Turn On
-*   **Websockets Support**: ✅ Turn On (Crucial for Realtime features!)
-
-### 3. SSL Tab
-*   **SSL Certificate**: "Request a new SSL Certificate"
-*   **Force SSL**: ✅ Turn On
-*   **HTTP/2 Support**: ✅ Turn On
-*   **Email**: Enter your email for Let's Encrypt.
-*   **Agree to Terms**: ✅ Check.
-
-### 4. Save & Test
-Click **Save**. Go to `https://app.agencyflow.com` in your browser. You should see the login screen.
-
----
-
-## 🛠️ Troubleshooting
-
-*   **"502 Bad Gateway"**:
-    *   Check if `agencyflow-app` container is running: `docker ps`
-    *   Check if NGINX Proxy Manager is in the same network (`proxy-netz`).
-    *   Try changing "Forward Hostname" to your server's IP address and Port to `3002`.
-
-*   **"Realtime updates not working"**:
-    *   Ensure **Websockets Support** is enabled in NGINX Proxy Manager.
-
-*   **"Permission denied" on install.sh**:
-    *   Run `chmod +x install.sh`
+- **"Network Error" or 500/404 on API calls**:
+  - Verify `VITE_API_URL` is correct.
+  - Ensure the `labs-api` backend has CORS configured to allow the frontend origin.
+  - Check backend logs for missing columns/tables in PostgreSQL.
+  - If uploading files fails, check the `public/uploads/agency` folder permissions on the backend server.

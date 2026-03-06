@@ -9,17 +9,20 @@ AgencyFlow is a React-based project management application for agencies, built w
 ## Development Commands
 
 ### Setup
+
 ```bash
 npm install                    # Install dependencies
 ```
 
 ### Environment Setup
+
 1. Copy `.env.example` to `.env.local`
 2. Add your Supabase credentials from https://app.supabase.com/project/_/settings/api:
    - `VITE_SUPABASE_URL`
    - `VITE_SUPABASE_ANON_KEY`
 
 ### Development
+
 ```bash
 npm run dev                    # Start dev server on http://localhost:3000
 npm run build                  # Build for production
@@ -29,14 +32,16 @@ npm run preview                # Preview production build
 ## Architecture
 
 ### Tech Stack
+
 - **Frontend**: React 19.2.3 with TypeScript 5.8
 - **Build Tool**: Vite 6.2
 - **State Management**: TanStack React Query 5.90 (server state) + React Context (auth)
-- **Backend**: Supabase (PostgreSQL + Auth + Storage)
+- **Backend**: Custom Express.js API (`labs-api`) connected to shared PostgreSQL database (`labs_db`)
 - **UI**: Tailwind CSS (dark theme), Recharts for analytics
 - **Notifications**: React Toastify
 
 ### Project Structure
+
 ```
 ├── App.tsx                    # Main container, view routing logic
 ├── index.tsx                  # React entry point
@@ -117,6 +122,7 @@ npm run preview                # Preview production build
    - Clears on view navigation
 
 ### Data Flow
+
 ```
 Components → useQuery/useAuth hooks
     ↓
@@ -124,24 +130,27 @@ React Query cache / Auth Context
     ↓
 Services API layer (services/api/*.ts)
     ↓
-Supabase Client (lib/supabase.ts)
+Fetch Wrapper (client.ts)
     ↓
-Supabase Backend (PostgreSQL + Auth + Storage)
+Custom Express.js Backend API
+    ↓
+PostgreSQL Database (`labs_db`)
 ```
 
 ### Database Schema
 
-Core entities in Supabase:
-- **profiles**: Users/team members (synced with auth.users) - includes billable_hourly_rate, internal_cost_per_hour, weekly_hours
-- **clients**: Customer companies with logo_url for company logos
-- **client_contacts**: Multiple contact persons per client (name, email, position, phone)
-- **projects**: Agency projects (belongs to client) - includes project_members for team assignments
-- **tasks**: Project tasks with Kanban workflow (belongs to project)
-- **assets**: Files/documents in 'AgencyStorage' storage bucket
-- **costs**: Project expenses with optional document attachments (receipts/invoices)
-- **time_entries**: Billable hours tracking (belongs to task/project)
-- **project_members**: Team assignments (many-to-many)
-- **notifications**: User alerts (realtime enabled)
+Core entities in PostgreSQL (all tables are prefixed with `agency_` to prevent collisions in the shared DB):
+
+- **agency_profiles**: Users/team members - includes billable_hourly_rate, internal_cost_per_hour, weekly_hours
+- **agency_clients**: Customer companies with logo_url for company logos
+- **agency_client_contacts**: Multiple contact persons per client (name, email, position, phone)
+- **agency_projects**: Agency projects (belongs to client) - includes project_members for team assignments
+- **agency_tasks**: Project tasks with Kanban workflow (belongs to project)
+- **agency_assets**: Files/documents uploaded to the backend server
+- **agency_costs**: Project expenses with optional document attachments (receipts/invoices)
+- **agency_time_entries**: Billable hours tracking (belongs to task/project)
+- **agency_project_members**: Team assignments (many-to-many)
+- **agency_notifications**: User alerts
 - **service_modules**: Service definitions (v2 - normalized structure)
 - **seniority_levels**: Level definitions (Junior/Professional/Senior/Director)
 - **service_pricing**: Service pricing matrix (module × level with rates, costs, margins)
@@ -149,6 +158,7 @@ Core entities in Supabase:
 - **financial_items**: Line items (linked to service_modules + seniority_levels for automated pricing)
 
 ### Real-Time Synchronization Pattern
+
 1. **Mutation**: User adds/edits a Quote/Invoice/Cost.
 2. **Invalidation**: `queryClient.invalidateQueries` triggers refresh for:
    - `['financial-documents']` (List)
@@ -161,14 +171,27 @@ Relationships: `clients ← client_contacts`, `clients ← projects ← tasks/as
 ### Type System (types/supabase.ts)
 
 Important enums:
+
 ```typescript
-UserRole: 'admin' | 'employee' | 'freelancer' | 'client'
-ProjectStatus: 'planned' | 'active' | 'on_hold' | 'completed' | 'cancelled'
-TaskStatus: 'todo' | 'in_progress' | 'review' | 'done'
-AssetStatus: 'upload' | 'internal_review' | 'client_review' | 'changes_requested' | 'approved' | 'archived'
-AssetType: 'briefing' | 'design' | 'contract' | 'kva' | 'invoice' | 'other'
-TimeStatus: 'draft' | 'submitted' | 'approved' | 'rejected' | 'billed'
-CostCategory: 'software_licenses' | 'external_services' | 'marketing' | 'hardware' | 'travel' | 'office_supplies' | 'consulting' | 'other'
+UserRole: "admin" | "employee" | "freelancer" | "client";
+ProjectStatus: "planned" | "active" | "on_hold" | "completed" | "cancelled";
+TaskStatus: "todo" | "in_progress" | "review" | "done";
+AssetStatus: "upload" |
+  "internal_review" |
+  "client_review" |
+  "changes_requested" |
+  "approved" |
+  "archived";
+AssetType: "briefing" | "design" | "contract" | "kva" | "invoice" | "other";
+TimeStatus: "draft" | "submitted" | "approved" | "rejected" | "billed";
+CostCategory: "software_licenses" |
+  "external_services" |
+  "marketing" |
+  "hardware" |
+  "travel" |
+  "office_supplies" |
+  "consulting" |
+  "other";
 ```
 
 All entities are defined as TypeScript interfaces. Use "enriched" types for data with relations (e.g., `Project.client` populated).
@@ -176,27 +199,40 @@ All entities are defined as TypeScript interfaces. Use "enriched" types for data
 ## Development Patterns
 
 ### Adding a New Entity
+
 1. Add interface + enum to `types/supabase.ts`
 2. Create service module in `services/api/newEntity.ts` with CRUD functions:
    ```typescript
-   export async function getEntities() { /* ... */ }
-   export async function getEntityById(id: string) { /* ... */ }
-   export async function createEntity(data: Partial<Entity>) { /* ... */ }
-   export async function updateEntity(id: string, data: Partial<Entity>) { /* ... */ }
-   export async function deleteEntity(id: string) { /* ... */ }
+   export async function getEntities() {
+     /* ... */
+   }
+   export async function getEntityById(id: string) {
+     /* ... */
+   }
+   export async function createEntity(data: Partial<Entity>) {
+     /* ... */
+   }
+   export async function updateEntity(id: string, data: Partial<Entity>) {
+     /* ... */
+   }
+   export async function deleteEntity(id: string) {
+     /* ... */
+   }
    ```
-3. Add mock data to `constants/index.ts` (use MOCK_* prefix)
+3. Add mock data to `constants/index.ts` (use MOCK\_\* prefix)
 4. Create list component and form/edit modals
 5. Use React Query: `useQuery({ queryKey: ['entities'], queryFn: getEntities })`
 6. Add to Sidebar navigation and `App.tsx` View type union
 
 ### Creating Modals
+
 Follow established pattern:
+
 ```typescript
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  item?: EntityType;  // For edit mode
+  item?: EntityType; // For edit mode
   onSuccess?: () => void;
 }
 
@@ -212,7 +248,7 @@ function EntityFormModal({ isOpen, onClose, item, onSuccess }: Props) {
       } else {
         await createEntity(formData);
       }
-      toast.success('Success!');
+      toast.success("Success!");
       onSuccess?.();
       onClose();
     } catch (error) {
@@ -227,6 +263,7 @@ function EntityFormModal({ isOpen, onClose, item, onSuccess }: Props) {
 ```
 
 ### Error Handling Strategy
+
 - **API Layer**: Throw descriptive errors
   ```typescript
   throw new Error(`Failed to fetch projects: ${error.message}`);
@@ -235,55 +272,74 @@ function EntityFormModal({ isOpen, onClose, item, onSuccess }: Props) {
 - **User Feedback**: Use `toast.error()` for all user-facing errors
 
 ### Query Key Convention
+
 ```typescript
-['projects']                    // List all
-['projects', projectId]         // Single item
-['tasks', projectId]            // Filtered by parent
-['timeEntries', { taskId }]     // Complex filters
+["projects"][("projects", projectId)][("tasks", projectId)][ // List all // Single item // Filtered by parent
+  ("timeEntries", { taskId })
+]; // Complex filters
 ```
 
 ### Navigation Pattern
+
 App uses view-based routing (no React Router):
+
 ```typescript
-type View = 'dashboard' | 'projects' | 'project-detail' | 'tasks' | 'assets' |
-            'clients' | 'employees' | 'finances' | 'reports' | 'settings';
+type View =
+  | "dashboard"
+  | "projects"
+  | "project-detail"
+  | "tasks"
+  | "assets"
+  | "clients"
+  | "employees"
+  | "finances"
+  | "reports"
+  | "settings";
 ```
+
 Navigation via `handleNavigate(view)` callback passed through Sidebar.
+
 - **employees** view is admin-only (hidden in sidebar for non-admin users)
 
 ### Path Alias
+
 Use `@/` for absolute imports:
+
 ```typescript
-import { supabase } from '@/lib/supabase';
-import { Project } from '@/types/supabase';
+import { supabase } from "@/lib/supabase";
+import { Project } from "@/types/supabase";
 ```
 
 ## Important Implementation Notes
 
-### Supabase Integration
-- Client initialized in `lib/supabase.ts` with env vars
-- Session persistence enabled (auto token refresh)
-- Use `.select()` with relation syntax: `.select('*, client(*), contacts(*)')`
-- Storage bucket: `'AgencyStorage'` for file uploads
-- Upload path format: `{project-id}/{timestamp}-{random}.{ext}`
-- Asset URLs: Use `getAssetUrl(storagePath)` helper function
+### Backend Integration
+
+- API client configured in `services/api/client.ts` with env vars
+- Session persistence enabled (JWT tokens stored in localStorage)
+- Storage: Uploaded via multipart/form-data to Express.js endpoints
+- Asset URLs: Generated securely by the backend
 
 ### Authentication Flow
-1. User signs up/in via Supabase Auth
-2. `AuthContext` stores session + fetches profile from `profiles` table
+
+1. User logs in via Custom Auth `/api/auth/login`
+2. `AuthContext` stores session token + fetches profile
 3. Protected routes check `user` from `useAuth()`
-4. Auto-refresh keeps session alive
+4. Valid JWT passed in Authorization header for all API calls
 
 ### Kanban Board
+
 - Tasks filtered into 4 columns by `status` enum
 - Column headers show task counts
 - Structure ready for drag-and-drop (not yet implemented)
 
 ### Mock Data Usage
+
 `constants/index.ts` provides realistic fixtures for development. Dashboard calculations use mock "spent amounts" as percentages of budgets.
 
 ### Loading States
+
 Always show loading UI:
+
 ```typescript
 const { data, isLoading, isError } = useQuery(...);
 if (isLoading) return <div>Loading...</div>;
@@ -291,6 +347,7 @@ if (isError) return <div className="text-red-500">Error...</div>;
 ```
 
 ### Responsive Design
+
 - Use Tailwind grid: `grid-cols-1 md:grid-cols-2 lg:grid-cols-3`
 - Dark theme: `bg-gray-900`, `text-gray-100`
 - Icons: Custom SVG component with Heroicons paths
@@ -298,28 +355,34 @@ if (isError) return <div className="text-red-500">Error...</div>;
 ## Common Tasks
 
 ### Running Tests (when added)
+
 Currently no test framework configured. Consider adding Vitest for unit tests.
 
 ### Database Migrations
+
 Supabase migrations managed at https://app.supabase.com/project/_/editor. No local migration files in repo.
 
 ### Debugging Supabase Connection
+
 Run the test utility:
+
 ```typescript
-import { testConnection } from '@/lib/test-connection';
+import { testConnection } from "@/lib/test-connection";
 await testConnection();
 ```
 
 ### Adding a New Service Function
+
 Example for custom query:
+
 ```typescript
 // services/api/projects.ts
 export async function getProjectsByStatus(status: ProjectStatus) {
   const { data, error } = await supabase
-    .from('projects')
-    .select('*, client(*)')
-    .eq('status', status)
-    .order('created_at', { ascending: false });
+    .from("projects")
+    .select("*, client(*)")
+    .eq("status", status)
+    .order("created_at", { ascending: false });
 
   if (error) throw new Error(`Failed to fetch projects: ${error.message}`);
   return data;
@@ -327,6 +390,7 @@ export async function getProjectsByStatus(status: ProjectStatus) {
 ```
 
 ## Known Limitations
+
 - No URL-based routing (views not bookmarkable)
 - Kanban drag-and-drop not fully implemented (visual only)
 - No real-time subscriptions (manual refetch only)
@@ -336,6 +400,7 @@ export async function getProjectsByStatus(status: ProjectStatus) {
 ## Recent Features Added
 
 ### Client Logo Upload
+
 - **ClientLogo.tsx**: Reusable component for displaying company logos
   - Uses signed URLs for secure image loading (1-hour expiry)
   - Fallback to icon when no logo exists
@@ -350,6 +415,7 @@ export async function getProjectsByStatus(status: ProjectStatus) {
   - Remove/replace existing logo functionality
 
 ### Finance Tab - Cost Tracking
+
 - **costs** table: Track project expenses with document attachments
 - **CostFormModal.tsx**: Add costs with metadata
   - Fields: Title, Amount (€), Category, Estimated checkbox
@@ -376,6 +442,7 @@ export async function getProjectsByStatus(status: ProjectStatus) {
   - Returns: totalHours, billableHours, totalValue (hours × rates from profiles)
 
 ### Real Financial Data on Project Cards
+
 - **getProjectsFinancialOverview()** in `projects.ts`:
   - Aggregates costs and billable hours value across all projects
   - Returns map: `{ projectId: { costs, billableValue, total } }`
@@ -386,6 +453,7 @@ export async function getProjectsByStatus(status: ProjectStatus) {
   - Uses React Query: `['projects-financial-overview']` cache key
 
 ### Project Deadline Display
+
 - **ProjectCard**: Deadline with urgency indicators
   - Calendar icon with date
   - Color-coded: Red (overdue), Yellow (≤7 days), Gray (normal)
@@ -393,6 +461,7 @@ export async function getProjectsByStatus(status: ProjectStatus) {
   - German date format: `toLocaleDateString('de-DE')`
 
 ### Employee Management (Admin-Only)
+
 - **EmployeeList.tsx**: Grid view of internal team members
   - Only visible to admin users (role-based UI filtering in Sidebar)
   - Card layout: Avatar, name, role badge
@@ -414,7 +483,9 @@ export async function getProjectsByStatus(status: ProjectStatus) {
   - Filtered based on `profile.role === 'admin'`
 
 ### "Only Me" Filter
+
 Personal filter button on Tasks, Projects, and Assets pages:
+
 - **TaskList.tsx**:
   - Blue toggle button: "Only Me"
   - Filters tasks where `assigned_to === user.id`
@@ -437,6 +508,7 @@ Personal filter button on Tasks, Projects, and Assets pages:
   - User icon from Heroicons
 
 ### Asset Status Management
+
 - **AssetStatusModal.tsx**: Change asset approval workflow status
   - Status options: Upload, Internal Review, Client Review, Changes Requested, Approved, Archived
   - Color-coded badges matching AssetStatus enum
@@ -444,6 +516,7 @@ Personal filter button on Tasks, Projects, and Assets pages:
   - Uses `updateAsset()` from assets.ts
 
 ### Modern Grid Layout with Filters & Sorting
+
 - **TaskList.tsx**: Complete redesign from table to grid layout
   - Responsive grid: 1/2/3/4 columns (mobile/tablet/desktop/xl)
   - TaskCard component: Title, status badge, project link, assignee with avatar, due date with overdue warning
@@ -460,6 +533,7 @@ Personal filter button on Tasks, Projects, and Assets pages:
   - formatFileSize() helper (Bytes → KB → MB → GB)
 
 ### Asset Preview Modal
+
 - **AssetPreviewModal.tsx**: Full-screen modal for asset previews
   - Image support: Direct display with max resolution
   - PDF support: Embedded iframe viewer
@@ -470,6 +544,7 @@ Personal filter button on Tasks, Projects, and Assets pages:
   - Integrated in both AssetList and ProjectDetail views
 
 ### Client Contact Management
+
 - Multiple contacts per client (client_contacts table)
 - ClientFormModal: Dynamic contact fields (add/remove)
 - ClientEditModal: Edit existing contacts, delete, add new
@@ -477,12 +552,14 @@ Personal filter button on Tasks, Projects, and Assets pages:
 - API: `services/api/clientContacts.ts` with full CRUD
 
 ### Time Tracking Timer Persistence
+
 - Timer continues running across navigation
 - State restored from draft time_entries in database
 - Calculates elapsed time from stored start_time
 - Implementation in TimeTrackingModal.tsx useEffect hook
 
 ### Service-Katalog v2 (Normalized Multi-Table Structure)
+
 - **3-Table Architecture**: Normalized structure for agency service catalog with seniority-based pricing
   - **service_modules**: Master service definitions (category, name, description, default unit)
   - **seniority_levels**: Level definitions (Junior, Professional, Senior, Director) with order and experience requirements
@@ -529,6 +606,7 @@ Personal filter button on Tasks, Projects, and Assets pages:
 - **Seed Data**: 4 seniority levels + 10 service modules + sample pricing in `scripts/service-catalog-v2-seed.sql`
 
 ### Project Margin Calculation & Display (Option A - Completed)
+
 - **Integrated financial tracking** with automatic margin calculation for projects
 - **Database Extension**:
   - Extended `financial_items` table with `service_module_id` and `seniority_level_id` columns
@@ -557,6 +635,7 @@ Personal filter button on Tasks, Projects, and Assets pages:
 - **Integration**: Margin appears automatically when projects have approved quotes
 
 ### Task-Level Service Integration (Option B - Completed)
+
 - **Plan vs Actual tracking** for individual tasks with service-based estimation
 - **Database Extension**:
   - Extended `tasks` table with `service_module_id`, `seniority_level_id`, `estimated_hours`, `estimated_rate`
@@ -599,12 +678,14 @@ Personal filter button on Tasks, Projects, and Assets pages:
 - **Progressive Enhancement**: All features optional, existing tasks work without changes
 
 ## Performance Considerations
+
 - React Query cache reduces API calls (5-min stale time)
 - Images/assets served from Supabase storage CDN
 - Bundle size: Monitor with `npm run build` (Recharts is large)
 - Consider lazy loading for modal components if bundle grows
 
 ### Resource Planning Module (v1.11.0)
+
 - **ResourcePlanning.tsx**: Main container for capacity planning
 - **ResourceTimeline.tsx**:
   - Custom Gantt-style implementation using native JS `Date` (no date-fns dependency)
@@ -618,4 +699,3 @@ Personal filter button on Tasks, Projects, and Assets pages:
   - `getResourceAvailability()`: Core logic for distributing task hours active across business days
   - Handles `profiles` (capacity) vs `tasks` (load)
   - Returns `ResourceData[]` with daily allocations
-

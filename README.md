@@ -15,6 +15,7 @@ This app aims to increase efficiency, improve transparency for internal teams an
 ### Core Functionality (100% Complete)
 
 **✅ Authentication & User Management**
+
 - Login and signup with Supabase Auth
 - Automatic profile creation on signup
 - Role-based access control (Admin, Employee, Freelancer, Client)
@@ -22,6 +23,7 @@ This app aims to increase efficiency, improve transparency for internal teams an
 - Full name capture during registration
 
 **✅ Client Management**
+
 - Create, view, update, and delete clients
 - **Company logo upload** with secure signed URL display
 - Company information (name, address, VAT ID, payment terms, website)
@@ -31,6 +33,7 @@ This app aims to increase efficiency, improve transparency for internal teams an
 - Full CRUD with React Query state management
 
 **✅ Project Management**
+
 - Create, view, edit, and delete projects
 - Link projects to clients
 - Project categories and status tracking
@@ -52,6 +55,7 @@ This app aims to increase efficiency, improve transparency for internal teams an
 - Full CRUD operations with auto-refresh
 
 **✅ Task Management (Modern Grid View with Service Integration)**
+
 - Create, view, edit, and delete tasks
 - **Service-based estimation**: Link tasks to service catalog with auto-filled rates
 - **Plan vs Actual tracking**: Compare estimated vs actual hours and costs per task
@@ -73,6 +77,7 @@ This app aims to increase efficiency, improve transparency for internal teams an
 - Full CRUD with instant updates
 
 **✅ Dashboard**
+
 - Active projects count
 - Total budget overview
 - Time tracking summary
@@ -80,6 +85,7 @@ This app aims to increase efficiency, improve transparency for internal teams an
 - Real-time data from Supabase
 
 **✅ Finance Management**
+
 - **Project cost tracking** with comprehensive expense management
 - **Cost categories**: Software/Licenses, External Services, Marketing, Hardware, Travel, Office Supplies, Consulting, Other
 - **Document upload** for receipts and invoices (10MB max, stored in AgencyStorage)
@@ -95,6 +101,7 @@ This app aims to increase efficiency, improve transparency for internal teams an
 - Integration with time tracking for accurate billing
 
 **✅ Employee Management (Admin-Only)**
+
 - **Team member management** restricted to admin users
 - Beautiful card-based grid layout
 - **Employee profiles** with:
@@ -114,15 +121,17 @@ This app aims to increase efficiency, improve transparency for internal teams an
 - Used for billable hours calculations in finance tracking
 
 **✅ Real-time Collaboration & Notifications**
+
 - **Live Data Sync**: Tasks, Costs, and Financials update instantly across all connected clients.
 - **Global Notification System**:
-    - **Instant Toast Alerts**: Receive popup notifications for assignments even when browsing other pages.
-    - **Badge Count**: Red notification badge updates in real-time.
-    - **Assignment Tracking**: Automatic notifications when tasks are assigned to you.
+  - **Instant Toast Alerts**: Receive popup notifications for assignments even when browsing other pages.
+  - **Badge Count**: Red notification badge updates in real-time.
+  - **Assignment Tracking**: Automatic notifications when tasks are assigned to you.
 - **Presence Awareness**: See who is currently online (green dot indicator on avatars).
 - **Efficient Sync**: Uses Supabase Realtime (Postgres Changes) to push updates only when necessary.
 
 **✅ Service-Katalog v2 (Admin-Only) - Normalized Multi-Table Structure**
+
 - **3-table architecture** for granular service pricing
   - service_modules: Master service definitions
   - seniority_levels: Junior, Professional, Senior, Director with experience requirements
@@ -149,6 +158,7 @@ This app aims to increase efficiency, improve transparency for internal teams an
 - **Seed data**: 4 seniority levels + 10 service modules + sample pricing
 
 **✅ Project Margin Calculation (Integrated Financial Tracking)**
+
 - **Automatic margin calculation** for project profitability analysis
 - **Database integration**: Extended financial_items table with service references (service_module_id, seniority_level_id)
 - **ProjectMarginCard** component in Finance tab:
@@ -164,6 +174,7 @@ This app aims to increase efficiency, improve transparency for internal teams an
 - **Future expansion**: Task-level service tracking (Option B) documented in ROADMAP-SERVICE-INTEGRATION.md
 
 **✅ Resource Planning (Interactive Capacity Timeline)**
+
 - **Timeline View**: Visual Gantt-style overview of team workload
 - **Heatmap Visualization**: Color-coded capacity indicators
   - Green (<80%): Available
@@ -176,6 +187,7 @@ This app aims to increase efficiency, improve transparency for internal teams an
 - **Smart Tooltips**: Hover for detailed task breakdown per day
 
 **✅ Asset Management (Modern Grid View with Preview)**
+
 - Complete file upload/download/delete workflow
 - **Modern card-based grid layout** (responsive: 1/2/3 columns)
 - **Advanced filtering**: Status, Project, Category, Uploader
@@ -206,6 +218,7 @@ This app aims to increase efficiency, improve transparency for internal teams an
 ## 🏗️ Technical Architecture
 
 ### Frontend Stack
+
 - **Framework**: React 18 with TypeScript
 - **Styling**: Tailwind CSS (responsive design)
 - **State Management**: @tanstack/react-query (v5)
@@ -215,15 +228,16 @@ This app aims to increase efficiency, improve transparency for internal teams an
 - **Notifications**: react-toastify for user feedback
 - **Build Tool**: Vite
 
-### Backend Stack (Supabase BaaS)
-- **Database**: PostgreSQL (fully configured)
-- **Authentication**: Supabase Auth (email/password)
-- **Storage**: Supabase Storage (for assets)
-- **API**: Auto-generated REST API
-- **Security**: Row Level Security (RLS) policies
-- **Real-time**: WebSocket subscriptions (optional)
+### Backend Stack (Custom Node.js)
+
+- **Database**: PostgreSQL (shared `labs_db` instance)
+- **Backend API**: Express.js REST API (`labs-api` project)
+- **Authentication**: Custom JWT-based Auth
+- **Storage**: Local file upload handling on backend
+- **API**: Custom REST API routes under `/api/agency`
 
 ### Database Schema
+
 - **14 Tables**: clients (with logo_url), client_contacts, profiles (with rates & hours), projects (with project_members), tasks, assets, costs (with document_path), financial_documents, financial_items, time_entries, service_modules, seniority_levels, service_pricing, project_members
 - **10 Enum Types**: user_role, project_category, project_status, task_status, asset_type, asset_status, doc_type, doc_status, time_status, cost_category
 - **19+ Foreign Keys**: Fully relational with CASCADE/RESTRICT rules
@@ -238,103 +252,112 @@ This app aims to increase efficiency, improve transparency for internal teams an
 
 ### Core Features (100%)
 
-| Feature | Status | CRUD | Notes |
-|---------|--------|------|-------|
-| Authentication | ✅ 100% | - | Login, Signup, Session, Roles |
-| Clients | ✅ 100% | ✅ | Create, Read, Update, Delete with contacts & logos |
-| Client Contacts | ✅ 100% | ✅ | Multiple contacts per client |
-| Projects | ✅ 100% | ✅ | Create, Read, Update, Delete with real financial data |
-| Project Finances | ✅ 100% | ✅ | Cost tracking, billable hours, budget calculations |
-| Tasks | ✅ 100% | ✅ | Create, Read, Update, Delete with "Only Me" filter + service integration |
-| Task Service Integration | ✅ 100% | ✅ | Plan vs Actual tracking with variance analysis |
-| Kanban Board | ✅ 100% | - | Visual task management by status |
-| Dashboard | ✅ 100% | - | KPIs, Charts, Real-time data |
-| Assets | ✅ 100% | ✅ | Upload, Download, Delete, Preview, Status workflow, "Only Me" filter |
-| Time Tracking | ✅ 90% | ✅ | Timer with persistence across navigation |
-| Employee Management | ✅ 100% | ✅ | Admin-only team member management with rates |
-| Service Catalog v2 | ✅ 100% | ✅ | Normalized 3-table structure with seniority-based pricing |
-| Project Margin Tracking | ✅ 100% | - | Automatic profitability calculation with status indicators |
+| Feature                  | Status  | CRUD | Notes                                                                    |
+| ------------------------ | ------- | ---- | ------------------------------------------------------------------------ |
+| Authentication           | ✅ 100% | -    | Login, Signup, Session, Roles                                            |
+| Clients                  | ✅ 100% | ✅   | Create, Read, Update, Delete with contacts & logos                       |
+| Client Contacts          | ✅ 100% | ✅   | Multiple contacts per client                                             |
+| Projects                 | ✅ 100% | ✅   | Create, Read, Update, Delete with real financial data                    |
+| Project Finances         | ✅ 100% | ✅   | Cost tracking, billable hours, budget calculations                       |
+| Tasks                    | ✅ 100% | ✅   | Create, Read, Update, Delete with "Only Me" filter + service integration |
+| Task Service Integration | ✅ 100% | ✅   | Plan vs Actual tracking with variance analysis                           |
+| Kanban Board             | ✅ 100% | -    | Visual task management by status                                         |
+| Dashboard                | ✅ 100% | -    | KPIs, Charts, Real-time data                                             |
+| Assets                   | ✅ 100% | ✅   | Upload, Download, Delete, Preview, Status workflow, "Only Me" filter     |
+| Time Tracking            | ✅ 90%  | ✅   | Timer with persistence across navigation                                 |
+| Employee Management      | ✅ 100% | ✅   | Admin-only team member management with rates                             |
+| Service Catalog v2       | ✅ 100% | ✅   | Normalized 3-table structure with seniority-based pricing                |
+| Project Margin Tracking  | ✅ 100% | -    | Automatic profitability calculation with status indicators               |
 
 ### Planned Features (0-50%)
 
-| Feature | Status | Priority | Notes |
-|---------|--------|----------|-------|
-| Financial Documents | ✅ 100% | ✅ | Quotes & Invoices with Service Selection, Real-time Budget Sync |
-| Reports | ✅ 100% | Medium | Analytics dashboard with service profitability analysis |
-| Resource Planning | ✅ 100% | Medium | Employee hours tracked, interactive capacity timeline |
-| Real-time Updates | ✅ 100% | High | Supabase Realtime (WebSockets) |
+| Feature             | Status  | Priority | Notes                                                           |
+| ------------------- | ------- | -------- | --------------------------------------------------------------- |
+| Financial Documents | ✅ 100% | ✅       | Quotes & Invoices with Service Selection, Real-time Budget Sync |
+| Reports             | ✅ 100% | Medium   | Analytics dashboard with service profitability analysis         |
+| Resource Planning   | ✅ 100% | Medium   | Employee hours tracked, interactive capacity timeline           |
+| Real-time Updates   | ✅ 100% | High     | Supabase Realtime (WebSockets)                                  |
 
 ### New in v1.8.0
-| Feature | Status | Notes |
-|---------|--------|-------|
-| Client Portal | ✅ 100% | Dedicated dashboard, restricted asset/project views, secure RLS |
+
+| Feature           | Status  | Notes                                                               |
+| ----------------- | ------- | ------------------------------------------------------------------- |
+| Client Portal     | ✅ 100% | Dedicated dashboard, restricted asset/project views, secure RLS     |
 | Asset Drag-n-Drop | ✅ 100% | Kanban board for assets, optimistic updates, role-based interaction |
-| Deployment | ✅ 100% | Docker, NGINX, VPS setup guide (`DEPLOYMENT.md`) |
+| Deployment        | ✅ 100% | Docker, NGINX, VPS setup guide (`DEPLOYMENT.md`)                    |
 
 ### New in v1.9.0
-| Feature | Status | Notes |
-|---------|--------|-------|
-| Reports & Analytics | ✅ 100% | Service Profitability, Revenue vs Cost charts |
-| Real-time Presence | ✅ 100% | Online user tracking, "Online Only" team filter |
-| Notifications | ✅ 100% | Real-time alerts, bell icon, feedback loops |
-| Time Approvals | ✅ 100% | Approval workflow, rejection with reason |
-| Secure Team View | ✅ 100% | Employee visibility without financial data (RPC secured) |
-| Real-time Updates | ✅ 100% | Live Task/Cost sync, Toast Notifications |
+
+| Feature             | Status  | Notes                                                    |
+| ------------------- | ------- | -------------------------------------------------------- |
+| Reports & Analytics | ✅ 100% | Service Profitability, Revenue vs Cost charts            |
+| Real-time Presence  | ✅ 100% | Online user tracking, "Online Only" team filter          |
+| Notifications       | ✅ 100% | Real-time alerts, bell icon, feedback loops              |
+| Time Approvals      | ✅ 100% | Approval workflow, rejection with reason                 |
+| Secure Team View    | ✅ 100% | Employee visibility without financial data (RPC secured) |
+| Real-time Updates   | ✅ 100% | Live Task/Cost sync, Toast Notifications                 |
 
 ### New in v1.11.0
-| Feature | Status | Notes |
-|---------|--------|-------|
+
+| Feature           | Status  | Notes                                                           |
+| ----------------- | ------- | --------------------------------------------------------------- |
 | Resource Planning | ✅ 100% | Interactive Timeline, Capacity Heatmap, Task Reassignment Modal |
-| PDF/CSV Export | ✅ 100% | Professional Quotes/Invoices, Payroll Data Export |
+| PDF/CSV Export    | ✅ 100% | Professional Quotes/Invoices, Payroll Data Export               |
 
 ---
 
 ## 🚀 Quick Start
 
 ### Prerequisites
+
 - Node.js 18+ and npm/yarn
 - Supabase account (free tier works)
 - Git
 
 ### 1. Clone Repository
+
 ```bash
 git clone <repository-url>
 cd agencyflow-project-management
 npm install
 ```
 
-### 2. Set Up Supabase
-1. Create a new project at [supabase.com](https://supabase.com)
-2. Go to SQL Editor
-3. Run `FINAL-SCHEMA.sql` (complete setup in one file)
-4. Run `scripts/upgrade-to-v2-schema.sql` (for Reports)
-5. Run `scripts/add-notifications.sql` (for Alerts)
-6. Run `scripts/secure_team_view.sql` (for Team Privacy)
-7. Get your project URL and anon key from Settings > API
+### 2. Set Up Backend (Visionary PX Studio API)
+
+1. Ensure the `labs_db` PostgreSQL database is running.
+2. the `labs-api` Node.js server needs to be running.
+3. The API includes all `agency_*` tables required for ProjectFlow.
 
 ### 3. Configure Environment
+
 Create `.env.local`:
+
 ```env
-VITE_SUPABASE_URL=your-project-url
-VITE_SUPABASE_ANON_KEY=your-anon-key
+VITE_API_URL=http://localhost:3000
 ```
 
+_(Point this to your running `labs-api` instance)_
+
 ### 4. Run Development Server
+
 ```bash
 npm run dev
 ```
 
 ### 5. Create First User
+
 1. Open the app (usually http://localhost:5173)
 2. Click "Sign Up"
 3. Enter your details (email, password, full name)
 4. After signup, set your role to admin:
+
 ```sql
 -- Run in Supabase SQL Editor
 UPDATE profiles SET role = 'admin' WHERE email = 'your@email.com';
 ```
 
 ### 6. (Optional) Add Seed Data
+
 Run `scripts/seed-data-fixed.sql` in Supabase SQL Editor for sample clients and projects.
 
 ---
@@ -385,7 +408,6 @@ agencyflow-project-management/
 │   ├── timeEntries.ts      # Time tracking + billable value
 │   └── profiles.ts         # User profiles + internal team
 ├── lib/                    # Core utilities
-│   ├── supabase.ts         # Supabase client
 │   ├── AuthContext.tsx     # Auth state management
 │   └── queryClient.ts      # React Query config
 ├── types/                  # TypeScript types
@@ -407,40 +429,44 @@ agencyflow-project-management/
 ## 🔐 Security Model
 
 ### Row Level Security (RLS)
+
 All tables have RLS enabled with policies for:
+
 - **Internal Users** (admin, employee, freelancer): Full CRUD access
 - **Client Users**: Read-only access to their own projects/tasks/assets
 - **Helper Functions**: `is_internal()` for role checks
 
 ### Authentication
-- Email/password authentication via Supabase Auth
-- Passwords hashed by Supabase (bcrypt)
-- Session tokens stored securely
+
+- JWT Auth via `labs-api` backend
+- Passwords hashed by backend (bcrypt)
+- Tokens stored securely
 - Auto-logout on session expiry
 
 ### Best Practices
-- Never use service role key in frontend
-- All database access through Supabase client (respects RLS)
-- Input validation on forms
-- SQL injection protection (parameterized queries)
+
+- All database access occurs securely on the backend via Express.js
+- Input validation on frontend & backend forms
+- SQL injection protection via backend parameterized queries
 
 ---
 
 ## 📚 Documentation
 
-| Document | Purpose |
-|----------|---------|
-| [DEPLOYMENT.md](DEPLOYMENT.md) | **NEW:** Complete Docker/VPS Deployment Guide |
-| [DATABASE-SCHEMA-REFERENCE.md](DATABASE-SCHEMA-REFERENCE.md) | Complete database documentation |
-| [AUTHENTICATION-SETUP-GUIDE.md](AUTHENTICATION-SETUP-GUIDE.md) | Auth system explained |
-| [CONTRIBUTING.md](CONTRIBUTING.md) | Development guidelines |
-| [DOCS-INDEX.md](DOCS-INDEX.md) | Documentation navigation |
+| Document                                                       | Purpose                                       |
+| -------------------------------------------------------------- | --------------------------------------------- |
+| [DEPLOYMENT.md](DEPLOYMENT.md)                                 | **NEW:** Complete Docker/VPS Deployment Guide |
+| [DATABASE-SCHEMA-REFERENCE.md](DATABASE-SCHEMA-REFERENCE.md)   | Complete database documentation               |
+| [AUTHENTICATION-SETUP-GUIDE.md](AUTHENTICATION-SETUP-GUIDE.md) | Auth system explained                         |
+| [CONTRIBUTING.md](CONTRIBUTING.md)                             | Development guidelines                        |
+| [DOCS-INDEX.md](DOCS-INDEX.md)                                 | Documentation navigation                      |
 
 ---
 
 ## 🛠️ Development
 
 ### Adding New Features
+
 1. Read [CONTRIBUTING.md](CONTRIBUTING.md) for patterns
 2. Check [DATABASE-SCHEMA-REFERENCE.md](DATABASE-SCHEMA-REFERENCE.md) for schema
 3. Follow existing component structure
@@ -449,6 +475,7 @@ All tables have RLS enabled with policies for:
 6. Test with different user roles
 
 ### Common Tasks
+
 ```bash
 # Development
 npm run dev          # Start dev server
@@ -461,6 +488,7 @@ npm run preview      # Preview production build
 ```
 
 ### Code Style
+
 - TypeScript strict mode
 - Functional components with hooks
 - Tailwind CSS for styling
@@ -474,20 +502,24 @@ npm run preview      # Preview production build
 ### Common Issues
 
 **"Profile not found" error**
+
 - Run `scripts/verify-and-fix-tasks-select.sql`
 - Ensure RLS policies are applied
 
 **"403 Forbidden" errors**
+
 - Check user role: `SELECT role FROM profiles WHERE id = auth.uid();`
 - Ensure role is 'admin', 'employee', or 'freelancer'
 - Verify RLS policies exist
 
 **Tasks not showing in project**
+
 - Clear browser cache
 - Check browser console for errors
 - Verify project has tasks in database
 
 **Can't create items**
+
 - Ensure RLS policies include INSERT/UPDATE/DELETE
 - Run `scripts/add-all-rls-policies.sql`
 
@@ -519,6 +551,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for development guidelines and best pract
 ## 🎉 Acknowledgments
 
 Built with:
+
 - React + TypeScript
 - Supabase (PostgreSQL + Auth + Storage)
 - Tailwind CSS
