@@ -32,7 +32,7 @@ export async function updateProfile(
  * Get profiles by role
  */
 export async function getProfilesByRole(
-  role: 'admin' | 'employee' | 'freelancer' | 'client'
+  role: 'admin' | 'pjm' | 'creative' | 'client' | 'guest'
 ): Promise<Profile[]> {
   return await fetchApi(`/api/profiles?role=${role}`);
 }
