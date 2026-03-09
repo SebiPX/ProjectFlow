@@ -415,6 +415,7 @@ Don't try to create RLS policies for admin access to all profiles - use service 
 - ✅ **Prefixed Schema**: Safely prefixed 15+ tables with `agency_` to prevent collisions in the shared DB.
 - ✅ **Admin Password Reset**: Implemented forced password resets for admins directly in the Settings UI.
 - ✅ **API Synchronization**: Built matching REST routes for profiles, costs, financial documents, timesheets, and assets.
+- ✅ **Cross-App Integration**: ProjectFlow tasks are now deeply integrated into the Visionary-PX-Studio Dashboard. Creatives can view assigned tasks, track time (stopwatch & manual entry), and update task statuses directly from the Studio UI.
 
 1. **Integrations & Export (Phase 2)**
    - [x] Automation email notifications (Edge Functions)

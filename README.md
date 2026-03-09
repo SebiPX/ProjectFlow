@@ -70,7 +70,8 @@ This app aims to increase efficiency, improve transparency for internal teams an
 - Due dates with overdue warnings (red highlight)
 - Task descriptions and planning (estimated time)
 - Client visibility toggle
-- Time tracking integration
+- Time tracking integration (also available via Visionary-PX-Studio Dashboard)
+- Cross-App Task Status: update statuses directly from the Visionary-PX-Studio Dashboard
 - Active filter count with clear filters button
 - Skeleton loading states
 - Enhanced empty states
