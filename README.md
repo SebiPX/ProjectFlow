@@ -523,6 +523,10 @@ npm run preview      # Preview production build
 - Ensure RLS policies include INSERT/UPDATE/DELETE
 - Run `scripts/add-all-rls-policies.sql`
 
+**Labs-API Backend Errors (Gemini 404, Database 500, Apify Sync)**
+
+- See the **Backend Connection Troubleshooting** section in `DEPLOYMENT.md` for fixes related to AI model names, API keys, and Postgres JSON array insertions.
+
 See [AUTHENTICATION-SETUP-GUIDE.md](AUTHENTICATION-SETUP-GUIDE.md) for detailed troubleshooting.
 
 ---

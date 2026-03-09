@@ -74,3 +74,14 @@ networks:
   - Ensure the `labs-api` backend has CORS configured to allow the frontend origin.
   - Check backend logs for missing columns/tables in PostgreSQL.
   - If uploading files fails, check the `public/uploads/agency` folder permissions on the backend server.
+
+- **Gemini API 404 / Model not found Error**:
+  - Google frequently changes "Experimental" API names (e.g. `gemini-2.0-flash-exp`) or your API Key is **expired**.
+  - **Fix:** Update the AI model string in the frontend to a stable version like `gemini-1.5-flash-latest` or `gemini-2.5-flash-lite`, and regenerate the API Key via [Google AI Studio](https://aistudio.google.com/).
+
+- **500 Server Error when saving JSON Arrays in Postgres (`labs-api`)**:
+  - The `pg` Node.js driver cannot directly insert raw JavaScript Arrays (like those returned from AI generated patterns) into a `JSONB` column.
+  - **Fix:** You MUST explicitly cast the array to a string before inserting using `JSON.stringify(array)`.
+
+- **Apify Sync / Profile Scraper fail (if applicable)**:
+  - **Fix:** Ensure `APIFY_API_TOKEN` is present in the backend `.env`. Check the Apify Console to ensure the Actor has not hit a login-wall or depleted its compute credits.
