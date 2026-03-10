@@ -38,10 +38,8 @@
 - ✅ User registration with Signup component
 - ✅ Login/logout functionality
 - ✅ Session management with AuthContext
-- ✅ Automatic profile creation on signup
-- ✅ Password reset (Supabase built-in)
 - ✅ Email confirmation (optional)
-- ✅ Role-based access (4 roles: admin, employee, freelancer, client)
+- ✅ Role-based access (4 roles: admin, pjm, creative, client)
 
 ### 3. Frontend Components (100%)
 
@@ -80,13 +78,11 @@
 
 ## 📊 Component Status
 
-| Component               | Status      | Data Source      | Notes                                                                |
-| ----------------------- | ----------- | ---------------- | -------------------------------------------------------------------- |
 | Login                   | ✅ Complete | Supabase Auth    | Working perfectly                                                    |
 | Signup                  | ✅ Complete | Supabase Auth    | Captures full_name                                                   |
 | Dashboard               | ✅ Complete | Supabase         | Live data with statistics                                            |
-| ProjectList             | ✅ Complete | Supabase         | Card view with real financial data, deadlines, "Only Me" filter      |
-| ProjectDetail           | ✅ Complete | Supabase         | Tabs: tasks, finances with cost tracking, assets with preview        |
+| ProjectList             | ✅ Complete | Supabase         | Card view with real financial data, deadlines, "Only Me" filter, Archiving |
+| ProjectDetail           | ✅ Complete | Supabase         | Tabs: tasks, finances with cost tracking, assets with preview, Archiving   |
 | KanbanBoard             | ✅ Complete | Supabase         | Drag-and-drop (mock only)                                            |
 | TaskList                | ✅ Complete | Supabase         | Modern grid layout with filters, sorting & "Only Me" filter          |
 | AssetList               | ✅ Complete | Supabase         | Modern grid layout with filters, sorting, preview & "Only Me" filter |

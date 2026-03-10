@@ -18,7 +18,8 @@ This app aims to increase efficiency, improve transparency for internal teams an
 
 - Login and signup with Supabase Auth
 - Automatic profile creation on signup
-- Role-based access control (Admin, Employee, Freelancer, Client)
+- Role-based access control (Admin, PJM, Creative, Client)
+- Restricted management actions (project creation, budgets, roles) to Admin & PJM only
 - Session management with persistent login
 - Full name capture during registration
 
@@ -34,7 +35,8 @@ This app aims to increase efficiency, improve transparency for internal teams an
 
 **✅ Project Management**
 
-- Create, view, edit, and delete projects
+- Create, view, edit, and delete projects (Admin & PJM only)
+- **Project Archiving:** Soft-delete active projects and hide them via "Show Archive" toggle
 - Link projects to clients
 - Project categories and status tracking
 - **Real-time budget tracking** with financial calculations
