@@ -47,12 +47,11 @@ const tabs: { id: ProjectTab; label: string }[] = [
   { id: 'services', label: 'Services' },
 ];
 
-import { AssetCard } from './AssetCard';
-
 export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialProject }) => {
   const queryClient = useQueryClient();
   const { profile } = useAuth(); // Add this hook call
   const isClient = profile?.role === 'client';
+  const isAdminOrPJM = profile?.role === 'admin' || profile?.role === 'pjm';
 
   const visibleTabs = tabs.filter(tab => {
     if (isClient) {
@@ -251,13 +250,15 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
           <div className="flex flex-col h-full">
             <div className="flex justify-between items-center px-6 py-4 border-b border-gray-800">
               <h2 className="text-xl font-bold text-white">Project Tasks</h2>
-              <button
-                onClick={() => setIsTaskFormModalOpen(true)}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center gap-2"
-              >
-                <Icon path="M12 4v16m8-8H4" className="w-5 h-5" />
-                Create Task
-              </button>
+              {isAdminOrPJM && (
+                <button
+                  onClick={() => setIsTaskFormModalOpen(true)}
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center gap-2"
+                >
+                  <Icon path="M12 4v16m8-8H4" className="w-5 h-5" />
+                  Create Task
+                </button>
+              )}
             </div>
             <div className="flex-grow overflow-hidden">
               <KanbanBoard tasks={tasks} />
@@ -375,13 +376,15 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
                         <option value="Other">Other</option>
                       </select>
                     </div>
-                    <button
-                      onClick={() => setIsCostFormModalOpen(true)}
-                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center gap-2"
-                    >
-                      <Icon path="M12 4v16m8-8H4" className="w-5 h-5" />
-                      Add Cost
-                    </button>
+                    {isAdminOrPJM && (
+                      <button
+                        onClick={() => setIsCostFormModalOpen(true)}
+                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center gap-2"
+                      >
+                        <Icon path="M12 4v16m8-8H4" className="w-5 h-5" />
+                        Add Cost
+                      </button>
+                    )}
                   </div>
 
                   {filteredCosts.length === 0 ? (
@@ -429,20 +432,24 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
                               </div>
                             </div>
                             <div className="flex items-center gap-2">
-                              <button
-                                onClick={() => setEditingCost(cost)}
-                                className="p-2 text-gray-400 hover:text-blue-400 hover:bg-gray-700 rounded-lg transition-colors"
-                                title="Edit cost"
-                              >
-                                <Icon path="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" className="w-5 h-5" />
-                              </button>
-                              <button
-                                onClick={() => handleDeleteCost(cost.id, cost.title)}
-                                className="p-2 text-gray-400 hover:text-red-400 hover:bg-gray-700 rounded-lg transition-colors"
-                                title="Delete cost"
-                              >
-                                <Icon path="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" className="w-5 h-5" />
-                              </button>
+                              {isAdminOrPJM && (
+                                <>
+                                  <button
+                                    onClick={() => setEditingCost(cost)}
+                                    className="p-2 text-gray-400 hover:text-blue-400 hover:bg-gray-700 rounded-lg transition-colors"
+                                    title="Edit cost"
+                                  >
+                                    <Icon path="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" className="w-5 h-5" />
+                                  </button>
+                                  <button
+                                    onClick={() => handleDeleteCost(cost.id, cost.title)}
+                                    className="p-2 text-gray-400 hover:text-red-400 hover:bg-gray-700 rounded-lg transition-colors"
+                                    title="Delete cost"
+                                  >
+                                    <Icon path="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" className="w-5 h-5" />
+                                  </button>
+                                </>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -457,7 +464,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
             <div>
               <div className={`flex justify-between items-center mb-4 ${!isClient ? 'border-t border-gray-700 pt-6' : ''}`}>
                 <h2 className="text-xl font-bold text-white">Quotes & Invoices</h2>
-                {!isClient && (
+                {isAdminOrPJM && (
                   <button
                     onClick={handleCreateDocument}
                     className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center gap-2"
@@ -523,20 +530,24 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
                               >
                                 <Icon path="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" className="w-4 h-4" />
                               </button>
-                              <button
-                                onClick={() => handleEditDocument(doc)}
-                                className="text-blue-400 hover:text-blue-300 p-1 hover:bg-gray-600 rounded"
-                                title="Edit"
-                              >
-                                <Icon path="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" className="w-4 h-4" />
-                              </button>
-                              <button
-                                onClick={() => handleDeleteDocument(doc.id, doc.document_number || '')}
-                                className="text-red-400 hover:text-red-300 p-1 hover:bg-gray-600 rounded"
-                                title="Delete"
-                              >
-                                <Icon path="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" className="w-4 h-4" />
-                              </button>
+                              {isAdminOrPJM && (
+                                <>
+                                  <button
+                                    onClick={() => handleEditDocument(doc)}
+                                    className="text-blue-400 hover:text-blue-300 p-1 hover:bg-gray-600 rounded"
+                                    title="Edit"
+                                  >
+                                    <Icon path="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" className="w-4 h-4" />
+                                  </button>
+                                  <button
+                                    onClick={() => handleDeleteDocument(doc.id, doc.document_number || '')}
+                                    className="text-red-400 hover:text-red-300 p-1 hover:bg-gray-600 rounded"
+                                    title="Delete"
+                                  >
+                                    <Icon path="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" className="w-4 h-4" />
+                                  </button>
+                                </>
+                              )}
                             </div>
                           </td>
                         </tr>
@@ -556,7 +567,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
           <div className="p-6">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-bold text-white">Project Team</h2>
-              {!isClient && (
+              {isAdminOrPJM && (
                 <button
                   onClick={() => setIsAddTeamMemberModalOpen(true)}
                   className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center gap-2"
@@ -595,18 +606,20 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
                           </p>
                         </div>
                       </div>
-                      <button
-                        onClick={() =>
-                          handleRemoveTeamMember(
-                            member.profile_id,
-                            member.profile?.full_name || 'team member'
-                          )
-                        }
-                        className="text-red-400 hover:text-red-300 p-1 hover:bg-gray-700 rounded transition-colors"
-                        title="Remove from project"
-                      >
-                        <Icon path="M6 18L18 6M6 6l12 12" className="w-4 h-4" />
-                      </button>
+                      {isAdminOrPJM && (
+                        <button
+                          onClick={() =>
+                            handleRemoveTeamMember(
+                              member.profile_id,
+                              member.profile?.full_name || 'team member'
+                            )
+                          }
+                          className="text-red-400 hover:text-red-300 p-1 hover:bg-gray-700 rounded transition-colors"
+                          title="Remove from project"
+                        >
+                          <Icon path="M6 18L18 6M6 6l12 12" className="w-4 h-4" />
+                        </button>
+                      )}
                     </div>
                     {member.role && (
                       <div className="mt-2 pt-2 border-t border-gray-700">
@@ -647,7 +660,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
             <p className="text-md text-blue-400 mt-1">{project.client?.company_name}</p>
           </div>
           <div>
-            {!isClient && (
+            {isAdminOrPJM && (
               <button
                 onClick={() => setIsEditModalOpen(true)}
                 className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors flex items-center gap-2"

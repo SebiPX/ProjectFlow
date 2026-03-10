@@ -129,7 +129,8 @@ const ProjectCard: React.FC<{
 };
 
 export const ProjectList: React.FC<({ onSelectProject: (project: Project) => void; searchQuery?: string })> = ({ onSelectProject, searchQuery = '' }) => {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
+  const isAdminOrPJM = profile?.role === 'admin' || profile?.role === 'pjm';
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [onlyMe, setOnlyMe] = useState(false);
   const [showArchived, setShowArchived] = useState(false);
@@ -226,15 +227,17 @@ export const ProjectList: React.FC<({ onSelectProject: (project: Project) => voi
             </svg>
             Show Archive
           </button>
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-            </svg>
-            New Project
-          </button>
+          {isAdminOrPJM && (
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              New Project
+            </button>
+          )}
         </div>
       </div>
       {filteredProjects.length === 0 ? (
