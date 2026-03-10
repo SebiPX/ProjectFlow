@@ -50,6 +50,16 @@ export async function deleteProject(id: string): Promise<void> {
 }
 
 /**
+ * Archive or unarchive a project
+ */
+export async function archiveProject(id: string, is_archived: boolean): Promise<Project> {
+  return await fetchApi(`/api/projects/${id}/archive`, {
+    method: 'PATCH',
+    body: JSON.stringify({ is_archived }),
+  });
+}
+
+/**
  * Get project statistics for dashboard
  */
 export async function getProjectStats() {

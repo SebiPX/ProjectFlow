@@ -132,6 +132,7 @@ export const ProjectList: React.FC<({ onSelectProject: (project: Project) => voi
   const { user } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [onlyMe, setOnlyMe] = useState(false);
+  const [showArchived, setShowArchived] = useState(false);
 
   const { data: projects = [], isLoading, error } = useQuery({
     queryKey: ['projects'],
@@ -152,6 +153,10 @@ export const ProjectList: React.FC<({ onSelectProject: (project: Project) => voi
 
   // Filter projects based on "Only Me" toggle AND Search Query
   const filteredProjects = projects.filter(project => {
+    // 0. Archived Filter
+    if (showArchived && !project.is_archived) return false;
+    if (!showArchived && project.is_archived) return false;
+
     // 1. Only Me Filter
     if (onlyMe) {
       const isTeamMember = project.project_members?.some(member => member.profile_id === user?.id);
@@ -208,6 +213,18 @@ export const ProjectList: React.FC<({ onSelectProject: (project: Project) => voi
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             </svg>
             Only Me
+          </button>
+          <button
+            onClick={() => setShowArchived(!showArchived)}
+            className={`font-semibold py-2 px-4 rounded-lg flex items-center transition-colors ${showArchived
+              ? 'bg-orange-600 hover:bg-orange-700 text-white'
+              : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
+              }`}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+            </svg>
+            Show Archive
           </button>
           <button
             onClick={() => setIsModalOpen(true)}

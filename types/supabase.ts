@@ -191,6 +191,7 @@ export interface Project {
   start_date?: string | null; // DATE
   deadline?: string | null; // DATE
   budget_total?: number; // NUMERIC
+  is_archived?: boolean; // BOOLEAN
   client?: Client; // Enriched data
   project_members?: ProjectMember[]; // Enriched data - team members assigned to project
 }
