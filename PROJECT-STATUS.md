@@ -43,8 +43,9 @@
 
 ### 3. Frontend Components (100%)
 
-- ✅ Dashboard with KPIs and statistics
-- ✅ Project list (card view)
+- ✨ **NEW: Complete Inventar & IT Management Module** migrated from PX-Studio
+- Dashboard with KPIs and statistics
+- Project list (card view)
 - ✅ Project detail (tabs: tasks, finances, assets with preview)
 - ✅ Task list (modern grid view with filters & sorting)
 - ✅ Kanban board for tasks
@@ -412,6 +413,19 @@ Don't try to create RLS policies for admin access to all profiles - use service 
 - ✅ **Admin Password Reset**: Implemented forced password resets for admins directly in the Settings UI.
 - ✅ **API Synchronization**: Built matching REST routes for profiles, costs, financial documents, timesheets, and assets.
 - ✅ **Cross-App Integration**: ProjectFlow tasks are now deeply integrated into the Visionary-PX-Studio Dashboard. Creatives can view assigned tasks, track time (stopwatch & manual entry), and update task statuses directly from the Studio UI.
+
+### Completed in v2.1.0 ✅ (March 2026) - INVENTAR & NAVIGATION REWORK
+
+- ✅ **Navigation Reorganization**:
+  - Simplified "Home" section (now contains Dashboard + Inventar items)
+  - Created new top-level "Projects" category with nested items (Tasks, Planning, Assets)
+  - Removed "Resources" as a top-level category, moved under Projects.
+- ✅ **Inventar Module Migration**:
+  - Migrated the entire internal Inventar system from Visionary PX Studio.
+  - Features include: Inventar, Verleih (Loans), Verleih Kalender, Logins, Verträge, Karten, Firma, Links.
+  - Fully integrated with ProjectFlow's `agency_session` Auth context.
+  - Admin-only protection for sensitive routes (Verträge, Karten, Firma).
+  - Uses the shared `labs-api` backend.
 
 1. **Integrations & Export (Phase 2)**
    - [x] Automation email notifications (Edge Functions)

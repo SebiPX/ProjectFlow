@@ -25,8 +25,9 @@ import { Settings } from './components/Settings';
 import ResourcePlanning from './components/ResourcePlanning';
 import type { Project } from './types/supabase';
 import { MOCK_PROJECTS } from './constants';
+import { InventarApp } from './components/InventarApp';
 
-export type View = 'dashboard' | 'projects' | 'project-detail' | 'tasks' | 'planning' | 'assets' | 'clients' | 'employees' | 'service-catalog' | 'finances' | 'reports' | 'resources' | 'settings';
+export type View = 'dashboard' | 'projects' | 'project-detail' | 'tasks' | 'planning' | 'assets' | 'clients' | 'employees' | 'service-catalog' | 'finances' | 'reports' | 'resources' | 'settings' | 'inventar' | 'verleih' | 'verleih-formular' | 'kalender' | 'logins' | 'handyvertraege' | 'kreditkarten' | 'firmendaten' | 'links';
 
 const MainApp: React.FC = () => {
   const [view, setView] = useState<View>('dashboard');
@@ -78,6 +79,17 @@ const MainApp: React.FC = () => {
         return <Reports />;
       case 'resources':
         return <ResourcePlanning />;
+      case 'inventar':
+      case 'verleih':
+      case 'verleih-formular':
+      case 'kalender':
+      case 'logins':
+      case 'handyvertraege':
+      case 'kreditkarten':
+      case 'firmendaten':
+      case 'links':
+        // InventarApp intercepts these paths and uses its own MemoryRouter structure
+        return <InventarApp onBack={() => handleNavigate('dashboard')} setView={handleNavigate} dashboardPath={`/${view}`} />;
       default:
         return profile?.role === 'client'
           ? <ClientDashboard onSelectProject={handleSelectProject} />
