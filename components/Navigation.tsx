@@ -129,8 +129,10 @@ export const Navigation: React.FC<NavigationProps> = ({ currentView, onNavigate,
   // Find the active category based on current view
   let activeCategory = visibleCategories.find(cat => cat.items.some(i => i.view === currentView)) || visibleCategories[0];
 
-  // If view is 'project-detail' or 'settings', keep the active category as Home or whatever it was
-  if (currentView === 'project-detail' || currentView === 'settings') {
+  // If view is 'project-detail', set active category to 'Projekte', for 'settings' keep 'Home'
+  if (currentView === 'project-detail') {
+     activeCategory = visibleCategories.find(cat => cat.label === 'Projekte') || visibleCategories[0];
+  } else if (currentView === 'settings') {
      activeCategory = visibleCategories.find(cat => cat.label === 'Home') || visibleCategories[0];
   }
 
