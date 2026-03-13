@@ -33,9 +33,9 @@ export enum ProjectCategory {
 }
 
 export enum ProjectStatus {
-  Planned = 'planned',
+  Planned = 'planning',
   Active = 'active',
-  OnHold = 'on_hold',
+  OnHold = 'paused',
   Completed = 'completed',
   Cancelled = 'cancelled',
 }

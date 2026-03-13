@@ -1,0 +1,56 @@
+[
+  {
+    "status": "todo",
+    "data": {
+      "error": "new row for relation \"agency_projects\" violates check constraint \"agency_projects_status_check\""
+    }
+  },
+  {
+    "status": "planning",
+    "data": {
+      "error": "insert or update on table \"agency_projects\" violates foreign key constraint \"agency_projects_client_id_fkey\""
+    }
+  },
+  {
+    "status": "inquiry",
+    "data": {
+      "error": "new row for relation \"agency_projects\" violates check constraint \"agency_projects_status_check\""
+    }
+  },
+  {
+    "status": "requested",
+    "data": {
+      "error": "new row for relation \"agency_projects\" violates check constraint \"agency_projects_status_check\""
+    }
+  },
+  {
+    "status": "prospect",
+    "data": {
+      "error": "new row for relation \"agency_projects\" violates check constraint \"agency_projects_status_check\""
+    }
+  },
+  {
+    "status": "prospecting",
+    "data": {
+      "error": "new row for relation \"agency_projects\" violates check constraint \"agency_projects_status_check\""
+    }
+  },
+  {
+    "status": "quote",
+    "data": {
+      "error": "new row for relation \"agency_projects\" violates check constraint \"agency_projects_status_check\""
+    }
+  },
+  {
+    "status": "quoted",
+    "data": {
+      "error": "new row for relation \"agency_projects\" violates check constraint \"agency_projects_status_check\""
+    }
+  },
+  {
+    "status": "negotiation",
+    "data": {
+      "error": "new row for relation \"agency_projects\" violates check constraint \"agency_projects_status_check\""
+    }
+  }
+]

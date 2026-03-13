@@ -18,7 +18,7 @@ export const ProjectFormModal: React.FC<ProjectFormModalProps> = ({ isOpen, onCl
     description: '',
     client_id: '',
     category: 'other',
-    status: 'planned',
+    status: 'planning',
     budget_total: '',
     start_date: '',
     deadline: '',
@@ -51,7 +51,7 @@ export const ProjectFormModal: React.FC<ProjectFormModalProps> = ({ isOpen, onCl
       description: '',
       client_id: '',
       category: 'other',
-      status: 'planned',
+      status: 'planning',
       budget_total: '',
       start_date: '',
       deadline: '',
@@ -190,9 +190,9 @@ export const ProjectFormModal: React.FC<ProjectFormModalProps> = ({ isOpen, onCl
                 onChange={(e) => setFormData({ ...formData, status: e.target.value })}
                 className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="planned">Planned</option>
+                <option value="planning">Planned</option>
                 <option value="active">Active</option>
-                <option value="on_hold">On Hold</option>
+                <option value="paused">On Hold (Paused)</option>
                 <option value="completed">Completed</option>
                 <option value="cancelled">Cancelled</option>
               </select>

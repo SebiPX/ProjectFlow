@@ -70,7 +70,7 @@ export async function getProjectStats() {
  * Get projects by status
  */
 export async function getProjectsByStatus(
-  status: 'planned' | 'active' | 'on_hold' | 'completed' | 'cancelled'
+  status: 'planning' | 'active' | 'paused' | 'completed' | 'cancelled'
 ): Promise<Project[]> {
   return await fetchApi(`/api/projects?status=${status}`);
 }
