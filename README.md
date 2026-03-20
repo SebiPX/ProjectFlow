@@ -84,6 +84,7 @@ This app aims to increase efficiency, improve transparency for internal teams an
 - Active projects count
 - Total budget overview
 - Time tracking summary
+- **News Of The Day Widget:** Agency-wide internal announcements and daily auto-curated AI news (powered by Gemini)
 - Visual charts and KPIs
 - Real-time data from Supabase
 
