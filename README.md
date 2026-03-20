@@ -308,6 +308,14 @@ This app aims to increase efficiency, improve transparency for internal teams an
 | Resource Planning | ✅ 100% | Interactive Timeline, Capacity Heatmap, Task Reassignment Modal |
 | PDF/CSV Export    | ✅ 100% | Professional Quotes/Invoices, Payroll Data Export               |
 
+### New in v2.2.0
+
+| Feature             | Status  | Notes                                                           |
+| ------------------- | ------- | --------------------------------------------------------------- |
+| MOCO App Sync       | ✅ 100% | Projects & Clients automatically sync via Webhooks              |
+| Live Time Tracking  | ✅ 100% | PX-Flow timesheet submissions push directly to MOCO billing     |
+| Resource & Absences | ✅ 100% | MOCO Vacations and Sick Days accurately render in Planner       |
+
 ---
 
 ## 🚀 Quick Start

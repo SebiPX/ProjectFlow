@@ -427,6 +427,15 @@ Don't try to create RLS policies for admin access to all profiles - use service 
   - Admin-only protection for sensitive routes (Verträge, Karten, Firma).
   - Uses the shared `labs-api` backend.
 
+### Completed in v2.2.0 ✅ (March 2026) - MOCO APP INTEGRATION
+
+- ✅ **Single Source of Truth**: MOCO App is now the master system for agencies, clients, projects, and absences.
+- ✅ **Webhooks Integration**: PX-Flow receives real-time updates for projects and absences directly from MOCO.
+- ✅ **Resource Planner Sync**: Integrated MOCO schedules, sick days, and vacation days natively into the visual timeline.
+- ✅ **Time Tracking Sync**: Active synchronization of PX-Flow stopwatches back to MOCO App using Impersonation headers. 
+- ✅ **Smart Task Mapping**: Time entries without a defined task fallback securely to the project's primary MOCO "Leistung" (Task).
+- ✅ **Automatic Descriptions**: PX-Flow Task Titles and Descriptions dynamically populate MOCO billing entries.
+
 1. **Integrations & Export (Phase 2)**
    - [x] Automation email notifications (Edge Functions)
    - [ ] API for external tool integration
