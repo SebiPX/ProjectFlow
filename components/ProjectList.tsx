@@ -145,7 +145,7 @@ export const ProjectList: React.FC<({ onSelectProject: (project: Project) => voi
       setIsSyncing(true);
       const token = localStorage.getItem('token');
       const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-      const res = await fetch(`${apiBaseUrl}/api/agency/projects/sync-moco`, {
+      const res = await fetch(`${apiBaseUrl}/api/projects/sync-moco`, {
          method: 'POST',
          headers: {
            'Authorization': `Bearer ${token}`
