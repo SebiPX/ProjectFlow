@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend, PieChart, Pie, Cell } from 'recharts';
+import { ResponsiveContainer, Tooltip, Legend, PieChart, Pie, Cell } from 'recharts';
 import { Card } from './ui/Card';
 import { Icon } from './ui/Icon';
 import type { Project } from '../types/supabase';
@@ -49,9 +49,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProject }) => {
   });
 
   // Calculate statistics
-  const totalBudget = projects.reduce((sum, p) => sum + (p.budget_total || 0), 0);
+  const totalBudget = projects.reduce((sum, p) => sum + (Number(p.budget_total) || 0), 0);
   const activeProjects = projects.filter(p => p.status === 'active').length;
-  const totalHoursTracked = timeEntries.reduce((sum, t) => sum + (t.duration_minutes || 0), 0) / 60;
+  const totalHoursTracked = timeEntries.reduce((sum, t) => sum + (Number(t.duration_minutes) || 0), 0) / 60;
 
   const overdueTasksCount = tasks.filter(t => {
     if (!t.due_date || t.status === 'done') return false;
@@ -62,11 +62,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProject }) => {
   }).length;
 
   // Prepare chart data
-  const budgetData = projects.map(p => ({
-    name: `P${p.project_number}`,
-    budget: p.budget_total,
-    spent: financialOverview[p.id]?.total || 0,
-  }));
 
   const statusData = Object.values(ProjectStatus).map(status => ({
     name: status.charAt(0).toUpperCase() + status.slice(1).replace('_', ' '),
@@ -143,21 +138,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProject }) => {
 
       {/* Charts & News */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card className="lg:col-span-2">
-          <h3 className="text-lg font-semibold text-white">Budget Overview</h3>
-          <div className="h-80 mt-4 w-full relative">
-            <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
-              <BarChart data={budgetData}>
-                <XAxis dataKey="name" stroke="#9ca3af" fontSize={12} tickLine={false} axisLine={false} />
-                <YAxis stroke="#9ca3af" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `€${Number(value) / 1000}k`} />
-                <Tooltip cursor={{ fill: 'rgba(107, 114, 128, 0.1)' }} contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151' }} />
-                <Legend />
-                <Bar dataKey="budget" fill="#3b82f6" name="Budget" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="spent" fill="#10b981" name="Spent" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </Card>
+        <div className="lg:col-span-2">
+          <NewsWidget />
+        </div>
         
         <div className="flex flex-col gap-6">
           <Card>
@@ -176,9 +159,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProject }) => {
               </ResponsiveContainer>
             </div>
           </Card>
-          
-          {/* News Widget integrated below Pie Chart */}
-          <NewsWidget />
         </div>
       </div>
 
