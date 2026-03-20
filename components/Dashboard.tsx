@@ -9,6 +9,7 @@ import { ProjectStatus } from '../types/supabase';
 import { getTasks } from '../services/api/tasks';
 import { getProjects, getProjectsFinancialOverview } from '../services/api/projects';
 import { getTimeEntries } from '../services/api/timeEntries';
+import { NewsWidget } from './NewsWidget';
 
 interface DashboardProps {
   onSelectProject: (project: Project) => void;
@@ -140,7 +141,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProject }) => {
         </Card>
       </div>
 
-      {/* Charts */}
+      {/* Charts & News */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card className="lg:col-span-2">
           <h3 className="text-lg font-semibold text-white">Budget Overview</h3>
@@ -157,22 +158,28 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProject }) => {
             </ResponsiveContainer>
           </div>
         </Card>
-        <Card>
-          <h3 className="text-lg font-semibold text-white">Project Status</h3>
-          <div className="h-80 mt-4 w-full relative">
-            <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
-              <PieChart>
-                <Pie data={statusData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} label>
-                  {statusData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={statusColors[entry.name.toLowerCase().replace(' ', '_') as ProjectStatus]} />
-                  ))}
-                </Pie>
-                <Tooltip contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151' }} />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        </Card>
+        
+        <div className="flex flex-col gap-6">
+          <Card>
+            <h3 className="text-lg font-semibold text-white">Project Status</h3>
+            <div className="h-[280px] mt-4 w-full relative">
+              <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
+                <PieChart>
+                  <Pie data={statusData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={90} label>
+                    {statusData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={statusColors[entry.name.toLowerCase().replace(' ', '_') as ProjectStatus]} />
+                    ))}
+                  </Pie>
+                  <Tooltip contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151' }} />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </Card>
+          
+          {/* News Widget integrated below Pie Chart */}
+          <NewsWidget />
+        </div>
       </div>
 
       {/* Recent Projects Table */}
