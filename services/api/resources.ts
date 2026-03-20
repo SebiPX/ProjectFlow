@@ -12,6 +12,9 @@ export interface ResourceAllocation {
         hours: number;
         status: string;
     }[];
+    absences?: {
+        reason: string;
+    }[];
 }
 
 export interface ResourceData {

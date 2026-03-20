@@ -64,6 +64,10 @@ export default function ResourcePlanning() {
                     <div className="w-3 h-3 rounded-full bg-red-200 border border-red-300"></div>
                     <span>Überbucht (&gt;100%)</span>
                 </div>
+                <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-purple-300 border border-purple-500"></div>
+                    <span>Abwesend (MOCO)</span>
+                </div>
             </div>
         </div>
     );

@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import type { Project } from '../types/supabase';
 import { ProjectStatus } from '../types/supabase';
 import { getProjects, getProjectsFinancialOverview } from '../services/api/projects';
-import { ProjectFormModal } from './ProjectFormModal';
+import { toast } from 'react-toastify';
 import { useAuth } from '../lib/AuthContext';
 import { calculateProjectsMargins } from '../services/api/projectFinancials';
 import { ClientLogo } from './ui/ClientLogo';
@@ -131,14 +131,39 @@ const ProjectCard: React.FC<{
 export const ProjectList: React.FC<({ onSelectProject: (project: Project) => void; searchQuery?: string })> = ({ onSelectProject, searchQuery = '' }) => {
   const { user, profile } = useAuth();
   const isAdminOrPJM = profile?.role === 'admin' || profile?.role === 'pjm';
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [onlyMe, setOnlyMe] = useState(false);
   const [showArchived, setShowArchived] = useState(false);
 
-  const { data: projects = [], isLoading, error } = useQuery({
+  const { data: projects = [], isLoading, error, refetch: refetchProjects } = useQuery({
     queryKey: ['projects'],
     queryFn: getProjects,
   });
+
+  const [isSyncing, setIsSyncing] = useState(false);
+  const handleMocoSync = async () => {
+    try {
+      setIsSyncing(true);
+      const token = localStorage.getItem('token');
+      const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+      const res = await fetch(`${apiBaseUrl}/api/agency/projects/sync-moco`, {
+         method: 'POST',
+         headers: {
+           'Authorization': `Bearer ${token}`
+         }
+      });
+      const data = await res.json();
+      if (data.success) {
+         toast.success(`${data.imported} Projekte aus MOCO importiert!`);
+         await refetchProjects();
+      } else {
+         toast.error(`Fehler: ${data.error}`);
+      }
+    } catch (e) {
+      toast.error('Sync fehlgeschlagen');
+    } finally {
+      setIsSyncing(false);
+    }
+  };
 
   const { data: financialOverview = {} } = useQuery({
     queryKey: ['projects-financial-overview'],
@@ -228,15 +253,24 @@ export const ProjectList: React.FC<({ onSelectProject: (project: Project) => voi
             Show Archive
           </button>
           {isAdminOrPJM && (
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
-              New Project
-            </button>
+            <>
+              <button
+                onClick={handleMocoSync}
+                disabled={isSyncing}
+                className={`font-semibold py-2 px-4 rounded-lg flex items-center transition-colors ${isSyncing ? 'bg-gray-700 text-gray-500 cursor-wait' : 'bg-purple-600 hover:bg-purple-700 text-white'}`}
+              >
+                {isSyncing ? 'Lädt...' : 'Alle aus MOCO importieren'}
+              </button>
+              <button
+                onClick={() => toast.info('Projekte werden zentral in MOCO erfasst. Bitte lege das neue Projekt in MOCO an, es erscheint hier automatisch in wenigen Sekunden.', { autoClose: 6000 })}
+                className="bg-gray-600 hover:bg-gray-500 text-white font-semibold py-2 px-4 rounded-lg flex items-center"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Neu via MOCO
+              </button>
+            </>
           )}
         </div>
       </div>
@@ -261,10 +295,6 @@ export const ProjectList: React.FC<({ onSelectProject: (project: Project) => voi
         </div>
       )}
 
-      <ProjectFormModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-      />
     </div>
   );
 };

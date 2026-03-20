@@ -42,6 +42,9 @@ export default function ResourceTimeline({ resources, startDate, onDateChange, i
     const dates = Array.from({ length: DAYS_TO_SHOW }, (_, i) => addDays(startDate, i));
 
     const getUtilizationColor = (allocation: ResourceAllocation | undefined, capacity: number) => {
+        if (allocation?.absences?.length) {
+            return 'bg-purple-900/40 text-purple-300 border-purple-700 hover:bg-purple-800/60';
+        }
         if (!allocation || allocation.hours === 0) return 'bg-gray-800 border-gray-700 text-gray-500'; // Empty state
         const utilization = (allocation.hours / capacity) * 100;
 
@@ -162,21 +165,25 @@ export default function ResourceTimeline({ resources, startDate, onDateChange, i
                                             <td key={dateKey} className="p-1 border-r border-gray-800 relative group">
                                                 <button
                                                     onClick={() => {
-                                                        if (allocation && allocation.tasks.length > 0) {
+                                                        if (allocation && allocation.tasks?.length > 0) {
                                                             setSelectedCell({ date, resource, allocation });
                                                         }
                                                     }}
-                                                    className={`w-full h-10 rounded flex items-center justify-center text-xs font-medium border transition-all duration-200 ${colorClass} ${allocation && allocation.tasks.length > 0 ? 'cursor-pointer transform hover:scale-105 shadow-sm' : 'cursor-default opacity-50'}`}
+                                                    className={`w-full h-10 rounded flex items-center justify-center text-xs font-medium border transition-all duration-200 ${colorClass} ${allocation && (allocation.tasks?.length > 0 || allocation.absences?.length) ? 'cursor-pointer transform hover:scale-105 shadow-sm' : 'cursor-default opacity-50'}`}
                                                 >
-                                                    {allocation && allocation.hours > 0 ? `${formatHours(allocation.hours)}h` : '-'}
+                                                    {allocation?.absences?.length ? 'Abwesend' : (allocation && allocation.hours > 0 ? `${formatHours(allocation.hours)}h` : '-')}
                                                 </button>
 
-                                                {/* Tooltip (Simplified) */}
-                                                {allocation && allocation.tasks.length > 0 && (
+                                                {/* Tooltip */}
+                                                {allocation?.absences?.length ? (
+                                                    <div className="absolute opacity-0 group-hover:opacity-100 transition-opacity z-20 bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-purple-800 text-white text-xs rounded pointer-events-none whitespace-nowrap">
+                                                        {allocation.absences.map((a, i) => <span key={i}>{a.reason}</span>)}
+                                                    </div>
+                                                ) : (allocation && allocation.tasks?.length > 0 && (
                                                     <div className="absolute opacity-0 group-hover:opacity-100 transition-opacity z-20 bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-black text-white text-xs rounded pointer-events-none whitespace-nowrap">
                                                         {allocation.tasks.length} {allocation.tasks.length === 1 ? 'Task' : 'Tasks'} • Klicken zum Bearbeiten
                                                     </div>
-                                                )}
+                                                ))}
                                             </td>
                                         );
                                     })}
