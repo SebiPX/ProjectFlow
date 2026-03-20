@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import type { Project } from '../types/supabase';
@@ -8,6 +7,7 @@ import { toast } from 'react-toastify';
 import { useAuth } from '../lib/AuthContext';
 import { calculateProjectsMargins } from '../services/api/projectFinancials';
 import { ClientLogo } from './ui/ClientLogo';
+import { fetchApi } from '../services/api/client';
 
 interface ProjectListProps {
   onSelectProject: (project: Project) => void;
@@ -143,23 +143,16 @@ export const ProjectList: React.FC<({ onSelectProject: (project: Project) => voi
   const handleMocoSync = async () => {
     try {
       setIsSyncing(true);
-      const token = localStorage.getItem('token');
-      const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-      const res = await fetch(`${apiBaseUrl}/api/projects/sync-moco`, {
-         method: 'POST',
-         headers: {
-           'Authorization': `Bearer ${token}`
-         }
-      });
-      const data = await res.json();
-      if (data.success) {
-         toast.success(`${data.imported} Projekte aus MOCO importiert!`);
+      const data = await fetchApi('/api/projects/sync-moco', { method: 'POST' });
+      
+      if (data?.success) {
+         toast.success(`${data.imported || 0} Projekte aus MOCO importiert!`);
          await refetchProjects();
       } else {
-         toast.error(`Fehler: ${data.error}`);
+         toast.error(`Fehler: ${data?.error || 'Unknown error'}`);
       }
-    } catch (e) {
-      toast.error('Sync fehlgeschlagen');
+    } catch (e: any) {
+      toast.error(`Sync fehlgeschlagen: ${e.message}`);
     } finally {
       setIsSyncing(false);
     }
