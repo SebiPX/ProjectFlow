@@ -16,7 +16,7 @@ This app aims to increase efficiency, improve transparency for internal teams an
 
 **✅ Authentication & User Management**
 
-- Login and signup with Supabase Auth
+- Custom JWT-based login and signup (migrated away from Supabase to custom `labs-api`)
 - Automatic profile creation on signup
 - Role-based access control (Admin, PJM, Creative, Client)
 - Restricted management actions (project creation, budgets, roles) to Admin & PJM only
@@ -86,7 +86,7 @@ This app aims to increase efficiency, improve transparency for internal teams an
 - Time tracking summary
 - **News Of The Day Widget:** Agency-wide internal announcements and daily auto-curated AI news (powered by Gemini)
 - Visual charts and KPIs
-- Real-time data from Supabase
+- Live data synchronized via custom real-time backend updates
 
 **✅ Finance Management**
 
@@ -132,7 +132,7 @@ This app aims to increase efficiency, improve transparency for internal teams an
   - **Badge Count**: Red notification badge updates in real-time.
   - **Assignment Tracking**: Automatic notifications when tasks are assigned to you.
 - **Presence Awareness**: See who is currently online (green dot indicator on avatars).
-- **Efficient Sync**: Uses Supabase Realtime (Postgres Changes) to push updates only when necessary.
+- **Efficient Sync**: Real-time event synchronization orchestrated directly through the Express.js API.
 
 **✅ Service-Katalog v2 (Admin-Only) - Normalized Multi-Table Structure**
 
@@ -205,7 +205,7 @@ This app aims to increase efficiency, improve transparency for internal teams an
   - Audio: Audio player with FileIcon
   - Other files: FileIcon with download button
 - **Signed URL support** for secure private storage access (1-hour expiry)
-- Integration with Supabase Storage (AgencyStorage bucket)
+- Integration with custom backend storage layer mapping
 - Visual file type indicators with color-coded icons
 - Image thumbnails with async loading
 - Status tracking and approval workflow
@@ -248,7 +248,7 @@ This app aims to increase efficiency, improve transparency for internal teams an
 - **RLS Policies**: Complete security model (internal vs client access) with costs table policies
 - **Helper Functions**: `is_internal()`, `get_my_client_id()`, `handle_new_user()`
 - **Triggers**: Auto-create profile on user signup
-- **Storage Buckets**: AgencyStorage for assets, client logos, and cost documents
+- **Storage**: Custom file storage mapping configured via the Express backend
 
 ---
 
@@ -280,7 +280,7 @@ This app aims to increase efficiency, improve transparency for internal teams an
 | Financial Documents | ✅ 100% | ✅       | Quotes & Invoices with Service Selection, Real-time Budget Sync |
 | Reports             | ✅ 100% | Medium   | Analytics dashboard with service profitability analysis         |
 | Resource Planning   | ✅ 100% | Medium   | Employee hours tracked, interactive capacity timeline           |
-| Real-time Updates   | ✅ 100% | High     | Supabase Realtime (WebSockets)                                  |
+| Real-time Updates   | ✅ 100% | High     | Custom backend event architecture                               |
 
 ### New in v1.8.0
 
@@ -315,7 +315,7 @@ This app aims to increase efficiency, improve transparency for internal teams an
 ### Prerequisites
 
 - Node.js 18+ and npm/yarn
-- Supabase account (free tier works)
+- PostgreSQL Database (`labs_db`) shared with Visionary PX Studio
 - Git
 
 ### 1. Clone Repository
@@ -356,13 +356,13 @@ npm run dev
 4. After signup, set your role to admin:
 
 ```sql
--- Run in Supabase SQL Editor
+-- Run in your PostgreSQL Client (e.g. pgAdmin, psql)
 UPDATE profiles SET role = 'admin' WHERE email = 'your@email.com';
 ```
 
 ### 6. (Optional) Add Seed Data
 
-Run `scripts/seed-data-fixed.sql` in Supabase SQL Editor for sample clients and projects.
+Run `scripts/seed-data-fixed.sql` in your PostgreSQL Client for sample clients and projects.
 
 ---
 
@@ -487,7 +487,7 @@ npm run build        # Build for production
 npm run preview      # Preview production build
 
 # Database
-# Run SQL scripts in Supabase SQL Editor
+# Run SQL scripts in your PostgreSQL Client
 # See scripts/ folder for utilities
 ```
 
@@ -561,7 +561,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for development guidelines and best pract
 Built with:
 
 - React + TypeScript
-- Supabase (PostgreSQL + Auth + Storage)
+- Shared Custom Backend (Node.js/Express + PostgreSQL `labs_db`)
 - Tailwind CSS
 - React Query
 - Recharts
