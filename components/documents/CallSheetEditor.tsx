@@ -20,11 +20,12 @@ import { toast } from 'react-toastify';
 
 interface CallSheetEditorProps {
   documentId: string;
+  pjmEmail: string;
   onBack: () => void;
   isAdminOrPJM: boolean;
 }
 
-export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, onBack, isAdminOrPJM }) => {
+export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pjmEmail, onBack, isAdminOrPJM }) => {
   const queryClient = useQueryClient();
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [titleInput, setTitleInput] = useState('');
@@ -174,14 +175,23 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, on
              <div>
                <h1 className="text-4xl font-black tracking-tight text-foreground uppercase print:text-black">Drehdispo</h1>
                <div className="mt-2 text-xl font-medium text-muted-foreground print:text-gray-800">{doc.title}</div>
-               <div className="mt-1 text-sm text-muted-foreground">Erstellt von: {doc.author_name} ({new Date(doc.created_at).toLocaleDateString()})</div>
+               <div className="mt-2 text-sm text-foreground flex items-center gap-2">
+                 <span className="font-bold uppercase text-muted-foreground">Drehtag:</span>
+                 <input 
+                    type="date"
+                    value={data.shoot_date || ''}
+                    onChange={(e) => handleDataChange('shoot_date', e.target.value)}
+                    className="bg-transparent border-b border-transparent hover:border-border focus:border-primary focus:outline-none print:border-none uppercase"
+                    disabled={!isAdminOrPJM}
+                 />
+               </div>
              </div>
              <div className="text-right">
                {/* Pixelschickeria Logo Header */}
                <img src="/Pixelschickeria_Logo.png" alt="Pixelschickeria" className="h-10 ml-auto mb-2 opacity-90 hidden dark:block print:hidden" />
                <img src="/Pixelschickeria_Logo_Dark.png" alt="Pixelschickeria" className="h-10 ml-auto mb-2 opacity-90 dark:hidden print:block" />
                <p className="text-xs font-medium text-foreground print:text-black">Pixelschickeria GmbH</p>
-               <p className="text-xs text-muted-foreground print:text-gray-600">hello@pixelschickeria.de</p>
+               <p className="text-xs text-muted-foreground print:text-gray-600">{pjmEmail}</p>
              </div>
            </div>
 

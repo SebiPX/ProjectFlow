@@ -28,6 +28,7 @@ export interface ShotlistItem {
 
 export interface CallSheetData {
   document_id: string;
+  shoot_date?: string;
   location_name: string;
   location_address: string;
   weather_info: string;

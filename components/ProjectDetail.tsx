@@ -647,8 +647,11 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
             <ProjectServiceBreakdown projectId={project.id} />
           </div>
         );
-      case 'documents':
-        return <DocumentList projectId={project.id} isClient={isClient} isAdminOrPJM={isAdminOrPJM} />;
+      case 'documents': {
+        const pjm = teamMembers.find((m: any) => m.role?.toLowerCase().includes('pjm') || m.role?.toLowerCase().includes('projektleitung'));
+        const pjmEmail = pjm?.profile?.email || 'hello@pixelschickeria.de';
+        return <DocumentList projectId={project.id} projectTitle={project.title} pjmEmail={pjmEmail} isClient={isClient} isAdminOrPJM={isAdminOrPJM} />;
+      }
       default:
         return <div className="p-6 text-muted-foreground">{project.description}</div>;
     }

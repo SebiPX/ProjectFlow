@@ -8,11 +8,13 @@ import { CallSheetEditor } from './CallSheetEditor';
 
 interface DocumentListProps {
   projectId: string;
+  projectTitle: string;
+  pjmEmail: string;
   isClient: boolean;
   isAdminOrPJM: boolean;
 }
 
-export const DocumentList: React.FC<DocumentListProps> = ({ projectId, isClient, isAdminOrPJM }) => {
+export const DocumentList: React.FC<DocumentListProps> = ({ projectId, projectTitle, pjmEmail, isClient, isAdminOrPJM }) => {
   const queryClient = useQueryClient();
   const [isCreating, setIsCreating] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState<AgencyDocument | null>(null);
@@ -49,7 +51,11 @@ export const DocumentList: React.FC<DocumentListProps> = ({ projectId, isClient,
 
   const handleCreate = (type: 'shotlist' | 'call_sheet') => {
     setIsCreating(true);
-    const title = type === 'shotlist' ? 'New Shotlist' : 'New Drehdispo';
+    let title = type === 'shotlist' ? 'New Shotlist' : 'New Drehdispo';
+    if (type === 'call_sheet') {
+      const existingDispos = documents.filter((d: AgencyDocument) => d.type === 'call_sheet').length;
+      title = `${projectTitle} - Dispo v${existingDispos + 1}`;
+    }
     createMutation.mutate({ title, type });
   };
 
@@ -61,7 +67,7 @@ export const DocumentList: React.FC<DocumentListProps> = ({ projectId, isClient,
     if (selectedDocument.type === 'shotlist') {
       return <ShotlistEditor documentId={selectedDocument.id} onBack={() => setSelectedDocument(null)} isAdminOrPJM={isAdminOrPJM} />;
     } else {
-      return <CallSheetEditor documentId={selectedDocument.id} onBack={() => setSelectedDocument(null)} isAdminOrPJM={isAdminOrPJM} />;
+      return <CallSheetEditor documentId={selectedDocument.id} pjmEmail={pjmEmail} onBack={() => setSelectedDocument(null)} isAdminOrPJM={isAdminOrPJM} />;
     }
   }
 
