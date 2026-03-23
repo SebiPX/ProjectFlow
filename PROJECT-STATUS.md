@@ -436,6 +436,13 @@ Don't try to create RLS policies for admin access to all profiles - use service 
 - ✅ **Smart Task Mapping**: Time entries without a defined task fallback securely to the project's primary MOCO "Leistung" (Task).
 - ✅ **Automatic Descriptions**: PX-Flow Task Titles and Descriptions dynamically populate MOCO billing entries.
 
+### In Progress: v2.3.0 🚧 (March 2026) - NATIVE PROJECT DOCUMENTS
+
+- 🚧 **Active Focus**: We are currently working on the **Documents Modal** within projects.
+- ✅ **Infrastructure**: Created 5 new PostgreSQL tables (`agency_documents`, `agency_shotlist_items`, etc.) and corresponding `labs-api` Express routes.
+- ✅ **Shotlist Editor**: Airtable-style grid for building structured shotlists with drag & drop functionality. (Image Upload feature upcoming).
+- ✅ **Drehdispo (Call Sheet)**: Form-based document builder combining Schedule, Contacts, Location, and Weather info. Includes Native PDF Print via browser `print:hidden` CSS logic, dynamic Drehtag, and PJM emails.
+
 1. **Integrations & Export (Phase 2)**
    - [x] Automation email notifications (Edge Functions)
    - [ ] API for external tool integration
