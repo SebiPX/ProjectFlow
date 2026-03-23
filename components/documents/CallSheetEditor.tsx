@@ -161,6 +161,43 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
     }
   };
 
+  const [isHospitalLoading, setIsHospitalLoading] = useState(false);
+
+  const fetchHospital = async (lat: string, lng: string) => {
+    if (!lat || !lng) {
+      toast.error('Bitte erst eine Location (mit Autocomplete) auswählen!');
+      return;
+    }
+    setIsHospitalLoading(true);
+    try {
+      // Nominatim search for Hospital biased by coords
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?q=Krankenhaus&lat=${lat}&lon=${lng}&format=json&addressdetails=1&limit=1`);
+      const data = await res.json();
+      
+      if (data && data.length > 0) {
+        const h = data[0];
+        // Try to get a clean name
+        const name = h.address?.hospital || h.address?.clinic || h.name || h.display_name.split(',')[0];
+        const road = h.address?.road || '';
+        const house = h.address?.house_number || '';
+        const city = h.address?.city || h.address?.town || h.address?.village || '';
+        
+        let info = `${name}`;
+        if (road || city) info += `\n${road} ${house}, ${city}`.trim();
+        
+        handleDataChange('hospital_info', info);
+        toast.success('Krankenhaus gefunden!');
+      } else {
+        toast.info('Kein Krankenhaus in der Nähe gefunden.');
+      }
+    } catch (e) {
+      console.error(e);
+      toast.error('Krankenhaus-Suche fehlgeschlagen.');
+    } finally {
+      setIsHospitalLoading(false);
+    }
+  };
+
   const printDocument = () => {
     window.print();
   };
@@ -261,9 +298,12 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                   <LocationAutocomplete 
                     value={data.location_address || ''} 
                     onChange={(val) => handleDataChange('location_address', val)}
-                    onSelectCallback={(lat, lon) => {
-                      handleDataChange('location_lat', lat);
-                      handleDataChange('location_lng', lon);
+                    onSelectCallback={(lat, lon, address) => {
+                      updateDataMutation.mutate({
+                        location_address: address,
+                        location_lat: lat,
+                        location_lng: lon
+                      });
                     }}
                     disabled={!isAdminOrPJM}
                   />
@@ -278,8 +318,9 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                     {isAdminOrPJM && (
                       <button 
                         onClick={() => fetchWeather(data.location_lat as string, data.location_lng as string, data.shoot_date as string)}
-                        disabled={isWeatherLoading || !data.location_lat || !data.shoot_date}
-                        className="text-[10px] font-bold bg-primary/10 text-primary hover:bg-primary/20 px-2 rounded disabled:opacity-50 print:hidden transition-colors"
+                        className={`text-[10px] font-bold bg-primary/10 text-primary hover:bg-primary/20 px-2 rounded print:hidden transition-colors ${
+                          (!data.location_lat || !data.shoot_date || isWeatherLoading) ? 'opacity-50 cursor-pointer' : ''
+                        }`}
                         title="Benötigt Datum & Adresse (Autocomplete)"
                       >
                         {isWeatherLoading ? 'Lade...' : 'Auto-Fill'}
@@ -301,13 +342,31 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-muted-foreground uppercase mb-1 flex items-center gap-1 text-red-400 print:text-red-600">
-                    <Icon path="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" className="w-3 h-3" /> Nächstes Krankenhaus
-                  </label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-bold text-muted-foreground uppercase flex items-center gap-1 text-red-400 print:text-red-600">
+                      <Icon path="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" className="w-3 h-3" /> Nächstes Krankenhaus
+                    </label>
+                    {isAdminOrPJM && (
+                      <button 
+                        onClick={() => fetchHospital(data.location_lat as string, data.location_lng as string)}
+                        className={`text-[10px] font-bold bg-red-400/10 text-red-400 hover:bg-red-400/20 px-2 rounded print:hidden transition-colors ${
+                          (!data.location_lat || isHospitalLoading) ? 'opacity-50 cursor-pointer' : ''
+                        }`}
+                        title="Sucht das nächste Krankenhaus via Koordinaten"
+                      >
+                        {isHospitalLoading ? 'Suche...' : 'Auto-Fill'}
+                      </button>
+                    )}
+                  </div>
                   <textarea 
+                    key={`hospital-${data.hospital_info}`}
                     defaultValue={data.hospital_info || ''} 
-                    onBlur={(e) => handleDataChange('hospital_info', e.target.value)}
-                    placeholder="Krankenhaus X..."
+                    onBlur={(e) => {
+                      if (e.target.value !== data.hospital_info) {
+                        handleDataChange('hospital_info', e.target.value);
+                      }
+                    }}
+                    placeholder={data.location_lat ? "Auto-Fill klicken für Krankenhaus..." : "Krankenhaus X... (erst Adresse setzen)"}
                     className="w-full bg-transparent text-sm border border-transparent hover:border-border focus:border-primary rounded resize-none h-10 p-1 focus:outline-none print:border-none print:p-0"
                     disabled={!isAdminOrPJM}
                   />
