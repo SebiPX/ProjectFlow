@@ -170,25 +170,50 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
     }
     setIsHospitalLoading(true);
     try {
-      // Nominatim search for Hospital biased by coords
-      const res = await fetch(`https://nominatim.openstreetmap.org/search?q=Krankenhaus&lat=${lat}&lon=${lng}&format=json&addressdetails=1&limit=1`);
+      const query = `[out:json];(node["amenity"="hospital"](around:5000,${lat},${lng});way["amenity"="hospital"](around:5000,${lat},${lng});relation["amenity"="hospital"](around:5000,${lat},${lng}););out center;`;
+      const res = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`);
       const data = await res.json();
       
-      if (data && data.length > 0) {
-        const h = data[0];
-        // Try to get a clean name
-        const name = h.address?.hospital || h.address?.clinic || h.name || h.display_name.split(',')[0];
-        const road = h.address?.road || '';
-        const house = h.address?.house_number || '';
-        const city = h.address?.city || h.address?.town || h.address?.village || '';
+      if (data.elements && data.elements.length > 0) {
+        let closest = data.elements[0];
+        let minD = Infinity;
+        const R = 6371; // Erdradius km
         
-        let info = `${name}`;
-        if (road || city) info += `\n${road} ${house}, ${city}`.trim();
-        
-        handleDataChange('hospital_info', info);
-        toast.success('Krankenhaus gefunden!');
+        data.elements.forEach((el: any) => {
+          const elLat = el.lat || el.center?.lat;
+          const elLng = el.lon || el.center?.lon;
+          if (!elLat || !elLng) return;
+          
+          const dLat = (elLat - parseFloat(lat)) * Math.PI / 180;
+          const dLon = (elLng - parseFloat(lng)) * Math.PI / 180;
+          const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                  Math.cos(parseFloat(lat) * Math.PI / 180) * Math.cos(elLat * Math.PI / 180) * 
+                  Math.sin(dLon/2) * Math.sin(dLon/2); 
+          const d = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+          
+          if (d < minD) {
+            minD = d;
+            closest = el;
+          }
+        });
+
+        if (closest && closest.tags) {
+          const h = closest.tags;
+          const name = h.name || h.operator || 'Krankenhaus';
+          const road = h['addr:street'] || '';
+          const house = h['addr:housenumber'] || '';
+          const city = h['addr:city'] || '';
+          
+          let info = `${name}`;
+          if (road || city) info += `\n${road} ${house}, ${city}`.trim();
+          
+          handleDataChange('hospital_info', info);
+          toast.success('Nächstes Krankenhaus gefunden!');
+        } else {
+          toast.info('Keine Details zum gefundenen Krankenhaus.');
+        }
       } else {
-        toast.info('Kein Krankenhaus in der Nähe gefunden.');
+        toast.info('Kein Krankenhaus im Umkreis von 5km gefunden.');
       }
     } catch (e) {
       console.error(e);
