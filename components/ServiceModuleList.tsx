@@ -96,8 +96,8 @@ export const ServiceModuleList: React.FC<ServiceModuleListProps> = ({ searchQuer
       <div className="p-8">
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
-            <p className="mt-4 text-gray-400">Lade Service-Katalog...</p>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+            <p className="mt-4 text-muted-foreground">Lade Service-Katalog...</p>
           </div>
         </div>
       </div>
@@ -119,14 +119,14 @@ export const ServiceModuleList: React.FC<ServiceModuleListProps> = ({ searchQuer
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-white">Service-Katalog</h1>
-          <p className="text-gray-400 mt-1">
+          <h1 className="text-3xl font-bold text-foreground">Service-Katalog</h1>
+          <p className="text-muted-foreground mt-1">
             Verwalten Sie Ihre Service-Module und Preise
           </p>
         </div>
         <button
           onClick={() => setIsCreateModalOpen(true)}
-          className="flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+          className="flex items-center px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium"
         >
           <Icon path="M12 4v16m8-8H4" className="w-5 h-5 mr-2" />
           Neues Service-Modul
@@ -134,14 +134,14 @@ export const ServiceModuleList: React.FC<ServiceModuleListProps> = ({ searchQuer
       </div>
 
       {/* Filters */}
-      <div className="bg-gray-800 rounded-lg p-4 mb-6 flex flex-wrap gap-4">
+      <div className="bg-card rounded-lg p-4 mb-6 flex flex-wrap gap-4">
         {/* Category Filter */}
         <div className="flex items-center gap-2">
-          <label className="text-sm font-medium text-gray-300">Kategorie:</label>
+          <label className="text-sm font-medium text-muted-foreground">Kategorie:</label>
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value as ServiceCategory | 'all')}
-            className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500"
+            className="px-3 py-2 bg-muted border border-input rounded-lg text-foreground text-sm focus:outline-none focus:border-primary"
           >
             <option value="all">Alle</option>
             <option value="CONSULTING">Consulting</option>
@@ -159,20 +159,20 @@ export const ServiceModuleList: React.FC<ServiceModuleListProps> = ({ searchQuer
             id="showInactive"
             checked={showInactive}
             onChange={(e) => setShowInactive(e.target.checked)}
-            className="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500"
+            className="w-4 h-4 text-primary bg-muted border-input rounded focus:ring-primary"
           />
-          <label htmlFor="showInactive" className="text-sm text-gray-300">
+          <label htmlFor="showInactive" className="text-sm text-muted-foreground">
             Inaktive anzeigen
           </label>
         </div>
 
         {/* Sort */}
         <div className="flex items-center gap-2 ml-auto">
-          <label className="text-sm font-medium text-gray-300">Sortieren:</label>
+          <label className="text-sm font-medium text-muted-foreground">Sortieren:</label>
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as 'name' | 'category')}
-            className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500"
+            className="px-3 py-2 bg-muted border border-input rounded-lg text-foreground text-sm focus:outline-none focus:border-primary"
           >
             <option value="category">Kategorie</option>
             <option value="name">Name</option>
@@ -182,19 +182,19 @@ export const ServiceModuleList: React.FC<ServiceModuleListProps> = ({ searchQuer
 
       {/* Module Cards */}
       {filteredModules.length === 0 ? (
-        <div className="bg-gray-800 rounded-lg p-12 text-center">
+        <div className="bg-card rounded-lg p-12 text-center">
           <div className="flex justify-center mb-4">
             <Icon
               path="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
               className="w-16 h-16 text-gray-600"
             />
           </div>
-          <h3 className="text-xl font-semibold text-white mb-2">
+          <h3 className="text-xl font-semibold text-foreground mb-2">
             {categoryFilter !== 'all' || !showInactive
               ? 'Keine Services gefunden'
               : 'Noch keine Services'}
           </h3>
-          <p className="text-gray-400 mb-6">
+          <p className="text-muted-foreground mb-6">
             {categoryFilter !== 'all' || !showInactive
               ? 'Passen Sie die Filter an, um mehr Services zu sehen.'
               : 'Erstellen Sie Ihr erstes Service-Modul, um loszulegen.'}
@@ -202,7 +202,7 @@ export const ServiceModuleList: React.FC<ServiceModuleListProps> = ({ searchQuer
           {categoryFilter === 'all' && showInactive && (
             <button
               onClick={() => setIsCreateModalOpen(true)}
-              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+              className="px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium"
             >
               Service-Modul erstellen
             </button>

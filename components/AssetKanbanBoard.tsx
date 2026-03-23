@@ -62,13 +62,13 @@ const KanbanColumn = ({ id, title, assets, assetCardProps, isClient }: { id: Ass
     const { setNodeRef } = useDroppable({ id });
 
     return (
-        <div className="flex flex-col w-80 bg-gray-900 rounded-lg border border-gray-800 h-full flex-shrink-0">
-            <div className={`p-4 border-b border-gray-800 font-semibold text-white flex justify-between items-center
+        <div className="flex flex-col w-80 bg-background rounded-lg border border-border h-full flex-shrink-0">
+            <div className={`p-4 border-b border-border font-semibold text-primary-foreground flex justify-between items-center
         ${id === AssetStatus.Approved ? 'bg-green-500/10 text-green-400' : ''}
-        ${id === AssetStatus.ClientReview ? 'bg-blue-500/10 text-blue-400' : ''}
+        ${id === AssetStatus.ClientReview ? 'bg-primary/10 text-primary' : ''}
       `}>
                 {title}
-                <span className="bg-gray-800 text-gray-400 text-xs py-0.5 px-2 rounded-full">
+                <span className="bg-card text-muted-foreground text-xs py-0.5 px-2 rounded-full">
                     {assets.length}
                 </span>
             </div>
@@ -83,7 +83,7 @@ const KanbanColumn = ({ id, title, assets, assetCardProps, isClient }: { id: Ass
                         />
                     ))}
                     {assets.length === 0 && (
-                        <div className="h-full flex items-center justify-center text-gray-600 text-sm border-2 border-dashed border-gray-800 rounded-lg py-8">
+                        <div className="h-full flex items-center justify-center text-gray-600 text-sm border-2 border-dashed border-border rounded-lg py-8">
                             Drop here
                         </div>
                     )}

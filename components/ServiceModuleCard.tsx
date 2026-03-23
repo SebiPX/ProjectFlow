@@ -19,17 +19,17 @@ export const ServiceModuleCard: React.FC<ServiceModuleCardProps> = ({
   const getCategoryColor = (category: string) => {
     switch (category) {
       case 'CONSULTING':
-        return 'bg-blue-600';
+        return 'bg-primary text-primary-foreground';
       case 'CREATION':
-        return 'bg-purple-600';
+        return 'bg-purple-600 text-white';
       case 'PRODUCTION':
-        return 'bg-orange-600';
+        return 'bg-orange-600 text-white';
       case 'MANAGEMENT':
-        return 'bg-green-600';
+        return 'bg-green-600 text-white';
       case 'LOGISTICS':
-        return 'bg-yellow-600';
+        return 'bg-yellow-600 text-white';
       default:
-        return 'bg-gray-600';
+        return 'bg-muted/80 text-foreground';
     }
   };
 
@@ -53,7 +53,7 @@ export const ServiceModuleCard: React.FC<ServiceModuleCardProps> = ({
   const hasPricing = pricingCount > 0;
 
   return (
-    <div className="bg-gray-800 rounded-lg shadow-lg overflow-hidden border border-gray-700">
+    <div className="bg-card rounded-lg shadow-lg overflow-hidden border border-border">
       {/* Header - Clickable to expand/collapse */}
       <div
         className="p-5 cursor-pointer hover:bg-gray-750 transition-colors"
@@ -66,16 +66,16 @@ export const ServiceModuleCard: React.FC<ServiceModuleCardProps> = ({
                 {module.category}
               </span>
               {!module.is_active && (
-                <span className="px-2 py-1 text-xs font-semibold rounded bg-gray-600 text-gray-300">
+                <span className="px-2 py-1 text-xs font-semibold rounded bg-muted/80 text-muted-foreground">
                   Inaktiv
                 </span>
               )}
             </div>
-            <h3 className="text-xl font-bold text-white">{module.service_module}</h3>
+            <h3 className="text-xl font-bold text-foreground">{module.service_module}</h3>
           </div>
           <button
             type="button"
-            className="text-gray-400 hover:text-white transition-colors ml-3"
+            className="text-muted-foreground hover:text-foreground transition-colors ml-3"
             onClick={(e) => {
               e.stopPropagation();
               setIsExpanded(!isExpanded);
@@ -93,10 +93,10 @@ export const ServiceModuleCard: React.FC<ServiceModuleCardProps> = ({
         </div>
 
         {module.description && (
-          <p className="text-gray-400 text-sm mb-3">{module.description}</p>
+          <p className="text-muted-foreground text-sm mb-3">{module.description}</p>
         )}
 
-        <div className="flex items-center gap-4 text-sm text-gray-400">
+        <div className="flex items-center gap-4 text-sm text-muted-foreground">
           <span className="flex items-center gap-1">
             <Icon path="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" className="w-4 h-4" />
             {getUnitText(module.default_unit)}
@@ -110,33 +110,33 @@ export const ServiceModuleCard: React.FC<ServiceModuleCardProps> = ({
 
       {/* Expanded Content - Pricing Table */}
       {isExpanded && hasPricing && (
-        <div className="px-5 pb-5 border-t border-gray-700">
+        <div className="px-5 pb-5 border-t border-border">
           <div className="mt-4">
-            <h4 className="text-sm font-semibold text-white mb-3 uppercase tracking-wider">
+            <h4 className="text-sm font-semibold text-foreground mb-3 uppercase tracking-wider">
               Preisübersicht
             </h4>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-gray-700">
-                    <th className="text-left py-2 px-3 text-gray-400 font-medium">Level</th>
-                    <th className="text-right py-2 px-3 text-gray-400 font-medium">Rate</th>
-                    <th className="text-right py-2 px-3 text-gray-400 font-medium">Cost</th>
-                    <th className="text-right py-2 px-3 text-gray-400 font-medium">Marge</th>
+                  <tr className="border-b border-border">
+                    <th className="text-left py-2 px-3 text-muted-foreground font-medium">Level</th>
+                    <th className="text-right py-2 px-3 text-muted-foreground font-medium">Rate</th>
+                    <th className="text-right py-2 px-3 text-muted-foreground font-medium">Cost</th>
+                    <th className="text-right py-2 px-3 text-muted-foreground font-medium">Marge</th>
                   </tr>
                 </thead>
                 <tbody>
                   {module.pricing
                     ?.sort((a, b) => (a.seniority_level?.level_order || 0) - (b.seniority_level?.level_order || 0))
                     .map((pricing) => (
-                      <tr key={pricing.id} className="border-b border-gray-700 last:border-0">
-                        <td className="py-3 px-3 text-white font-medium">
+                      <tr key={pricing.id} className="border-b border-border last:border-0">
+                        <td className="py-3 px-3 text-foreground font-medium">
                           {pricing.seniority_level?.level_name || 'N/A'}
                         </td>
-                        <td className="py-3 px-3 text-right text-white">
+                        <td className="py-3 px-3 text-right text-foreground">
                           {pricing.rate.toFixed(2)} €/{getUnitText(module.default_unit)?.toLowerCase() || ''}
                         </td>
-                        <td className="py-3 px-3 text-right text-gray-400">
+                        <td className="py-3 px-3 text-right text-muted-foreground">
                           {(pricing.internal_cost || 0).toFixed(2)} €
                         </td>
                         <td className="py-3 px-3 text-right">
@@ -162,11 +162,11 @@ export const ServiceModuleCard: React.FC<ServiceModuleCardProps> = ({
       )}
 
       {/* Actions */}
-      <div className="px-5 py-3 bg-gray-750 border-t border-gray-700 flex gap-3">
+      <div className="px-5 py-3 bg-gray-750 border-t border-border flex gap-3">
         <button
           type="button"
           onClick={() => onEdit(module)}
-          className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+          className="flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors text-sm font-medium"
         >
           <Icon path="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" className="w-4 h-4 mr-2" />
           Bearbeiten
@@ -176,7 +176,7 @@ export const ServiceModuleCard: React.FC<ServiceModuleCardProps> = ({
           onClick={() => onToggleActive(module.id, !module.is_active)}
           className={`flex items-center px-4 py-2 rounded-lg transition-colors text-sm font-medium ${
             module.is_active
-              ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+              ? 'bg-muted text-muted-foreground hover:bg-muted/80'
               : 'bg-green-600 text-white hover:bg-green-700'
           }`}
         >

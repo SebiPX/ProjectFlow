@@ -201,13 +201,13 @@ export const ClientFormModal: React.FC<ClientFormModalProps> = ({ isOpen, onClos
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+      <div className="bg-card rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex justify-between items-center p-6 border-b border-gray-700">
-          <h2 className="text-2xl font-bold text-white">Create New Client</h2>
+        <div className="flex justify-between items-center p-6 border-b border-border">
+          <h2 className="text-2xl font-bold text-foreground">Create New Client</h2>
           <button
             onClick={handleClose}
-            className="text-gray-400 hover:text-white transition-colors"
+            className="text-muted-foreground hover:text-foreground transition-colors"
           >
             <Icon path="M6 18L18 6M6 6l12 12" className="w-6 h-6" />
           </button>
@@ -217,7 +217,7 @@ export const ClientFormModal: React.FC<ClientFormModalProps> = ({ isOpen, onClos
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {/* Company Name */}
           <div>
-            <label htmlFor="company_name" className="block text-sm font-medium text-gray-300 mb-2">
+            <label htmlFor="company_name" className="block text-sm font-medium text-muted-foreground mb-2">
               Company Name *
             </label>
             <input
@@ -226,14 +226,14 @@ export const ClientFormModal: React.FC<ClientFormModalProps> = ({ isOpen, onClos
               required
               value={formData.company_name}
               onChange={(e) => setFormData({ ...formData, company_name: e.target.value })}
-              className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="Enter company name"
             />
           </div>
 
           {/* Company Logo */}
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-muted-foreground mb-2">
               Company Logo
             </label>
             <div className="flex items-center gap-4">
@@ -241,11 +241,11 @@ export const ClientFormModal: React.FC<ClientFormModalProps> = ({ isOpen, onClos
                 <img
                   src={logoPreview}
                   alt="Logo Preview"
-                  className="w-20 h-20 rounded-lg object-cover border-2 border-gray-600"
+                  className="w-20 h-20 rounded-lg object-cover border-2 border-input"
                 />
               ) : (
-                <div className="w-20 h-20 rounded-lg bg-gray-700 border-2 border-gray-600 flex items-center justify-center">
-                  <Icon path="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" className="w-8 h-8 text-gray-500" />
+                <div className="w-20 h-20 rounded-lg bg-muted border-2 border-input flex items-center justify-center">
+                  <Icon path="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" className="w-8 h-8 text-muted-foreground" />
                 </div>
               )}
               <div className="flex-1">
@@ -258,7 +258,7 @@ export const ClientFormModal: React.FC<ClientFormModalProps> = ({ isOpen, onClos
                 />
                 <label
                   htmlFor="logo-upload"
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg cursor-pointer transition-colors"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground text-sm rounded-lg cursor-pointer transition-colors"
                 >
                   <Icon path="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" className="w-4 h-4" />
                   Choose Logo
@@ -275,7 +275,7 @@ export const ClientFormModal: React.FC<ClientFormModalProps> = ({ isOpen, onClos
                     Remove
                   </button>
                 )}
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   JPG, PNG or GIF. Max size 5MB.
                 </p>
               </div>
@@ -284,7 +284,7 @@ export const ClientFormModal: React.FC<ClientFormModalProps> = ({ isOpen, onClos
 
           {/* Address */}
           <div>
-            <label htmlFor="address_line1" className="block text-sm font-medium text-gray-300 mb-2">
+            <label htmlFor="address_line1" className="block text-sm font-medium text-muted-foreground mb-2">
               Address
             </label>
             <input
@@ -292,7 +292,7 @@ export const ClientFormModal: React.FC<ClientFormModalProps> = ({ isOpen, onClos
               id="address_line1"
               value={formData.address_line1}
               onChange={(e) => setFormData({ ...formData, address_line1: e.target.value })}
-              className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="Street and house number"
             />
           </div>
@@ -300,7 +300,7 @@ export const ClientFormModal: React.FC<ClientFormModalProps> = ({ isOpen, onClos
           {/* City & ZIP Row */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label htmlFor="zip_code" className="block text-sm font-medium text-gray-300 mb-2">
+              <label htmlFor="zip_code" className="block text-sm font-medium text-muted-foreground mb-2">
                 ZIP Code
               </label>
               <input
@@ -308,13 +308,13 @@ export const ClientFormModal: React.FC<ClientFormModalProps> = ({ isOpen, onClos
                 id="zip_code"
                 value={formData.zip_code}
                 onChange={(e) => setFormData({ ...formData, zip_code: e.target.value })}
-                className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                 placeholder="12345"
               />
             </div>
 
             <div>
-              <label htmlFor="city" className="block text-sm font-medium text-gray-300 mb-2">
+              <label htmlFor="city" className="block text-sm font-medium text-muted-foreground mb-2">
                 City
               </label>
               <input
@@ -322,7 +322,7 @@ export const ClientFormModal: React.FC<ClientFormModalProps> = ({ isOpen, onClos
                 id="city"
                 value={formData.city}
                 onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                 placeholder="City"
               />
             </div>
@@ -330,14 +330,14 @@ export const ClientFormModal: React.FC<ClientFormModalProps> = ({ isOpen, onClos
 
           {/* Country */}
           <div>
-            <label htmlFor="country" className="block text-sm font-medium text-gray-300 mb-2">
+            <label htmlFor="country" className="block text-sm font-medium text-muted-foreground mb-2">
               Country
             </label>
             <select
               id="country"
               value={formData.country}
               onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-              className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             >
               <option value="Germany">Germany</option>
               <option value="Austria">Austria</option>
@@ -353,7 +353,7 @@ export const ClientFormModal: React.FC<ClientFormModalProps> = ({ isOpen, onClos
           {/* VAT ID & Payment Terms Row */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label htmlFor="vat_id" className="block text-sm font-medium text-gray-300 mb-2">
+              <label htmlFor="vat_id" className="block text-sm font-medium text-muted-foreground mb-2">
                 VAT ID
               </label>
               <input
@@ -361,13 +361,13 @@ export const ClientFormModal: React.FC<ClientFormModalProps> = ({ isOpen, onClos
                 id="vat_id"
                 value={formData.vat_id}
                 onChange={(e) => setFormData({ ...formData, vat_id: e.target.value })}
-                className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                 placeholder="DE123456789"
               />
             </div>
 
             <div>
-              <label htmlFor="payment_terms_days" className="block text-sm font-medium text-gray-300 mb-2">
+              <label htmlFor="payment_terms_days" className="block text-sm font-medium text-muted-foreground mb-2">
                 Payment Terms (Days)
               </label>
               <input
@@ -376,7 +376,7 @@ export const ClientFormModal: React.FC<ClientFormModalProps> = ({ isOpen, onClos
                 min="0"
                 value={formData.payment_terms_days}
                 onChange={(e) => setFormData({ ...formData, payment_terms_days: e.target.value })}
-                className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                 placeholder="30"
               />
             </div>
@@ -384,7 +384,7 @@ export const ClientFormModal: React.FC<ClientFormModalProps> = ({ isOpen, onClos
 
           {/* Website */}
           <div>
-            <label htmlFor="website" className="block text-sm font-medium text-gray-300 mb-2">
+            <label htmlFor="website" className="block text-sm font-medium text-muted-foreground mb-2">
               Website
             </label>
             <input
@@ -392,19 +392,19 @@ export const ClientFormModal: React.FC<ClientFormModalProps> = ({ isOpen, onClos
               id="website"
               value={formData.website}
               onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-              className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="https://example.com"
             />
           </div>
 
           {/* Contact Persons Section */}
-          <div className="pt-6 border-t border-gray-700">
+          <div className="pt-6 border-t border-border">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-white">Contact Persons</h3>
+              <h3 className="text-lg font-semibold text-foreground">Contact Persons</h3>
               <button
                 type="button"
                 onClick={addContact}
-                className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition-colors flex items-center gap-2"
+                className="px-3 py-1 bg-primary hover:bg-primary/90 text-primary-foreground text-sm rounded-lg transition-colors flex items-center gap-2"
               >
                 <Icon path="M12 6v6m0 0v6m0-6h6m-6 0H6" className="w-4 h-4" />
                 Add Contact
@@ -413,9 +413,9 @@ export const ClientFormModal: React.FC<ClientFormModalProps> = ({ isOpen, onClos
 
             <div className="space-y-4">
               {contacts.map((contact, index) => (
-                <div key={index} className="bg-gray-700/50 rounded-lg p-4 space-y-3">
+                <div key={index} className="bg-muted/50 rounded-lg p-4 space-y-3">
                   <div className="flex justify-between items-start">
-                    <h4 className="text-sm font-medium text-gray-300">Contact {index + 1}</h4>
+                    <h4 className="text-sm font-medium text-muted-foreground">Contact {index + 1}</h4>
                     {contacts.length > 1 && (
                       <button
                         type="button"
@@ -430,67 +430,67 @@ export const ClientFormModal: React.FC<ClientFormModalProps> = ({ isOpen, onClos
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs font-medium text-gray-400 mb-1">
+                      <label className="block text-xs font-medium text-muted-foreground mb-1">
                         Full Name
                       </label>
                       <input
                         type="text"
                         value={contact.full_name}
                         onChange={(e) => updateContact(index, 'full_name', e.target.value)}
-                        className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 bg-muted border border-input rounded text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                         placeholder="John Doe"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-medium text-gray-400 mb-1">
+                      <label className="block text-xs font-medium text-muted-foreground mb-1">
                         Position
                       </label>
                       <input
                         type="text"
                         value={contact.position}
                         onChange={(e) => updateContact(index, 'position', e.target.value)}
-                        className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 bg-muted border border-input rounded text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                         placeholder="Marketing Manager"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-medium text-gray-400 mb-1">
+                      <label className="block text-xs font-medium text-muted-foreground mb-1">
                         Email
                       </label>
                       <input
                         type="email"
                         value={contact.email}
                         onChange={(e) => updateContact(index, 'email', e.target.value)}
-                        className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 bg-muted border border-input rounded text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                         placeholder="john@example.com"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-medium text-gray-400 mb-1">
+                      <label className="block text-xs font-medium text-muted-foreground mb-1">
                         Phone
                       </label>
                       <input
                         type="tel"
                         value={contact.phone}
                         onChange={(e) => updateContact(index, 'phone', e.target.value)}
-                        className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 bg-muted border border-input rounded text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                         placeholder="+49 123 456789"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-gray-400 mb-1">
+                    <label className="block text-xs font-medium text-muted-foreground mb-1">
                       Notes
                     </label>
                     <textarea
                       value={contact.notes}
                       onChange={(e) => updateContact(index, 'notes', e.target.value)}
                       rows={2}
-                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 bg-muted border border-input rounded text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                       placeholder="Additional notes..."
                     />
                   </div>
@@ -501,9 +501,9 @@ export const ClientFormModal: React.FC<ClientFormModalProps> = ({ isOpen, onClos
                       id={`primary-${index}`}
                       checked={contact.is_primary}
                       onChange={(e) => updateContact(index, 'is_primary', e.target.checked)}
-                      className="w-4 h-4 bg-gray-700 border-gray-600 rounded focus:ring-2 focus:ring-blue-500"
+                      className="w-4 h-4 bg-muted border-input rounded focus:ring-2 focus:ring-primary"
                     />
-                    <label htmlFor={`primary-${index}`} className="ml-2 text-xs text-gray-300">
+                    <label htmlFor={`primary-${index}`} className="ml-2 text-xs text-muted-foreground">
                       Primary Contact
                     </label>
                   </div>
@@ -513,11 +513,11 @@ export const ClientFormModal: React.FC<ClientFormModalProps> = ({ isOpen, onClos
           </div>
 
           {/* Form Actions */}
-          <div className="flex justify-end gap-3 pt-4 border-t border-gray-700">
+          <div className="flex justify-end gap-3 pt-4 border-t border-border">
             <button
               type="button"
               onClick={handleClose}
-              className="px-6 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors"
+              className="px-6 py-2 bg-muted hover:bg-muted/80 text-foreground rounded-lg transition-colors"
               disabled={createMutation.isPending}
             >
               Cancel
@@ -525,7 +525,7 @@ export const ClientFormModal: React.FC<ClientFormModalProps> = ({ isOpen, onClos
             <button
               type="submit"
               disabled={createMutation.isPending}
-              className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              className="px-6 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
               {createMutation.isPending ? (
                 <>

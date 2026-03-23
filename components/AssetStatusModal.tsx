@@ -15,13 +15,13 @@ const statusOptions: { value: AssetStatus; label: string; color: string; icon: s
   {
     value: 'upload' as AssetStatus,
     label: 'Upload',
-    color: 'bg-gray-500/20 text-gray-300',
+    color: 'bg-gray-500/20 text-muted-foreground',
     icon: 'M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12',
   },
   {
     value: 'internal_review' as AssetStatus,
     label: 'Internal Review',
-    color: 'bg-blue-500/20 text-blue-400',
+    color: 'bg-primary/20 text-primary',
     icon: 'M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z',
   },
   {
@@ -45,7 +45,7 @@ const statusOptions: { value: AssetStatus; label: string; color: string; icon: s
   {
     value: 'archived' as AssetStatus,
     label: 'Archived',
-    color: 'bg-gray-600/20 text-gray-500',
+    color: 'bg-muted/80/20 text-muted-foreground',
     icon: 'M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4',
   },
 ];
@@ -112,15 +112,15 @@ export const AssetStatusModal: React.FC<AssetStatusModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] flex flex-col">
-        <div className="flex justify-between items-center p-6 border-b border-gray-700 flex-shrink-0">
+      <div className="bg-card rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] flex flex-col">
+        <div className="flex justify-between items-center p-6 border-b border-border flex-shrink-0">
           <div>
-            <h2 className="text-xl font-bold text-white">Update Asset Status</h2>
-            <p className="text-sm text-gray-400 mt-1">{asset.name}</p>
+            <h2 className="text-xl font-bold text-foreground">Update Asset Status</h2>
+            <p className="text-sm text-muted-foreground mt-1">{asset.name}</p>
           </div>
           <button
             onClick={handleClose}
-            className="text-gray-400 hover:text-white transition-colors"
+            className="text-muted-foreground hover:text-foreground transition-colors"
             disabled={loading}
           >
             <Icon path="M6 18L18 6M6 6l12 12" className="w-6 h-6" />
@@ -130,8 +130,8 @@ export const AssetStatusModal: React.FC<AssetStatusModalProps> = ({
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto">
           <div className="p-6 space-y-4">
             {/* Current Status */}
-            <div className="p-4 bg-gray-700/50 rounded-lg border border-gray-600">
-              <p className="text-sm text-gray-400 mb-1">Current Status:</p>
+            <div className="p-4 bg-muted/50 rounded-lg border border-input">
+              <p className="text-sm text-muted-foreground mb-1">Current Status:</p>
               <div className="flex items-center gap-2">
                 {statusOptions
                   .filter((opt) => opt.value === asset.status)
@@ -148,7 +148,7 @@ export const AssetStatusModal: React.FC<AssetStatusModalProps> = ({
 
             {/* Status Options */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-3">
+              <label className="block text-sm font-medium text-muted-foreground mb-3">
                 New Status <span className="text-red-500">*</span>
               </label>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -160,10 +160,10 @@ export const AssetStatusModal: React.FC<AssetStatusModalProps> = ({
                       p-4 rounded-lg border-2 cursor-pointer transition-all
                       ${
                         selectedStatus === option.value
-                          ? 'border-blue-500 bg-blue-500/10'
-                          : 'border-gray-600 bg-gray-700/50 hover:border-gray-500'
+                          ? 'border-primary bg-primary/10'
+                          : 'border-input bg-muted/50 hover:border-gray-500'
                       }
-                    `}
+                     text-primary-foreground`}
                   >
                     <div className="flex items-center gap-3">
                       <Icon path={option.icon} className="w-6 h-6" />
@@ -175,12 +175,12 @@ export const AssetStatusModal: React.FC<AssetStatusModalProps> = ({
                       <div
                         className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
                           selectedStatus === option.value
-                            ? 'border-blue-500 bg-blue-500'
+                            ? 'border-primary bg-primary'
                             : 'border-gray-500'
-                        }`}
+                        } text-primary-foreground`}
                       >
                         {selectedStatus === option.value && (
-                          <Icon path="M5 13l4 4L19 7" className="w-3 h-3 text-white" />
+                          <Icon path="M5 13l4 4L19 7" className="w-3 h-3 text-foreground" />
                         )}
                       </div>
                     </div>
@@ -191,7 +191,7 @@ export const AssetStatusModal: React.FC<AssetStatusModalProps> = ({
 
             {/* Feedback Note */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-muted-foreground mb-2">
                 Feedback / Notes
               </label>
               <textarea
@@ -199,10 +199,10 @@ export const AssetStatusModal: React.FC<AssetStatusModalProps> = ({
                 onChange={(e) => setFeedbackNote(e.target.value)}
                 placeholder="Add feedback or notes about this status change..."
                 rows={4}
-                className="w-full bg-gray-700 border border-gray-600 text-white placeholder-gray-400 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5"
+                className="w-full bg-muted border border-input text-foreground placeholder-gray-400 text-sm rounded-lg focus:ring-primary focus:border-primary p-2.5"
                 disabled={loading}
               />
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="mt-1 text-xs text-muted-foreground">
                 Optional: Add context about this status change (visible to team and client if applicable)
               </p>
             </div>
@@ -212,14 +212,14 @@ export const AssetStatusModal: React.FC<AssetStatusModalProps> = ({
               <button
                 type="button"
                 onClick={handleClose}
-                className="px-4 py-2 text-gray-300 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+                className="px-4 py-2 text-muted-foreground bg-muted hover:bg-muted/80 rounded-lg transition-colors"
                 disabled={loading}
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                className="px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                 disabled={loading || !selectedStatus}
               >
                 {loading ? (

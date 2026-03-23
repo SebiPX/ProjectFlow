@@ -118,13 +118,13 @@ export const CostEditModal: React.FC<CostEditModalProps> = ({ isOpen, onClose, c
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-800 rounded-lg shadow-xl w-full max-w-lg max-h-[90vh] flex flex-col">
+      <div className="bg-card rounded-lg shadow-xl w-full max-w-lg max-h-[90vh] flex flex-col">
         {/* Header */}
-        <div className="flex justify-between items-center p-6 border-b border-gray-700 flex-shrink-0">
-          <h2 className="text-2xl font-bold text-white">Edit Cost</h2>
+        <div className="flex justify-between items-center p-6 border-b border-border flex-shrink-0">
+          <h2 className="text-2xl font-bold text-foreground">Edit Cost</h2>
           <button
             onClick={handleClose}
-            className="text-gray-400 hover:text-white transition-colors"
+            className="text-muted-foreground hover:text-foreground transition-colors"
             disabled={uploading}
           >
             <Icon path="M6 18L18 6M6 6l12 12" className="w-6 h-6" />
@@ -135,7 +135,7 @@ export const CostEditModal: React.FC<CostEditModalProps> = ({ isOpen, onClose, c
         <form onSubmit={handleSubmit} className="p-6 space-y-4 flex-1 overflow-y-auto">
           {/* Title */}
           <div>
-            <label htmlFor="title" className="block text-sm font-medium text-gray-300 mb-2">
+            <label htmlFor="title" className="block text-sm font-medium text-muted-foreground mb-2">
               Title / Description <span className="text-red-500">*</span>
             </label>
             <input
@@ -144,7 +144,7 @@ export const CostEditModal: React.FC<CostEditModalProps> = ({ isOpen, onClose, c
               required
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="e.g., Adobe Creative Cloud License"
               disabled={uploading}
             />
@@ -152,7 +152,7 @@ export const CostEditModal: React.FC<CostEditModalProps> = ({ isOpen, onClose, c
 
           {/* Amount */}
           <div>
-            <label htmlFor="amount" className="block text-sm font-medium text-gray-300 mb-2">
+            <label htmlFor="amount" className="block text-sm font-medium text-muted-foreground mb-2">
               Amount (€) <span className="text-red-500">*</span>
             </label>
             <input
@@ -163,7 +163,7 @@ export const CostEditModal: React.FC<CostEditModalProps> = ({ isOpen, onClose, c
               step="0.01"
               value={formData.amount}
               onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-              className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="0.00"
               disabled={uploading}
             />
@@ -171,14 +171,14 @@ export const CostEditModal: React.FC<CostEditModalProps> = ({ isOpen, onClose, c
 
           {/* Category */}
           <div>
-            <label htmlFor="category" className="block text-sm font-medium text-gray-300 mb-2">
+            <label htmlFor="category" className="block text-sm font-medium text-muted-foreground mb-2">
               Category
             </label>
             <select
               id="category"
               value={formData.category}
               onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-              className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               disabled={uploading}
             >
               {costCategories.map((cat) => (
@@ -196,17 +196,17 @@ export const CostEditModal: React.FC<CostEditModalProps> = ({ isOpen, onClose, c
               id="is_estimated"
               checked={formData.is_estimated}
               onChange={(e) => setFormData({ ...formData, is_estimated: e.target.checked })}
-              className="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500"
+              className="w-4 h-4 text-primary bg-muted border-input rounded focus:ring-primary"
               disabled={uploading}
             />
-            <label htmlFor="is_estimated" className="ml-2 text-sm text-gray-300">
+            <label htmlFor="is_estimated" className="ml-2 text-sm text-muted-foreground">
               This is an estimated cost
             </label>
           </div>
 
           {/* Document Upload */}
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-muted-foreground mb-2">
               Invoice / Receipt
             </label>
             <div className="flex items-center gap-3">
@@ -219,14 +219,14 @@ export const CostEditModal: React.FC<CostEditModalProps> = ({ isOpen, onClose, c
               />
               <label
                 htmlFor="document-upload"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white text-sm rounded-lg cursor-pointer transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-muted hover:bg-muted/80 text-foreground text-sm rounded-lg cursor-pointer transition-colors"
               >
                 <Icon path="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" className="w-4 h-4" />
                 {documentFile ? 'Change File' : cost.invoice_document_path ? 'Replace File' : 'Attach File'}
               </label>
               {documentFile && (
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-400 truncate max-w-[200px]">
+                  <span className="text-sm text-muted-foreground truncate max-w-[200px]">
                     {documentFile.name}
                   </span>
                   <button
@@ -243,7 +243,7 @@ export const CostEditModal: React.FC<CostEditModalProps> = ({ isOpen, onClose, c
                 <span className="text-sm text-green-400">✓ Document attached</span>
               )}
             </div>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               PDF, images, or documents. Max size 10MB.
             </p>
           </div>
@@ -253,14 +253,14 @@ export const CostEditModal: React.FC<CostEditModalProps> = ({ isOpen, onClose, c
             <button
               type="button"
               onClick={handleClose}
-              className="px-4 py-2 text-gray-300 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+              className="px-4 py-2 text-muted-foreground bg-muted hover:bg-muted/80 rounded-lg transition-colors"
               disabled={uploading}
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              className="px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               disabled={uploading}
             >
               {uploading ? (

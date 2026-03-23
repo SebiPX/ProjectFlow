@@ -139,15 +139,15 @@ export const TaskList: React.FC<TaskListProps> = ({ onSelectProject, searchQuery
     return (
       <div className="p-4 sm:p-6 lg:p-8">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-white">All Tasks</h1>
+          <h1 className="text-3xl font-bold text-foreground">All Tasks</h1>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {[1, 2, 3, 4, 5, 6].map(i => (
-            <Card key={i} className="h-64 animate-pulse bg-gray-800">
-              <div className="h-6 bg-gray-700 rounded w-3/4 mb-4"></div>
-              <div className="h-4 bg-gray-700 rounded w-1/2 mb-2"></div>
-              <div className="h-4 bg-gray-700 rounded w-full mb-2"></div>
-              <div className="h-4 bg-gray-700 rounded w-2/3"></div>
+            <Card key={i} className="h-64 animate-pulse bg-muted/30">
+              <div className="h-6 bg-muted rounded w-3/4 mb-4"></div>
+              <div className="h-4 bg-muted rounded w-1/2 mb-2"></div>
+              <div className="h-4 bg-muted rounded w-full mb-2"></div>
+              <div className="h-4 bg-muted rounded w-2/3"></div>
             </Card>
           ))}
         </div>
@@ -158,7 +158,7 @@ export const TaskList: React.FC<TaskListProps> = ({ onSelectProject, searchQuery
   if (tasksError) {
     return (
       <div className="flex items-center justify-center h-full">
-        <div className="text-red-500 text-xl">Error loading tasks. Please try again.</div>
+        <div className="text-destructive text-xl">Error loading tasks. Please try again.</div>
       </div>
     );
   }
@@ -168,8 +168,8 @@ export const TaskList: React.FC<TaskListProps> = ({ onSelectProject, searchQuery
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white">All Tasks</h1>
-          <p className="text-sm text-gray-400 mt-1">
+          <h1 className="text-3xl font-bold text-foreground">All Tasks</h1>
+          <p className="text-sm text-muted-foreground mt-1">
             {filteredAndSortedTasks.length} {filteredAndSortedTasks.length === 1 ? 'task' : 'tasks'}
             {getActiveFilterCount() > 0 && ' (filtered)'}
             {onlyMe && ' • Only Me'}
@@ -177,12 +177,12 @@ export const TaskList: React.FC<TaskListProps> = ({ onSelectProject, searchQuery
         </div>
         <div className="flex flex-wrap items-center gap-3">
           {/* View Toggle */}
-          <div className="bg-gray-800 p-1 rounded-lg border border-gray-700 flex">
+          <div className="bg-secondary p-1 rounded-lg border border-border flex">
             <button
               onClick={() => setViewMode('grid')}
               className={`p-2 rounded transition-colors ${viewMode === 'grid'
-                ? 'bg-blue-600 text-white'
-                : 'text-gray-400 hover:text-white hover:bg-gray-700'
+                ? 'bg-primary text-primary-foreground shadow-sm'
+                : 'text-secondary-foreground hover:text-foreground hover:bg-muted'
                 }`}
               title="Grid View"
             >
@@ -191,8 +191,8 @@ export const TaskList: React.FC<TaskListProps> = ({ onSelectProject, searchQuery
             <button
               onClick={() => setViewMode('board')}
               className={`p-2 rounded transition-colors ${viewMode === 'board'
-                ? 'bg-blue-600 text-white'
-                : 'text-gray-400 hover:text-white hover:bg-gray-700'
+                ? 'bg-primary text-primary-foreground shadow-sm'
+                : 'text-secondary-foreground hover:text-foreground hover:bg-muted'
                 }`}
               title="Board View (Kanban)"
             >
@@ -203,8 +203,8 @@ export const TaskList: React.FC<TaskListProps> = ({ onSelectProject, searchQuery
           <button
             onClick={() => setOnlyMe(!onlyMe)}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-colors ${onlyMe
-              ? 'bg-blue-600 hover:bg-blue-700 text-white'
-              : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
+              ? 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm'
+              : 'bg-muted hover:bg-muted/80 text-muted-foreground'
               }`}
           >
             <Icon path="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" className="w-5 h-5" />
@@ -212,7 +212,7 @@ export const TaskList: React.FC<TaskListProps> = ({ onSelectProject, searchQuery
           </button>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-2 px-4 rounded-lg flex items-center shadow-sm"
           >
             <Icon path="M12 6v6m0 0v6m0-6h6m-6 0H6" className="h-5 w-5 mr-2" />
             New Task
@@ -221,18 +221,18 @@ export const TaskList: React.FC<TaskListProps> = ({ onSelectProject, searchQuery
       </div>
 
       {/* Filter Bar */}
-      <div className="mb-6 bg-gray-800 border border-gray-700 rounded-lg p-4">
+      <div className="mb-6 bg-card border border-border rounded-lg p-4">
         <div className="flex flex-wrap gap-4 items-end">
           {/* Status Filter - Hide in Board View as it filters redundant columns */}
           {viewMode === 'grid' && (
             <div className="flex-1 min-w-[150px]">
-              <label className="block text-sm font-medium text-gray-400 mb-1">
+              <label className="block text-sm font-medium text-muted-foreground mb-1">
                 Status
               </label>
               <select
                 value={filters.status}
                 onChange={(e) => setFilters({ ...filters, status: e.target.value as any })}
-                className="w-full bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5"
+                className="w-full bg-background border border-input text-foreground text-sm rounded-lg focus:ring-primary focus:border-primary p-2.5"
               >
                 <option value="all">All Statuses</option>
                 <option value={TaskStatus.Todo}>To Do</option>
@@ -245,13 +245,13 @@ export const TaskList: React.FC<TaskListProps> = ({ onSelectProject, searchQuery
 
           {/* Project Filter */}
           <div className="flex-1 min-w-[200px]">
-            <label className="block text-sm font-medium text-gray-400 mb-1">
+            <label className="block text-sm font-medium text-muted-foreground mb-1">
               Project
             </label>
             <select
               value={filters.projectId}
               onChange={(e) => setFilters({ ...filters, projectId: e.target.value })}
-              className="w-full bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5"
+              className="w-full bg-background border border-input text-foreground text-sm rounded-lg focus:ring-primary focus:border-primary p-2.5"
             >
               <option value="all">All Projects</option>
               {projects.map(project => (
@@ -264,13 +264,13 @@ export const TaskList: React.FC<TaskListProps> = ({ onSelectProject, searchQuery
 
           {/* Assignee Filter */}
           <div className="flex-1 min-w-[200px]">
-            <label className="block text-sm font-medium text-gray-400 mb-1">
+            <label className="block text-sm font-medium text-muted-foreground mb-1">
               Assigned To
             </label>
             <select
               value={filters.assigneeId}
               onChange={(e) => setFilters({ ...filters, assigneeId: e.target.value })}
-              className="w-full bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5"
+              className="w-full bg-background border border-input text-foreground text-sm rounded-lg focus:ring-primary focus:border-primary p-2.5"
             >
               <option value="all">All Assignees</option>
               <option value="unassigned">Unassigned</option>
@@ -285,14 +285,14 @@ export const TaskList: React.FC<TaskListProps> = ({ onSelectProject, searchQuery
           {/* Sort Dropdown - Grid Only */}
           {viewMode === 'grid' && (
             <div className="flex-1 min-w-[200px]">
-              <label className="block text-sm font-medium text-gray-400 mb-1">
+              <label className="block text-sm font-medium text-muted-foreground mb-1">
                 Sort By
               </label>
               <div className="flex gap-2">
                 <select
                   value={sort.field}
                   onChange={(e) => setSort({ ...sort, field: e.target.value as any })}
-                  className="flex-1 bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5"
+                  className="flex-1 bg-background border border-input text-foreground text-sm rounded-lg focus:ring-primary focus:border-primary p-2.5"
                 >
                   <option value="created_at">Date Created</option>
                   <option value="title">Task Name</option>
@@ -301,7 +301,7 @@ export const TaskList: React.FC<TaskListProps> = ({ onSelectProject, searchQuery
                 </select>
                 <button
                   onClick={() => setSort({ ...sort, direction: sort.direction === 'asc' ? 'desc' : 'asc' })}
-                  className="bg-gray-700 border border-gray-600 text-gray-300 hover:text-white hover:bg-gray-600 rounded-lg p-2.5 transition-colors"
+                  className="bg-muted border border-input text-muted-foreground hover:text-foreground hover:bg-muted/80 rounded-lg p-2.5 transition-colors"
                   title={`Sort ${sort.direction === 'asc' ? 'ascending' : 'descending'}`}
                 >
                   <Icon
@@ -321,7 +321,7 @@ export const TaskList: React.FC<TaskListProps> = ({ onSelectProject, searchQuery
             <div>
               <button
                 onClick={() => setFilters({ status: 'all', projectId: 'all', assigneeId: 'all' })}
-                className="bg-gray-700 hover:bg-gray-600 text-white text-sm rounded-lg px-4 py-2.5 flex items-center gap-2 transition-colors"
+                className="bg-muted hover:bg-muted/80 text-foreground text-sm rounded-lg px-4 py-2.5 flex items-center gap-2 transition-colors"
               >
                 <Icon path="M6 18L18 6M6 6l12 12" className="w-4 h-4" />
                 Clear ({getActiveFilterCount()})
@@ -333,8 +333,8 @@ export const TaskList: React.FC<TaskListProps> = ({ onSelectProject, searchQuery
 
       {/* Grid or Board or Empty */}
       {filteredAndSortedTasks.length === 0 ? (
-        <div className="text-center text-gray-400 mt-12">
-          <Icon path="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" className="w-16 h-16 mx-auto mb-4 text-gray-600" />
+        <div className="text-center text-muted-foreground mt-12">
+          <Icon path="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" className="w-16 h-16 mx-auto mb-4 opacity-50" />
           <p className="text-xl mb-2">
             {getActiveFilterCount() > 0 ? 'No tasks match your filters' : 'No tasks found'}
           </p>

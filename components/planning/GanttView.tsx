@@ -75,21 +75,21 @@ export const GanttView: React.FC = () => {
     };
 
     return (
-        <div className="bg-gray-800 rounded-xl overflow-hidden shadow-lg border border-gray-700 flex flex-col h-full">
+        <div className="bg-card rounded-xl overflow-hidden shadow-lg border border-border flex flex-col h-full">
             {/* Controls */}
-            <div className="flex items-center justify-between p-4 border-b border-gray-700 bg-gray-800">
+            <div className="flex items-center justify-between p-4 border-b border-border bg-card">
                 <div className="flex items-center gap-2">
-                    <button onClick={() => shiftTime(-7)} className="p-2 hover:bg-gray-700 rounded text-gray-400">
+                    <button onClick={() => shiftTime(-7)} className="p-2 hover:bg-muted rounded text-muted-foreground">
                         <Icon path="M15 19l-7-7 7-7" className="w-5 h-5" />
                     </button>
-                    <span className="text-white font-medium">
+                    <span className="text-foreground font-medium">
                         {formatDate(timelineDays[0])} - {formatDate(timelineDays[timelineDays.length - 1])}
                     </span>
-                    <button onClick={() => shiftTime(7)} className="p-2 hover:bg-gray-700 rounded text-gray-400">
+                    <button onClick={() => shiftTime(7)} className="p-2 hover:bg-muted rounded text-muted-foreground">
                         <Icon path="M9 5l7 7-7 7" className="w-5 h-5" />
                     </button>
                 </div>
-                <button onClick={() => setStartDate(new Date())} className="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-500">
+                <button onClick={() => setStartDate(new Date())} className="px-3 py-1 bg-primary text-primary-foreground rounded text-sm hover:bg-primary hover:text-primary-foreground">
                     Jump to Today
                 </button>
             </div>
@@ -97,20 +97,20 @@ export const GanttView: React.FC = () => {
             {/* Timeline Area */}
             <div className="flex-1 overflow-auto relative flex">
                 {/* Sidebar (Project Names) - Fixed Left */}
-                <div className="w-64 flex-shrink-0 bg-gray-800 border-r border-gray-700 z-10 sticky left-0 shadow-xl">
-                    <div className="h-10 border-b border-gray-700 bg-gray-900/50 flex items-center px-4 font-semibold text-gray-400 text-sm">
+                <div className="w-64 flex-shrink-0 bg-card border-r border-border z-10 sticky left-0 shadow-xl">
+                    <div className="h-10 border-b border-border bg-background/50 flex items-center px-4 font-semibold text-muted-foreground text-sm">
                         Projects / Tasks
                     </div>
                     {groupedTasks.map(group => (
                         <div key={group.project.id}>
                             {/* Project Row */}
-                            <div className="h-10 px-4 flex items-center bg-gray-800 border-b border-gray-700/50 font-bold text-white truncate sticky top-0">
+                            <div className="h-10 px-4 flex items-center bg-card border-b border-border/50 font-bold text-foreground truncate sticky top-0">
                                 <span className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: group.project.color_code || '#777' }} />
                                 {group.project.title}
                             </div>
                             {/* Task Rows */}
                             {group.tasks.map(task => (
-                                <div key={task.id} className="h-8 px-8 flex items-center text-sm text-gray-300 border-b border-gray-700/30 truncate hover:bg-gray-700/30">
+                                <div key={task.id} className="h-8 px-8 flex items-center text-sm text-muted-foreground border-b border-border/30 truncate hover:bg-muted/30">
                                     {task.title}
                                 </div>
                             ))}
@@ -123,11 +123,11 @@ export const GanttView: React.FC = () => {
                     <div className="relative min-w-full" style={{ width: `${timelineDays.length * CELL_WIDTH}px` }}> {/* Explicit width container */}
 
                         {/* Header Dates */}
-                        <div className="flex h-10 border-b border-gray-700 bg-gray-900/50">
+                        <div className="flex h-10 border-b border-border bg-background/50">
                             {timelineDays.map(day => (
                                 <div
                                     key={day.toISOString()}
-                                    className={`flex-shrink-0 border-r border-gray-700 flex flex-col items-center justify-center text-xs ${isSameDay(day, new Date()) ? 'bg-blue-900/30 text-blue-400' : 'text-gray-500'}`}
+                                    className={`flex-shrink-0 border-r border-border flex flex-col items-center justify-center text-xs ${isSameDay(day, new Date()) ? 'bg-blue-900/30 text-primary' : 'text-muted-foreground'}`}
                                     style={{ width: CELL_WIDTH }}
                                 >
                                     <span className="font-bold">{day.getDate()}</span>
@@ -141,7 +141,7 @@ export const GanttView: React.FC = () => {
                             {timelineDays.map(day => (
                                 <div
                                     key={`grid-${day.toISOString()}`}
-                                    className="flex-shrink-0 border-r border-gray-700/20 h-full"
+                                    className="flex-shrink-0 border-r border-border/20 h-full"
                                     style={{ width: CELL_WIDTH, backgroundColor: isSameDay(day, new Date()) ? 'rgba(59, 130, 246, 0.05)' : 'transparent' }}
                                 />
                             ))}
@@ -161,9 +161,9 @@ export const GanttView: React.FC = () => {
                                         const barStyle = getBarStyles(task, timelineDays[0]);
 
                                         return (
-                                            <div key={`bar-${task.id}`} className="h-8 relative w-full border-b border-gray-700/30">
+                                            <div key={`bar-${task.id}`} className="h-8 relative w-full border-b border-border/30">
                                                 <div
-                                                    className="absolute h-5 top-1.5 rounded-full text-[10px] px-2 flex items-center text-white overflow-hidden whitespace-nowrap shadow-sm"
+                                                    className="absolute h-5 top-1.5 rounded-full text-[10px] px-2 flex items-center text-foreground overflow-hidden whitespace-nowrap shadow-sm"
                                                     style={{
                                                         ...barStyle,
                                                         backgroundColor: group.project.color_code || '#3B82F6',

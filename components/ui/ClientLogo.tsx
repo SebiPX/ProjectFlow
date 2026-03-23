@@ -38,17 +38,17 @@ export const ClientLogo: React.FC<ClientLogoProps> = ({
 
   if (loading) {
     return (
-      <div className={`${className} bg-gray-700 animate-pulse`} />
+      <div className={`${className} bg-muted animate-pulse`} />
     );
   }
 
   if (error || !logoUrl) {
     // Fallback icon
     return (
-      <div className={`${className} bg-blue-600 flex items-center justify-center flex-shrink-0`}>
+      <div className={`${className} bg-primary flex items-center justify-center flex-shrink-0 text-primary-foreground`}>
         <Icon
           path="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a3.001 3.001 0 01-2.704-2.143M8 11V7a4 4 0 118 0v4m-2 8h2"
-          className="w-6 h-6 text-white"
+          className="w-6 h-6"
         />
       </div>
     );

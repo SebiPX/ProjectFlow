@@ -228,37 +228,37 @@ export const FinancialDocumentFormModal: React.FC<FinancialDocumentFormModalProp
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
-            <div className="bg-gray-800 rounded-lg shadow-xl w-full max-w-5xl max-h-[95vh] flex flex-col">
+            <div className="bg-card rounded-lg shadow-xl w-full max-w-5xl max-h-[95vh] flex flex-col">
                 {/* Header */}
-                <div className="flex justify-between items-center p-6 border-b border-gray-700">
-                    <h2 className="text-2xl font-bold text-white">
+                <div className="flex justify-between items-center p-6 border-b border-border">
+                    <h2 className="text-2xl font-bold text-foreground">
                         {isEditMode ? 'Edit' : 'New'} Financial Document
                     </h2>
-                    <button onClick={onClose} className="text-gray-400 hover:text-white">
+                    <button onClick={onClose} className="text-muted-foreground hover:text-foreground">
                         <Icon path="M6 18L18 6M6 6l12 12" className="w-6 h-6" />
                     </button>
                 </div>
 
                 <div className="flex-1 overflow-y-auto p-6 space-y-6">
                     {/* Document Details */}
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 bg-gray-900/50 p-4 rounded-lg">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 bg-background/50 p-4 rounded-lg">
                         <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-1">Type</label>
+                            <label className="block text-sm font-medium text-muted-foreground mb-1">Type</label>
                             <select
                                 value={formData.type}
                                 onChange={e => setFormData({ ...formData, type: e.target.value as DocType })}
-                                className="w-full bg-gray-700 border-gray-600 rounded-md text-white"
+                                className="w-full bg-muted border-input rounded-md text-foreground"
                             >
                                 <option value={DocType.Quote}>Quote (KVA)</option>
                                 <option value={DocType.Invoice}>Invoice (Rechnung)</option>
                             </select>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-1">Status</label>
+                            <label className="block text-sm font-medium text-muted-foreground mb-1">Status</label>
                             <select
                                 value={formData.status}
                                 onChange={e => setFormData({ ...formData, status: e.target.value as DocStatus })}
-                                className="w-full bg-gray-700 border-gray-600 rounded-md text-white"
+                                className="w-full bg-muted border-input rounded-md text-foreground"
                             >
                                 <option value={DocStatus.Draft}>Draft</option>
                                 <option value={DocStatus.Sent}>Sent</option>
@@ -268,22 +268,22 @@ export const FinancialDocumentFormModal: React.FC<FinancialDocumentFormModalProp
                             </select>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-1">Date Issued</label>
+                            <label className="block text-sm font-medium text-muted-foreground mb-1">Date Issued</label>
                             <input
                                 type="date"
                                 value={formData.date_issued}
                                 onChange={e => setFormData({ ...formData, date_issued: e.target.value })}
-                                className="w-full bg-gray-700 border-gray-600 rounded-md text-white"
+                                className="w-full bg-muted border-input rounded-md text-foreground"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-1">Document No.</label>
+                            <label className="block text-sm font-medium text-muted-foreground mb-1">Document No.</label>
                             <input
                                 type="text"
                                 value={formData.document_number}
                                 onChange={e => setFormData({ ...formData, document_number: e.target.value })}
                                 placeholder="Auto or Manual"
-                                className="w-full bg-gray-700 border-gray-600 rounded-md text-white"
+                                className="w-full bg-muted border-input rounded-md text-foreground"
                             />
                         </div>
                     </div>
@@ -291,11 +291,11 @@ export const FinancialDocumentFormModal: React.FC<FinancialDocumentFormModalProp
                     {/* Line Items */}
                     <div>
                         <div className="flex justify-between items-center mb-2">
-                            <h3 className="text-lg font-medium text-white">Line Items</h3>
+                            <h3 className="text-lg font-medium text-foreground">Line Items</h3>
                             <button
                                 type="button"
                                 onClick={handleAddItem}
-                                className="text-sm bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded"
+                                className="text-sm bg-primary hover:bg-primary/90 text-primary-foreground px-3 py-1 rounded"
                             >
                                 + Add Item
                             </button>
@@ -303,7 +303,7 @@ export const FinancialDocumentFormModal: React.FC<FinancialDocumentFormModalProp
 
                         <table className="w-full text-left border-collapse">
                             <thead>
-                                <tr className="text-gray-400 text-xs border-b border-gray-700">
+                                <tr className="text-muted-foreground text-xs border-b border-border">
                                     <th className="py-2 w-[25%]">Service (Standard)</th>
                                     <th className="py-2 w-[25%]">Position / Desc</th>
                                     <th className="py-2 w-[10%] text-center">Qty</th>
@@ -314,14 +314,14 @@ export const FinancialDocumentFormModal: React.FC<FinancialDocumentFormModalProp
                             </thead>
                             <tbody className="divide-y divide-gray-800">
                                 {items.map((item, index) => (
-                                    <tr key={item.id} className="group hover:bg-gray-700/30">
+                                    <tr key={item.id} className="group hover:bg-muted/30">
                                         <td className="py-3 pr-2 align-top">
                                             {/* Service Selectors */}
                                             <div className="flex flex-col gap-1">
                                                 <select
                                                     value={item.service_module_id}
                                                     onChange={(e) => handleServiceSelection(index, e.target.value, item.seniority_level_id)}
-                                                    className="w-full bg-gray-700 border-gray-600 rounded text-sm text-white px-2 py-1"
+                                                    className="w-full bg-muted border-input rounded text-sm text-foreground px-2 py-1"
                                                 >
                                                     <option value="">Select Service...</option>
                                                     {serviceModules.filter(m => m.is_active).map(m => (
@@ -332,7 +332,7 @@ export const FinancialDocumentFormModal: React.FC<FinancialDocumentFormModalProp
                                                     value={item.seniority_level_id}
                                                     onChange={(e) => handleServiceSelection(index, item.service_module_id, e.target.value)}
                                                     disabled={!item.service_module_id}
-                                                    className="w-full bg-gray-700 border-gray-600 rounded text-sm text-white px-2 py-1 disabled:opacity-50"
+                                                    className="w-full bg-muted border-input rounded text-sm text-foreground px-2 py-1 disabled:opacity-50"
                                                 >
                                                     <option value="">Select Level...</option>
                                                     {seniorityLevels.filter(l => l.is_active).map(l => (
@@ -348,14 +348,14 @@ export const FinancialDocumentFormModal: React.FC<FinancialDocumentFormModalProp
                                                     value={item.position_title}
                                                     onChange={(e) => handleItemChange(index, 'position_title', e.target.value)}
                                                     placeholder="Position Title"
-                                                    className="w-full bg-gray-700 border-gray-600 rounded text-sm text-white px-2 py-1 placeholder-gray-500 font-medium"
+                                                    className="w-full bg-muted border-input rounded text-sm text-foreground px-2 py-1 placeholder-gray-500 font-medium"
                                                 />
                                                 <textarea
                                                     rows={1}
                                                     value={item.description}
                                                     onChange={(e) => handleItemChange(index, 'description', e.target.value)}
                                                     placeholder="Description (optional)"
-                                                    className="w-full bg-gray-700 border-gray-600 rounded text-sm text-white px-2 py-1 placeholder-gray-500"
+                                                    className="w-full bg-muted border-input rounded text-sm text-foreground px-2 py-1 placeholder-gray-500"
                                                 />
                                             </div>
                                         </td>
@@ -366,7 +366,7 @@ export const FinancialDocumentFormModal: React.FC<FinancialDocumentFormModalProp
                                                 step="0.01"
                                                 value={item.quantity}
                                                 onChange={(e) => handleItemChange(index, 'quantity', parseFloat(e.target.value) || 0)}
-                                                className="w-full bg-gray-700 border-gray-600 rounded text-sm text-white px-2 py-1 text-center"
+                                                className="w-full bg-muted border-input rounded text-sm text-foreground px-2 py-1 text-center"
                                             />
                                         </td>
                                         <td className="py-3 px-2 align-top">
@@ -376,16 +376,16 @@ export const FinancialDocumentFormModal: React.FC<FinancialDocumentFormModalProp
                                                 step="0.01"
                                                 value={item.unit_price}
                                                 onChange={(e) => handleItemChange(index, 'unit_price', parseFloat(e.target.value) || 0)}
-                                                className="w-full bg-gray-700 border-gray-600 rounded text-sm text-white px-2 py-1 text-right"
+                                                className="w-full bg-muted border-input rounded text-sm text-foreground px-2 py-1 text-right"
                                             />
                                         </td>
-                                        <td className="py-3 px-2 align-top text-right font-medium text-gray-200">
+                                        <td className="py-3 px-2 align-top text-right font-medium text-foreground">
                                             {(item.quantity * item.unit_price).toFixed(2)} €
                                         </td>
                                         <td className="py-3 align-middle text-center">
                                             <button
                                                 onClick={() => handleRemoveItem(index)}
-                                                className="text-gray-500 hover:text-red-400"
+                                                className="text-muted-foreground hover:text-red-400"
                                                 title="Remove Item"
                                             >
                                                 <Icon path="M6 18L18 6M6 6l12 12" className="w-4 h-4" />
@@ -398,17 +398,17 @@ export const FinancialDocumentFormModal: React.FC<FinancialDocumentFormModalProp
                     </div>
 
                     {/* Totals */}
-                    <div className="flex justify-end border-t border-gray-700 pt-4">
+                    <div className="flex justify-end border-t border-border pt-4">
                         <div className="w-64 space-y-2">
-                            <div className="flex justify-between text-gray-300">
+                            <div className="flex justify-between text-muted-foreground">
                                 <span>Subtotal (Net):</span>
                                 <span>{totalNet.toFixed(2)} €</span>
                             </div>
-                            <div className="flex justify-between text-gray-300 items-center">
+                            <div className="flex justify-between text-muted-foreground items-center">
                                 <span>VAT ({formData.vat_percent}%):</span>
                                 <span className="text-sm">{totalVat.toFixed(2)} €</span>
                             </div>
-                            <div className="flex justify-between text-white font-bold text-lg border-t border-gray-600 pt-2">
+                            <div className="flex justify-between text-foreground font-bold text-lg border-t border-input pt-2">
                                 <span>Total (Gross):</span>
                                 <span>{totalGross.toFixed(2)} €</span>
                             </div>
@@ -417,17 +417,17 @@ export const FinancialDocumentFormModal: React.FC<FinancialDocumentFormModalProp
                 </div>
 
                 {/* Footer Actions */}
-                <div className="p-6 border-t border-gray-700 flex justify-end gap-3 bg-gray-900/50 rounded-b-lg">
+                <div className="p-6 border-t border-border flex justify-end gap-3 bg-background/50 rounded-b-lg">
                     <button
                         onClick={onClose}
-                        className="px-6 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded transition-colors"
+                        className="px-6 py-2 bg-muted hover:bg-muted/80 text-foreground rounded transition-colors"
                     >
                         Cancel
                     </button>
                     <button
                         onClick={() => mutation.mutate()}
                         disabled={mutation.isPending}
-                        className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors disabled:opacity-50"
+                        className="px-6 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded transition-colors disabled:opacity-50"
                     >
                         {mutation.isPending ? 'Saving...' : 'Save Document'}
                     </button>

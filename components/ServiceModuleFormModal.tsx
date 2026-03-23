@@ -232,16 +232,16 @@ export const ServiceModuleFormModal: React.FC<ServiceModuleFormModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-800 rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col">
+      <div className="bg-card rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col">
         {/* Header */}
-        <div className="flex justify-between items-center p-6 border-b border-gray-700">
-          <h2 className="text-2xl font-bold text-white">
+        <div className="flex justify-between items-center p-6 border-b border-border">
+          <h2 className="text-2xl font-bold text-foreground">
             {isEditMode ? 'Service-Modul bearbeiten' : 'Neues Service-Modul'}
           </h2>
           <button
             onClick={handleClose}
             disabled={isPending}
-            className="text-gray-400 hover:text-white transition-colors"
+            className="text-muted-foreground hover:text-foreground transition-colors"
           >
             <Icon path="M6 18L18 6M6 6l12 12" className="w-6 h-6" />
           </button>
@@ -251,13 +251,13 @@ export const ServiceModuleFormModal: React.FC<ServiceModuleFormModalProps> = ({
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-6">
           {/* Service Info Section */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-white border-b border-gray-700 pb-2">
+            <h3 className="text-lg font-semibold text-foreground border-b border-border pb-2">
               Service-Information
             </h3>
 
             {/* Service Module Name */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-muted-foreground mb-2">
                 Service-Modul <span className="text-red-500">*</span>
               </label>
               <input
@@ -266,13 +266,13 @@ export const ServiceModuleFormModal: React.FC<ServiceModuleFormModalProps> = ({
                 onChange={(e) =>
                   setFormData({ ...formData, service_module: e.target.value })
                 }
-                className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
+                className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground placeholder-gray-400 focus:outline-none focus:border-primary"
                 placeholder="z.B. STRATEGY, DESIGN, RECORDING"
                 maxLength={200}
                 disabled={isPending}
                 required
               />
-              <p className="text-xs text-gray-400 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 {formData.service_module.length} / 200 Zeichen
               </p>
             </div>
@@ -280,7 +280,7 @@ export const ServiceModuleFormModal: React.FC<ServiceModuleFormModalProps> = ({
             {/* Category & Unit */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-muted-foreground mb-2">
                   Kategorie <span className="text-red-500">*</span>
                 </label>
                 <select
@@ -288,7 +288,7 @@ export const ServiceModuleFormModal: React.FC<ServiceModuleFormModalProps> = ({
                   onChange={(e) =>
                     setFormData({ ...formData, category: e.target.value as ServiceCategory })
                   }
-                  className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                  className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:border-primary"
                   disabled={isPending}
                   required
                 >
@@ -301,7 +301,7 @@ export const ServiceModuleFormModal: React.FC<ServiceModuleFormModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-muted-foreground mb-2">
                   Einheit <span className="text-red-500">*</span>
                 </label>
                 <select
@@ -309,7 +309,7 @@ export const ServiceModuleFormModal: React.FC<ServiceModuleFormModalProps> = ({
                   onChange={(e) =>
                     setFormData({ ...formData, default_unit: e.target.value as ServiceUnit })
                   }
-                  className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                  className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:border-primary"
                   disabled={isPending}
                   required
                 >
@@ -323,7 +323,7 @@ export const ServiceModuleFormModal: React.FC<ServiceModuleFormModalProps> = ({
 
             {/* Description */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-muted-foreground mb-2">
                 Beschreibung
               </label>
               <textarea
@@ -331,7 +331,7 @@ export const ServiceModuleFormModal: React.FC<ServiceModuleFormModalProps> = ({
                 onChange={(e) =>
                   setFormData({ ...formData, description: e.target.value })
                 }
-                className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 resize-none"
+                className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground placeholder-gray-400 focus:outline-none focus:border-primary resize-none"
                 placeholder="Detaillierte Beschreibung des Service..."
                 rows={3}
                 disabled={isPending}
@@ -347,10 +347,10 @@ export const ServiceModuleFormModal: React.FC<ServiceModuleFormModalProps> = ({
                 onChange={(e) =>
                   setFormData({ ...formData, is_active: e.target.checked })
                 }
-                className="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500"
+                className="w-4 h-4 text-primary bg-muted border-input rounded focus:ring-primary"
                 disabled={isPending}
               />
-              <label htmlFor="is_active" className="ml-2 text-sm text-gray-300">
+              <label htmlFor="is_active" className="ml-2 text-sm text-muted-foreground">
                 Service ist aktiv (verfügbar für Kostenvoranschläge)
               </label>
             </div>
@@ -358,10 +358,10 @@ export const ServiceModuleFormModal: React.FC<ServiceModuleFormModalProps> = ({
 
           {/* Pricing Matrix Section */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-white border-b border-gray-700 pb-2">
+            <h3 className="text-lg font-semibold text-foreground border-b border-border pb-2">
               Preise für Seniority-Levels
             </h3>
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-muted-foreground">
               Aktivieren Sie die gewünschten Seniority-Levels und legen Sie die Preise fest.
               Die Marge wird automatisch berechnet.
             </p>
@@ -369,14 +369,14 @@ export const ServiceModuleFormModal: React.FC<ServiceModuleFormModalProps> = ({
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-gray-700">
-                    <th className="text-left py-3 px-3 text-gray-400 font-medium w-12"></th>
-                    <th className="text-left py-3 px-3 text-gray-400 font-medium">Level</th>
-                    <th className="text-left py-3 px-3 text-gray-400 font-medium">Rate (€)</th>
-                    <th className="text-left py-3 px-3 text-gray-400 font-medium">
+                  <tr className="border-b border-border">
+                    <th className="text-left py-3 px-3 text-muted-foreground font-medium w-12"></th>
+                    <th className="text-left py-3 px-3 text-muted-foreground font-medium">Level</th>
+                    <th className="text-left py-3 px-3 text-muted-foreground font-medium">Rate (€)</th>
+                    <th className="text-left py-3 px-3 text-muted-foreground font-medium">
                       Internal Cost (€)
                     </th>
-                    <th className="text-left py-3 px-3 text-gray-400 font-medium">Marge (%)</th>
+                    <th className="text-left py-3 px-3 text-muted-foreground font-medium">Marge (%)</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -385,7 +385,7 @@ export const ServiceModuleFormModal: React.FC<ServiceModuleFormModalProps> = ({
                     const isValid = row.enabled && parseFloat(row.rate) > 0;
 
                     return (
-                      <tr key={row.levelId} className="border-b border-gray-700 last:border-0">
+                      <tr key={row.levelId} className="border-b border-border last:border-0">
                         <td className="py-3 px-3">
                           <input
                             type="checkbox"
@@ -393,12 +393,12 @@ export const ServiceModuleFormModal: React.FC<ServiceModuleFormModalProps> = ({
                             onChange={(e) =>
                               updatePricingRow(row.levelId, 'enabled', e.target.checked)
                             }
-                            className="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500"
+                            className="w-4 h-4 text-primary bg-muted border-input rounded focus:ring-primary"
                             disabled={isPending}
                           />
                         </td>
                         <td className="py-3 px-3">
-                          <span className="text-white font-medium">{row.levelName}</span>
+                          <span className="text-foreground font-medium">{row.levelName}</span>
                         </td>
                         <td className="py-3 px-3">
                           <input
@@ -407,7 +407,7 @@ export const ServiceModuleFormModal: React.FC<ServiceModuleFormModalProps> = ({
                             onChange={(e) =>
                               updatePricingRow(row.levelId, 'rate', e.target.value)
                             }
-                            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white focus:outline-none focus:border-blue-500 disabled:opacity-50"
+                            className="w-full px-3 py-2 bg-muted border border-input rounded text-foreground focus:outline-none focus:border-primary disabled:opacity-50"
                             placeholder="0.00"
                             step="0.01"
                             min="0"
@@ -421,7 +421,7 @@ export const ServiceModuleFormModal: React.FC<ServiceModuleFormModalProps> = ({
                             onChange={(e) =>
                               updatePricingRow(row.levelId, 'internalCost', e.target.value)
                             }
-                            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white focus:outline-none focus:border-blue-500 disabled:opacity-50"
+                            className="w-full px-3 py-2 bg-muted border border-input rounded text-foreground focus:outline-none focus:border-primary disabled:opacity-50"
                             placeholder="0.00"
                             step="0.01"
                             min="0"
@@ -455,14 +455,14 @@ export const ServiceModuleFormModal: React.FC<ServiceModuleFormModalProps> = ({
 
           {/* Delete Section (Edit Mode Only) */}
           {isEditMode && (
-            <div className="pt-6 border-t border-gray-700">
-              <h3 className="text-lg font-semibold text-white mb-3">Gefahrenzone</h3>
+            <div className="pt-6 border-t border-border">
+              <h3 className="text-lg font-semibold text-foreground mb-3">Gefahrenzone</h3>
               {!showDeleteConfirm ? (
                 <button
                   type="button"
                   onClick={() => setShowDeleteConfirm(true)}
                   disabled={isPending}
-                  className="flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center px-4 py-2 bg-red-600 text-foreground rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Icon
                     path="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
@@ -472,7 +472,7 @@ export const ServiceModuleFormModal: React.FC<ServiceModuleFormModalProps> = ({
                 </button>
               ) : (
                 <div className="bg-red-900 bg-opacity-20 border border-red-700 rounded-lg p-4">
-                  <p className="text-white mb-3">
+                  <p className="text-foreground mb-3">
                     Möchten Sie dieses Service-Modul wirklich unwiderruflich löschen? Alle
                     zugehörigen Preise werden ebenfalls gelöscht.
                   </p>
@@ -481,7 +481,7 @@ export const ServiceModuleFormModal: React.FC<ServiceModuleFormModalProps> = ({
                       type="button"
                       onClick={() => setShowDeleteConfirm(false)}
                       disabled={deleteMutation.isPending}
-                      className="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                      className="px-4 py-2 bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-colors"
                     >
                       Abbrechen
                     </button>
@@ -489,7 +489,7 @@ export const ServiceModuleFormModal: React.FC<ServiceModuleFormModalProps> = ({
                       type="button"
                       onClick={handleDelete}
                       disabled={deleteMutation.isPending}
-                      className="flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="flex items-center px-4 py-2 bg-red-600 text-foreground rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {deleteMutation.isPending ? (
                         <>
@@ -511,12 +511,12 @@ export const ServiceModuleFormModal: React.FC<ServiceModuleFormModalProps> = ({
         </form>
 
         {/* Footer */}
-        <div className="flex justify-end gap-3 p-6 border-t border-gray-700">
+        <div className="flex justify-end gap-3 p-6 border-t border-border">
           <button
             type="button"
             onClick={handleClose}
             disabled={isPending}
-            className="px-4 py-2 text-gray-300 hover:text-white transition-colors"
+            className="px-4 py-2 text-muted-foreground hover:text-foreground transition-colors"
           >
             Abbrechen
           </button>
@@ -524,7 +524,7 @@ export const ServiceModuleFormModal: React.FC<ServiceModuleFormModalProps> = ({
             type="submit"
             onClick={handleSubmit}
             disabled={isPending}
-            className="flex items-center px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isPending ? (
               <>

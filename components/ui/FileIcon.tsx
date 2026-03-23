@@ -34,8 +34,8 @@ export const FileIcon: React.FC<FileIconProps> = ({ fileType, fileName, classNam
     if (type.includes('word') || type.includes('document') || name.match(/\.(doc|docx)$/)) {
       return {
         path: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z",
-        color: "text-blue-400",
-        bg: "bg-blue-500/20"
+        color: "text-primary",
+        bg: "bg-primary/20"
       };
     }
 
@@ -96,7 +96,7 @@ export const FileIcon: React.FC<FileIconProps> = ({ fileType, fileName, classNam
     // Default/Unknown
     return {
       path: "M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z",
-      color: "text-gray-400",
+      color: "text-muted-foreground",
       bg: "bg-gray-500/20"
     };
   };

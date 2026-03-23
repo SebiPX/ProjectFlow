@@ -21,10 +21,10 @@ const columns: { status: TaskStatus, title: string }[] = [
 ];
 
 const statusStyles = {
-  [TaskStatus.Todo]: 'bg-gray-500',
-  [TaskStatus.InProgress]: 'bg-blue-500',
-  [TaskStatus.Review]: 'bg-purple-500',
-  [TaskStatus.Done]: 'bg-green-500',
+  [TaskStatus.Todo]: 'bg-secondary',
+  [TaskStatus.InProgress]: 'bg-primary',
+  [TaskStatus.Review]: 'bg-accent',
+  [TaskStatus.Done]: 'bg-emerald-500',
 };
 
 const KanbanColumn: React.FC<{
@@ -38,13 +38,13 @@ const KanbanColumn: React.FC<{
   onSelectProject?: (project: Project) => void
 }> = ({ status, title, tasks, projects, currentProject, onEditTask, onTimeTrack, onSelectProject }) => {
   return (
-    <div className="w-80 bg-gray-900 rounded-lg flex flex-col flex-shrink-0 border border-gray-800">
-      <div className="flex items-center justify-between p-3 border-b-4 border-gray-800" style={{ borderColor: statusStyles[status].replace('bg-', '').replace('-500', '#500') || '#4fa94d' }}>
+    <div className="w-80 bg-muted/30 rounded-lg flex flex-col flex-shrink-0 border border-border">
+      <div className="flex items-center justify-between p-3 border-b-2 border-border mb-2">
         <div className="flex items-center">
           <span className={`w-3 h-3 rounded-full mr-2 ${statusStyles[status]}`}></span>
-          <h3 className="font-semibold text-white">{title}</h3>
+          <h3 className="font-semibold text-foreground">{title}</h3>
         </div>
-        <span className="text-sm font-medium bg-gray-700 text-gray-300 rounded-full px-2 py-0.5">{tasks.length}</span>
+        <span className="text-sm font-medium bg-muted text-muted-foreground rounded-full px-2 py-0.5">{tasks.length}</span>
       </div>
       <div className="flex-1 overflow-y-auto p-3 space-y-3 kanban-column min-h-[100px]">
         {tasks.map(task => {

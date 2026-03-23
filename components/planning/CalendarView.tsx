@@ -59,21 +59,21 @@ export const CalendarView: React.FC = () => {
     const weekdays = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
 
     return (
-        <div className="bg-gray-800 rounded-xl overflow-hidden shadow-lg border border-gray-700 flex flex-col h-full">
+        <div className="bg-card rounded-xl overflow-hidden shadow-lg border border-border flex flex-col h-full">
             {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b border-gray-700">
+            <div className="flex items-center justify-between p-6 border-b border-border">
                 <div className="flex items-center gap-4">
-                    <h2 className="text-2xl font-bold text-white uppercase tracking-wide">
+                    <h2 className="text-2xl font-bold text-foreground uppercase tracking-wide">
                         {getMonthName(currentDate)}
                     </h2>
-                    <div className="flex bg-gray-700 rounded-lg p-1">
-                        <button onClick={prevMonth} className="p-1 hover:bg-gray-600 rounded text-gray-300">
+                    <div className="flex bg-muted rounded-lg p-1">
+                        <button onClick={prevMonth} className="p-1 hover:bg-muted/80 rounded text-muted-foreground">
                             <Icon path="M15 19l-7-7 7-7" className="w-5 h-5" />
                         </button>
-                        <button onClick={goToToday} className="px-3 py-1 text-sm font-medium text-white hover:bg-gray-600 rounded">
+                        <button onClick={goToToday} className="px-3 py-1 text-sm font-medium text-foreground hover:bg-muted/80 rounded">
                             Today
                         </button>
-                        <button onClick={nextMonth} className="p-1 hover:bg-gray-600 rounded text-gray-300">
+                        <button onClick={nextMonth} className="p-1 hover:bg-muted/80 rounded text-muted-foreground">
                             <Icon path="M9 5l7 7-7 7" className="w-5 h-5" />
                         </button>
                     </div>
@@ -83,9 +83,9 @@ export const CalendarView: React.FC = () => {
             {/* Grid */}
             <div className="flex-1 min-h-0 flex flex-col">
                 {/* Weekday Headers */}
-                <div className="grid grid-cols-7 border-b border-gray-700 bg-gray-800/50">
+                <div className="grid grid-cols-7 border-b border-border bg-card/50">
                     {weekdays.map(day => (
-                        <div key={day} className="py-2 text-center text-sm font-semibold text-gray-400 uppercase tracking-wider">
+                        <div key={day} className="py-2 text-center text-sm font-semibold text-muted-foreground uppercase tracking-wider">
                             {day}
                         </div>
                     ))}
@@ -95,7 +95,7 @@ export const CalendarView: React.FC = () => {
                 <div className="flex-1 grid grid-cols-7 auto-rows-fr">
                     {days.map((date, index) => {
                         if (!date) {
-                            return <div key={`empty-${index}`} className="bg-gray-900/40 border-r border-b border-gray-700" />;
+                            return <div key={`empty-${index}`} className="bg-background/40 border-r border-b border-border" />;
                         }
 
                         const dayTasks = tasks.filter(task => {
@@ -110,9 +110,9 @@ export const CalendarView: React.FC = () => {
                         return (
                             <div
                                 key={date.toISOString()}
-                                className={`border-r border-b border-gray-700 p-2 min-h-[100px] relative transition-colors hover:bg-gray-800/80 ${isToday ? 'bg-blue-900/20' : ''}`}
+                                className={`border-r border-b border-border p-2 min-h-[100px] relative transition-colors hover:bg-card/80 ${isToday ? 'bg-blue-900/20' : ''}`}
                             >
-                                <div className={`text-sm font-medium mb-2 w-7 h-7 flex items-center justify-center rounded-full ${isToday ? 'bg-blue-500 text-white' : 'text-gray-400'}`}>
+                                <div className={`text-sm font-medium mb-2 w-7 h-7 flex items-center justify-center rounded-full ${isToday ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'}`}>
                                     {date.getDate()}
                                 </div>
 
@@ -120,7 +120,7 @@ export const CalendarView: React.FC = () => {
                                     {dayTasks.map(task => (
                                         <div
                                             key={task.id}
-                                            className="text-xs px-2 py-1 rounded truncate border-l-2 text-white/90"
+                                            className="text-xs px-2 py-1 rounded truncate border-l-2 text-foreground/90"
                                             style={{
                                                 backgroundColor: `${getProjectColor(task.project_id)}20`, // 20% opacity
                                                 borderColor: getProjectColor(task.project_id)

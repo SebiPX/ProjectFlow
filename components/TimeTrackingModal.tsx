@@ -257,16 +257,16 @@ export const TimeTrackingModal: React.FC<TimeTrackingModalProps> = ({ isOpen, on
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-800 rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+      <div className="bg-card rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex justify-between items-center p-6 border-b border-gray-700">
+        <div className="flex justify-between items-center p-6 border-b border-border">
           <div>
-            <h2 className="text-2xl font-bold text-white">Time Tracking</h2>
-            <p className="text-gray-400 text-sm mt-1">{task.title}</p>
+            <h2 className="text-2xl font-bold text-foreground">Time Tracking</h2>
+            <p className="text-muted-foreground text-sm mt-1">{task.title}</p>
           </div>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-white transition-colors"
+            className="text-muted-foreground hover:text-foreground transition-colors"
           >
             <Icon path="M6 18L18 6M6 6l12 12" className="w-6 h-6" />
           </button>
@@ -275,17 +275,17 @@ export const TimeTrackingModal: React.FC<TimeTrackingModalProps> = ({ isOpen, on
         {/* Content */}
         <div className="p-6 space-y-6">
           {/* Timer Section */}
-          <div className="bg-gray-700/50 rounded-lg p-6">
-            <h3 className="text-lg font-semibold text-white mb-4">Timer</h3>
+          <div className="bg-muted/50 rounded-lg p-6">
+            <h3 className="text-lg font-semibold text-foreground mb-4">Timer</h3>
             <div className="flex items-center justify-between">
-              <div className="text-4xl font-mono text-blue-400">
+              <div className="text-4xl font-mono text-primary">
                 {formatTime(elapsedSeconds)}
               </div>
               <div className="flex gap-3">
                 {!isTimerRunning ? (
                   <button
                     onClick={handleStartTimer}
-                    className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors flex items-center gap-2"
+                    className="px-6 py-3 bg-green-600 hover:bg-green-700 text-foreground rounded-lg transition-colors flex items-center gap-2"
                   >
                     <Icon path="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z M21 12a9 9 0 11-18 0 9 9 0 0118 0z" className="w-5 h-5" />
                     Start
@@ -293,7 +293,7 @@ export const TimeTrackingModal: React.FC<TimeTrackingModalProps> = ({ isOpen, on
                 ) : (
                   <button
                     onClick={handleStopTimer}
-                    className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors flex items-center gap-2"
+                    className="px-6 py-3 bg-red-600 hover:bg-red-700 text-foreground rounded-lg transition-colors flex items-center gap-2"
                   >
                     <Icon path="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" className="w-5 h-5" />
                     Stop
@@ -307,7 +307,7 @@ export const TimeTrackingModal: React.FC<TimeTrackingModalProps> = ({ isOpen, on
           <div>
             <button
               onClick={() => setShowManualEntry(!showManualEntry)}
-              className="text-blue-400 hover:text-blue-300 flex items-center gap-2"
+              className="text-primary hover:text-blue-300 flex items-center gap-2"
             >
               <Icon path="M12 6v6m0 0v6m0-6h6m-6 0H6" className="w-5 h-5" />
               {showManualEntry ? 'Hide Manual Entry' : 'Add Manual Entry'}
@@ -316,12 +316,12 @@ export const TimeTrackingModal: React.FC<TimeTrackingModalProps> = ({ isOpen, on
 
           {/* Manual Entry Form */}
           {showManualEntry && (
-            <form onSubmit={handleManualSubmit} className="bg-gray-700/50 rounded-lg p-6 space-y-4">
-              <h3 className="text-lg font-semibold text-white mb-4">Manual Time Entry</h3>
+            <form onSubmit={handleManualSubmit} className="bg-muted/50 rounded-lg p-6 space-y-4">
+              <h3 className="text-lg font-semibold text-foreground mb-4">Manual Time Entry</h3>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-muted-foreground mb-2">
                     Start Time *
                   </label>
                   <input
@@ -329,12 +329,12 @@ export const TimeTrackingModal: React.FC<TimeTrackingModalProps> = ({ isOpen, on
                     required
                     value={manualFormData.start_time}
                     onChange={(e) => setManualFormData({ ...manualFormData, start_time: e.target.value })}
-                    className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-muted-foreground mb-2">
                     End Time *
                   </label>
                   <input
@@ -342,13 +342,13 @@ export const TimeTrackingModal: React.FC<TimeTrackingModalProps> = ({ isOpen, on
                     required
                     value={manualFormData.end_time}
                     onChange={(e) => setManualFormData({ ...manualFormData, end_time: e.target.value })}
-                    className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-muted-foreground mb-2">
                   Duration (minutes) - Optional
                 </label>
                 <input
@@ -356,7 +356,7 @@ export const TimeTrackingModal: React.FC<TimeTrackingModalProps> = ({ isOpen, on
                   min="1"
                   value={manualFormData.duration_minutes}
                   onChange={(e) => setManualFormData({ ...manualFormData, duration_minutes: e.target.value })}
-                  className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                   placeholder="Auto-calculated if not provided"
                 />
               </div>
@@ -367,9 +367,9 @@ export const TimeTrackingModal: React.FC<TimeTrackingModalProps> = ({ isOpen, on
                   id="billable"
                   checked={manualFormData.billable}
                   onChange={(e) => setManualFormData({ ...manualFormData, billable: e.target.checked })}
-                  className="w-4 h-4 bg-gray-700 border-gray-600 rounded focus:ring-2 focus:ring-blue-500"
+                  className="w-4 h-4 bg-muted border-input rounded focus:ring-2 focus:ring-primary"
                 />
-                <label htmlFor="billable" className="ml-2 text-sm text-gray-300">
+                <label htmlFor="billable" className="ml-2 text-sm text-muted-foreground">
                   Billable
                 </label>
               </div>
@@ -378,14 +378,14 @@ export const TimeTrackingModal: React.FC<TimeTrackingModalProps> = ({ isOpen, on
                 <button
                   type="button"
                   onClick={() => setShowManualEntry(false)}
-                  className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors"
+                  className="px-4 py-2 bg-muted hover:bg-muted/80 text-foreground rounded-lg transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={createMutation.isPending}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50"
+                  className="px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-colors disabled:opacity-50"
                 >
                   Add Entry
                 </button>
@@ -394,10 +394,10 @@ export const TimeTrackingModal: React.FC<TimeTrackingModalProps> = ({ isOpen, on
           )}
 
           {/* Total Time */}
-          <div className="bg-blue-600/20 border border-blue-600/50 rounded-lg p-4">
+          <div className="bg-primary/20 border border-blue-600/50 rounded-lg p-4 text-primary-foreground">
             <div className="flex justify-between items-center">
-              <span className="text-gray-300">Total Time Tracked:</span>
-              <span className="text-2xl font-bold text-blue-400">
+              <span className="text-muted-foreground">Total Time Tracked:</span>
+              <span className="text-2xl font-bold text-primary">
                 {totalHours}h {remainingMinutes}m
               </span>
             </div>
@@ -405,11 +405,11 @@ export const TimeTrackingModal: React.FC<TimeTrackingModalProps> = ({ isOpen, on
 
           {/* Time Entries List */}
           <div>
-            <h3 className="text-lg font-semibold text-white mb-4">Time Entries</h3>
+            <h3 className="text-lg font-semibold text-foreground mb-4">Time Entries</h3>
             {isLoading ? (
-              <div className="text-center text-gray-400 py-8">Loading...</div>
+              <div className="text-center text-muted-foreground py-8">Loading...</div>
             ) : timeEntries.length === 0 ? (
-              <div className="text-center text-gray-400 py-8">
+              <div className="text-center text-muted-foreground py-8">
                 No time entries yet. Start tracking time!
               </div>
             ) : (
@@ -417,18 +417,18 @@ export const TimeTrackingModal: React.FC<TimeTrackingModalProps> = ({ isOpen, on
                 {timeEntries.map((entry) => (
                   <div
                     key={entry.id}
-                    className="bg-gray-700/50 rounded-lg p-4 flex items-center justify-between"
+                    className="bg-muted/50 rounded-lg p-4 flex items-center justify-between"
                   >
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
-                        <span className="text-white font-medium">
+                        <span className="text-foreground font-medium">
                           {entry.profile?.full_name || entry.profile?.email || 'Unknown'}
                         </span>
                         <span className={`px-2 py-1 text-xs rounded-full ${
                           entry.status === 'approved' ? 'bg-green-500/20 text-green-400' :
-                          entry.status === 'submitted' ? 'bg-blue-500/20 text-blue-400' :
+                          entry.status === 'submitted' ? 'bg-primary/20 text-primary' :
                           entry.status === 'rejected' ? 'bg-red-500/20 text-red-400' :
-                          'bg-gray-500/20 text-gray-400'
+                          'bg-gray-500/20 text-primary-foreground'
                         }`}>
                           {entry.status}
                         </span>
@@ -438,18 +438,18 @@ export const TimeTrackingModal: React.FC<TimeTrackingModalProps> = ({ isOpen, on
                           </span>
                         )}
                       </div>
-                      <div className="text-sm text-gray-400">
+                      <div className="text-sm text-muted-foreground">
                         {new Date(entry.start_time).toLocaleString('de-DE')}
                         {entry.end_time && ` - ${new Date(entry.end_time).toLocaleString('de-DE')}`}
                       </div>
                     </div>
                     <div className="flex items-center gap-4">
-                      <span className="text-xl font-bold text-blue-400">
+                      <span className="text-xl font-bold text-primary">
                         {entry.duration_minutes ? `${Math.floor(entry.duration_minutes / 60)}h ${entry.duration_minutes % 60}m` : 'Running...'}
                       </span>
                       <button
                         onClick={() => handleDelete(entry.id)}
-                        className="p-2 text-red-400 hover:text-red-300 hover:bg-gray-600 rounded transition-colors"
+                        className="p-2 text-red-400 hover:text-red-300 hover:bg-muted/80 rounded transition-colors"
                         title="Delete entry"
                       >
                         <Icon path="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" className="w-5 h-5" />
@@ -463,10 +463,10 @@ export const TimeTrackingModal: React.FC<TimeTrackingModalProps> = ({ isOpen, on
         </div>
 
         {/* Footer */}
-        <div className="flex justify-end p-6 border-t border-gray-700">
+        <div className="flex justify-end p-6 border-t border-border">
           <button
             onClick={onClose}
-            className="px-6 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors"
+            className="px-6 py-2 bg-muted hover:bg-muted/80 text-foreground rounded-lg transition-colors"
           >
             Close
           </button>

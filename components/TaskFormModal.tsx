@@ -148,13 +148,13 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+      <div className="bg-card rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex justify-between items-center p-6 border-b border-gray-700">
-          <h2 className="text-2xl font-bold text-white">Create New Task</h2>
+        <div className="flex justify-between items-center p-6 border-b border-border">
+          <h2 className="text-2xl font-bold text-foreground">Create New Task</h2>
           <button
             onClick={handleClose}
-            className="text-gray-400 hover:text-white transition-colors"
+            className="text-muted-foreground hover:text-foreground transition-colors"
           >
             <Icon path="M6 18L18 6M6 6l12 12" className="w-6 h-6" />
           </button>
@@ -164,7 +164,7 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {/* Task Title */}
           <div>
-            <label htmlFor="title" className="block text-sm font-medium text-gray-300 mb-2">
+            <label htmlFor="title" className="block text-sm font-medium text-muted-foreground mb-2">
               Task Title *
             </label>
             <input
@@ -173,14 +173,14 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
               required
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="Enter task name"
             />
           </div>
 
           {/* Project Selection */}
           <div>
-            <label htmlFor="project_id" className="block text-sm font-medium text-gray-300 mb-2">
+            <label htmlFor="project_id" className="block text-sm font-medium text-muted-foreground mb-2">
               Project *
             </label>
             <select
@@ -188,7 +188,7 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
               required
               value={formData.project_id}
               onChange={(e) => setFormData({ ...formData, project_id: e.target.value })}
-              className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             >
               <option value="">Select a project</option>
               {projects.map((project) => (
@@ -201,7 +201,7 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
 
           {/* Description */}
           <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-300 mb-2">
+            <label htmlFor="description" className="block text-sm font-medium text-muted-foreground mb-2">
               Description
             </label>
             <textarea
@@ -209,7 +209,7 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
               rows={3}
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="Task description..."
             />
           </div>
@@ -217,14 +217,14 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
           {/* Status & Assignee Row */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label htmlFor="status" className="block text-sm font-medium text-gray-300 mb-2">
+              <label htmlFor="status" className="block text-sm font-medium text-muted-foreground mb-2">
                 Status
               </label>
               <select
                 id="status"
                 value={formData.status}
                 onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               >
                 <option value="todo">To Do</option>
                 <option value="in_progress">In Progress</option>
@@ -234,14 +234,14 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
             </div>
 
             <div>
-              <label htmlFor="assigned_to" className="block text-sm font-medium text-gray-300 mb-2">
+              <label htmlFor="assigned_to" className="block text-sm font-medium text-muted-foreground mb-2">
                 Assign To
               </label>
               <select
                 id="assigned_to"
                 value={formData.assigned_to}
                 onChange={(e) => setFormData({ ...formData, assigned_to: e.target.value })}
-                className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               >
                 <option value="">Unassigned</option>
                 {profiles.map((profile) => (
@@ -256,7 +256,7 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
           {/* Dates Row */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label htmlFor="start_date" className="block text-sm font-medium text-gray-300 mb-2">
+              <label htmlFor="start_date" className="block text-sm font-medium text-muted-foreground mb-2">
                 Start Date
               </label>
               <input
@@ -264,12 +264,12 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
                 id="start_date"
                 value={formData.start_date}
                 onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
-                className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
 
             <div>
-              <label htmlFor="due_date" className="block text-sm font-medium text-gray-300 mb-2">
+              <label htmlFor="due_date" className="block text-sm font-medium text-muted-foreground mb-2">
                 Due Date
               </label>
               <input
@@ -277,14 +277,14 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
                 id="due_date"
                 value={formData.due_date}
                 onChange={(e) => setFormData({ ...formData, due_date: e.target.value })}
-                className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
           </div>
 
           {/* Planned Minutes */}
           <div>
-            <label htmlFor="planned_minutes" className="block text-sm font-medium text-gray-300 mb-2">
+            <label htmlFor="planned_minutes" className="block text-sm font-medium text-muted-foreground mb-2">
               Planned Time (minutes)
             </label>
             <input
@@ -294,28 +294,28 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
               step="15"
               value={formData.planned_minutes}
               onChange={(e) => setFormData({ ...formData, planned_minutes: e.target.value })}
-              className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="0"
             />
-            <p className="text-xs text-gray-400 mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               Estimated time in minutes (e.g., 60 for 1 hour, 120 for 2 hours)
             </p>
           </div>
 
           {/* Service-Based Estimation (Optional) */}
-          <div className="border-t border-gray-700 pt-4 mt-4">
-            <h3 className="text-sm font-medium text-gray-300 mb-3 flex items-center gap-2">
-              <Icon path="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" className="w-5 h-5 text-blue-500" />
+          <div className="border-t border-border pt-4 mt-4">
+            <h3 className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
+              <Icon path="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" className="w-5 h-5 text-primary" />
               Service-Based Estimation (Optional)
             </h3>
-            <p className="text-xs text-gray-400 mb-3">
+            <p className="text-xs text-muted-foreground mb-3">
               Link this task to a service from the catalog to enable Plan vs Actual tracking.
             </p>
 
             {/* Service Module & Seniority Level */}
             <div className="grid grid-cols-2 gap-4 mb-4">
               <div>
-                <label htmlFor="service_module_id" className="block text-sm font-medium text-gray-300 mb-2">
+                <label htmlFor="service_module_id" className="block text-sm font-medium text-muted-foreground mb-2">
                   Service Module
                 </label>
                 <select
@@ -326,7 +326,7 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
                     setSeniorityLevelId(''); // Reset level when module changes
                     setEstimatedRate(''); // Reset rate
                   }}
-                  className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                   disabled={createMutation.isPending}
                 >
                   <option value="">None</option>
@@ -341,7 +341,7 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
               </div>
 
               <div>
-                <label htmlFor="seniority_level_id" className="block text-sm font-medium text-gray-300 mb-2">
+                <label htmlFor="seniority_level_id" className="block text-sm font-medium text-muted-foreground mb-2">
                   Seniority Level
                 </label>
                 <select
@@ -352,7 +352,7 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
                     setEstimatedRate(''); // Reset rate to trigger auto-fill
                   }}
                   disabled={!serviceModuleId || createMutation.isPending}
-                  className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <option value="">Select level</option>
                   {seniorityLevels
@@ -369,7 +369,7 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
             {/* Estimated Hours & Rate */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label htmlFor="estimated_hours" className="block text-sm font-medium text-gray-300 mb-2">
+                <label htmlFor="estimated_hours" className="block text-sm font-medium text-muted-foreground mb-2">
                   Estimated Hours
                 </label>
                 <input
@@ -380,14 +380,14 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
                   value={estimatedHours}
                   onChange={(e) => setEstimatedHours(e.target.value)}
                   disabled={!serviceModuleId || createMutation.isPending}
-                  className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                  className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
                   placeholder="0"
                 />
-                <p className="text-xs text-gray-400 mt-1">Planned billable hours</p>
+                <p className="text-xs text-muted-foreground mt-1">Planned billable hours</p>
               </div>
 
               <div>
-                <label htmlFor="estimated_rate" className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-1">
+                <label htmlFor="estimated_rate" className="block text-sm font-medium text-muted-foreground mb-2 flex items-center gap-1">
                   Estimated Rate (€/h)
                   {pricingRate && (
                     <span className="text-green-500 text-xs">(Auto-filled)</span>
@@ -401,10 +401,10 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
                   value={estimatedRate}
                   onChange={(e) => setEstimatedRate(e.target.value)}
                   disabled={!serviceModuleId || createMutation.isPending}
-                  className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                  className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
                   placeholder="0.00"
                 />
-                <p className="text-xs text-gray-400 mt-1">Override if custom pricing</p>
+                <p className="text-xs text-muted-foreground mt-1">Override if custom pricing</p>
               </div>
             </div>
 
@@ -426,19 +426,19 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
               id="is_visible_to_client"
               checked={formData.is_visible_to_client}
               onChange={(e) => setFormData({ ...formData, is_visible_to_client: e.target.checked })}
-              className="w-4 h-4 bg-gray-700 border-gray-600 rounded focus:ring-2 focus:ring-blue-500"
+              className="w-4 h-4 bg-muted border-input rounded focus:ring-2 focus:ring-primary"
             />
-            <label htmlFor="is_visible_to_client" className="ml-2 text-sm text-gray-300">
+            <label htmlFor="is_visible_to_client" className="ml-2 text-sm text-muted-foreground">
               Visible to client
             </label>
           </div>
 
           {/* Form Actions */}
-          <div className="flex justify-end gap-3 pt-4 border-t border-gray-700">
+          <div className="flex justify-end gap-3 pt-4 border-t border-border">
             <button
               type="button"
               onClick={handleClose}
-              className="px-6 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors"
+              className="px-6 py-2 bg-muted hover:bg-muted/80 text-foreground rounded-lg transition-colors"
               disabled={createMutation.isPending}
             >
               Cancel
@@ -446,7 +446,7 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
             <button
               type="submit"
               disabled={createMutation.isPending}
-              className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              className="px-6 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
               {createMutation.isPending ? (
                 <>

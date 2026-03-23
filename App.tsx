@@ -100,10 +100,10 @@ const MainApp: React.FC = () => {
   // Show loading spinner while checking auth
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-gray-900">
+      <div className="flex items-center justify-center h-screen bg-background">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
-          <p className="mt-4 text-gray-400">Loading...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-muted-foreground">Loading...</p>
         </div>
       </div>
     );
@@ -116,14 +116,14 @@ const MainApp: React.FC = () => {
 
   // Show main app if authenticated
   return (
-    <div className="flex flex-col h-screen bg-[#101622] text-gray-100 overflow-hidden font-display">
+    <div className="flex flex-col h-screen bg-background text-foreground overflow-hidden font-sans antialiased">
       <Navigation 
         currentView={view} 
         onNavigate={handleNavigate} 
         searchQuery={searchQuery}
         onSearch={setSearchQuery}
       />
-      <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-900 border-t border-white/5">
+      <main className="flex-1 overflow-x-hidden overflow-y-auto bg-muted/40 border-t border-border">
         {renderContent()}
       </main>
     </div>

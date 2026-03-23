@@ -32,12 +32,12 @@ interface AssetSort {
 }
 
 const assetStatusStyles: { [key in AssetStatus]: string } = {
-  [AssetStatus.Upload]: 'bg-gray-500/20 text-gray-300',
+  [AssetStatus.Upload]: 'bg-gray-500/20 text-muted-foreground',
   [AssetStatus.InternalReview]: 'bg-yellow-500/20 text-yellow-400',
   [AssetStatus.ClientReview]: 'bg-purple-500/20 text-purple-400',
   [AssetStatus.ChangesRequested]: 'bg-red-500/20 text-red-400',
   [AssetStatus.Approved]: 'bg-green-500/20 text-green-400',
-  [AssetStatus.Archived]: 'bg-gray-700/20 text-gray-500',
+  [AssetStatus.Archived]: 'bg-muted/20 text-muted-foreground',
 };
 
 // Helper function for file size formatting
@@ -61,7 +61,7 @@ const AssetCard: React.FC<{
 }> = ({ asset, project, onDownload, onDelete, onSelectProject, onPreview, onChangeStatus }) => {
   return (
     <Card
-      className="hover:border-blue-500 transition-all duration-200 flex flex-col h-full cursor-pointer"
+      className="hover:border-primary transition-all duration-200 flex flex-col h-full cursor-pointer"
       onClick={() => onPreview(asset)}
     >
       <div className="flex-1">
@@ -73,11 +73,11 @@ const AssetCard: React.FC<{
             className="w-12 h-12 flex-shrink-0"
           />
           <div className="flex-1 min-w-0">
-            <h3 className="text-lg font-bold text-white mb-1 line-clamp-2 break-words">
+            <h3 className="text-lg font-bold text-foreground mb-1 line-clamp-2 break-words">
               {asset.name}
             </h3>
             {asset.file_size && (
-              <span className="text-xs text-gray-500">
+              <span className="text-xs text-muted-foreground">
                 {formatFileSize(asset.file_size)}
               </span>
             )}
@@ -101,7 +101,7 @@ const AssetCard: React.FC<{
 
         {/* Description */}
         {asset.description && (
-          <p className="text-sm text-gray-400 mb-3 line-clamp-2">
+          <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
             {asset.description}
           </p>
         )}
@@ -109,7 +109,7 @@ const AssetCard: React.FC<{
         {/* Category and Status Badges */}
         <div className="flex flex-wrap gap-2 mb-3">
           {asset.category && (
-            <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-blue-500/20 text-blue-400 capitalize">
+            <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-primary/20 text-primary capitalize">
               {asset.category.replace('_', ' ')}
             </span>
           )}
@@ -120,7 +120,7 @@ const AssetCard: React.FC<{
 
         {/* Uploader */}
         <div className="flex items-center gap-2 mb-2">
-          <Icon path="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" className="w-4 h-4 text-gray-500" />
+          <Icon path="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" className="w-4 h-4 text-muted-foreground" />
           {asset.uploader ? (
             <div className="flex items-center gap-2">
               <Avatar
@@ -128,30 +128,30 @@ const AssetCard: React.FC<{
                 alt={asset.uploader.full_name || ''}
                 className="w-6 h-6 rounded-full object-cover"
               />
-              <span className="text-sm text-gray-300">{asset.uploader.full_name}</span>
+              <span className="text-sm text-muted-foreground">{asset.uploader.full_name}</span>
             </div>
           ) : (
-            <span className="text-sm text-gray-500">Unknown</span>
+            <span className="text-sm text-muted-foreground">Unknown</span>
           )}
         </div>
 
         {/* Upload Date */}
         <div className="flex items-center gap-2">
-          <Icon path="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" className="w-4 h-4 text-gray-500" />
-          <span className="text-sm text-gray-400">
+          <Icon path="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" className="w-4 h-4 text-muted-foreground" />
+          <span className="text-sm text-muted-foreground">
             {asset.created_at ? new Date(asset.created_at).toLocaleDateString('de-DE') : 'N/A'}
           </span>
         </div>
       </div>
 
       {/* Action Buttons */}
-      <div className="flex items-center gap-2 mt-4 pt-4 border-t border-gray-700">
+      <div className="flex items-center gap-2 mt-4 pt-4 border-t border-border">
         <button
           onClick={(e) => {
             e.stopPropagation();
             onChangeStatus(asset);
           }}
-          className="flex-1 p-2 text-yellow-400 hover:text-yellow-300 hover:bg-gray-700 rounded-lg transition-colors flex items-center justify-center gap-2"
+          className="flex-1 p-2 text-yellow-400 hover:text-yellow-300 hover:bg-muted rounded-lg transition-colors flex items-center justify-center gap-2"
           title="Change Status"
         >
           <Icon path="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" className="w-5 h-5" />
@@ -163,7 +163,7 @@ const AssetCard: React.FC<{
               e.stopPropagation();
               onDownload(asset);
             }}
-            className="p-2 text-blue-400 hover:text-blue-300 hover:bg-gray-700 rounded-lg transition-colors"
+            className="p-2 text-primary hover:text-blue-300 hover:bg-muted rounded-lg transition-colors"
             title="Download"
           >
             <Icon path="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" className="w-5 h-5" />
@@ -174,7 +174,7 @@ const AssetCard: React.FC<{
             e.stopPropagation();
             onDelete(asset);
           }}
-          className="p-2 text-red-400 hover:text-red-300 hover:bg-gray-700 rounded-lg transition-colors"
+          className="p-2 text-red-400 hover:text-red-300 hover:bg-muted rounded-lg transition-colors"
           title="Delete"
         >
           <Icon path="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" className="w-5 h-5" />
@@ -320,15 +320,15 @@ export const AssetList: React.FC<AssetListProps> = ({ onSelectProject, searchQue
     return (
       <div className="p-4 sm:p-6 lg:p-8">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-white">All Assets</h1>
+          <h1 className="text-3xl font-bold text-foreground">All Assets</h1>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1, 2, 3, 4, 5, 6].map(i => (
             <Card key={i} className="h-72 animate-pulse">
-              <div className="h-6 bg-gray-700 rounded w-3/4 mb-4"></div>
-              <div className="h-4 bg-gray-700 rounded w-1/2 mb-2"></div>
-              <div className="h-4 bg-gray-700 rounded w-full mb-2"></div>
-              <div className="h-4 bg-gray-700 rounded w-2/3"></div>
+              <div className="h-6 bg-muted rounded w-3/4 mb-4"></div>
+              <div className="h-4 bg-muted rounded w-1/2 mb-2"></div>
+              <div className="h-4 bg-muted rounded w-full mb-2"></div>
+              <div className="h-4 bg-muted rounded w-2/3"></div>
             </Card>
           ))}
         </div>
@@ -349,8 +349,8 @@ export const AssetList: React.FC<AssetListProps> = ({ onSelectProject, searchQue
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-white">All Assets</h1>
-          <p className="text-sm text-gray-400 mt-1">
+          <h1 className="text-3xl font-bold text-foreground">All Assets</h1>
+          <p className="text-sm text-muted-foreground mt-1">
             {filteredAndSortedAssets.length} {filteredAndSortedAssets.length === 1 ? 'asset' : 'assets'}
             {onlyMe && ' • Only Me'}
             {getActiveFilterCount() > 0 && ' (filtered)'}
@@ -360,8 +360,8 @@ export const AssetList: React.FC<AssetListProps> = ({ onSelectProject, searchQue
           <button
             onClick={() => setOnlyMe(!onlyMe)}
             className={`font-semibold py-2 px-4 rounded-lg flex items-center transition-colors ${onlyMe
-              ? 'bg-blue-600 hover:bg-blue-700 text-white'
-              : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
+              ? 'bg-primary hover:bg-primary/90 text-primary-foreground'
+              : 'bg-muted hover:bg-muted/80 text-muted-foreground'
               }`}
           >
             <Icon path="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" className="h-5 w-5 mr-2" />
@@ -369,7 +369,7 @@ export const AssetList: React.FC<AssetListProps> = ({ onSelectProject, searchQue
           </button>
           <button
             onClick={() => setIsUploadModalOpen(true)}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-2 px-4 rounded-lg flex items-center"
           >
             <Icon path="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" className="h-5 w-5 mr-2" />
             Upload Asset
@@ -378,17 +378,17 @@ export const AssetList: React.FC<AssetListProps> = ({ onSelectProject, searchQue
       </div>
 
       {/* Filter Bar */}
-      <div className="mb-6 bg-gray-800 border border-gray-700 rounded-lg p-4">
+      <div className="mb-6 bg-card border border-border rounded-lg p-4">
         <div className="flex flex-wrap gap-4 items-end">
           {/* Status Filter */}
           <div className="flex-1 min-w-[200px]">
-            <label className="block text-sm font-medium text-gray-400 mb-1">
+            <label className="block text-sm font-medium text-muted-foreground mb-1">
               Status
             </label>
             <select
               value={filters.status}
               onChange={(e) => setFilters({ ...filters, status: e.target.value as any })}
-              className="w-full bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5"
+              className="w-full bg-muted border border-input text-foreground text-sm rounded-lg focus:ring-primary focus:border-primary p-2.5"
             >
               <option value="all">All Statuses</option>
               <option value={AssetStatus.Upload}>Upload</option>
@@ -402,13 +402,13 @@ export const AssetList: React.FC<AssetListProps> = ({ onSelectProject, searchQue
 
           {/* Project Filter */}
           <div className="flex-1 min-w-[200px]">
-            <label className="block text-sm font-medium text-gray-400 mb-1">
+            <label className="block text-sm font-medium text-muted-foreground mb-1">
               Project
             </label>
             <select
               value={filters.projectId}
               onChange={(e) => setFilters({ ...filters, projectId: e.target.value })}
-              className="w-full bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5"
+              className="w-full bg-muted border border-input text-foreground text-sm rounded-lg focus:ring-primary focus:border-primary p-2.5"
             >
               <option value="all">All Projects</option>
               {projects.map(project => (
@@ -421,13 +421,13 @@ export const AssetList: React.FC<AssetListProps> = ({ onSelectProject, searchQue
 
           {/* Category Filter */}
           <div className="flex-1 min-w-[200px]">
-            <label className="block text-sm font-medium text-gray-400 mb-1">
+            <label className="block text-sm font-medium text-muted-foreground mb-1">
               Category
             </label>
             <select
               value={filters.category}
               onChange={(e) => setFilters({ ...filters, category: e.target.value as any })}
-              className="w-full bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5"
+              className="w-full bg-muted border border-input text-foreground text-sm rounded-lg focus:ring-primary focus:border-primary p-2.5"
             >
               <option value="all">All Categories</option>
               <option value={AssetType.Briefing}>Briefing</option>
@@ -441,13 +441,13 @@ export const AssetList: React.FC<AssetListProps> = ({ onSelectProject, searchQue
 
           {/* Uploader Filter */}
           <div className="flex-1 min-w-[200px]">
-            <label className="block text-sm font-medium text-gray-400 mb-1">
+            <label className="block text-sm font-medium text-muted-foreground mb-1">
               Uploaded By
             </label>
             <select
               value={filters.uploaderId}
               onChange={(e) => setFilters({ ...filters, uploaderId: e.target.value })}
-              className="w-full bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5"
+              className="w-full bg-muted border border-input text-foreground text-sm rounded-lg focus:ring-primary focus:border-primary p-2.5"
             >
               <option value="all">All Uploaders</option>
               {uniqueUploaders.map(uploader => (
@@ -460,14 +460,14 @@ export const AssetList: React.FC<AssetListProps> = ({ onSelectProject, searchQue
 
           {/* Sort Dropdown */}
           <div className="flex-1 min-w-[200px]">
-            <label className="block text-sm font-medium text-gray-400 mb-1">
+            <label className="block text-sm font-medium text-muted-foreground mb-1">
               Sort By
             </label>
             <div className="flex gap-2">
               <select
                 value={sort.field}
                 onChange={(e) => setSort({ ...sort, field: e.target.value as any })}
-                className="flex-1 bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5"
+                className="flex-1 bg-muted border border-input text-foreground text-sm rounded-lg focus:ring-primary focus:border-primary p-2.5"
               >
                 <option value="created_at">Date Created</option>
                 <option value="name">Asset Name</option>
@@ -476,7 +476,7 @@ export const AssetList: React.FC<AssetListProps> = ({ onSelectProject, searchQue
               </select>
               <button
                 onClick={() => setSort({ ...sort, direction: sort.direction === 'asc' ? 'desc' : 'asc' })}
-                className="bg-gray-700 border border-gray-600 text-gray-300 hover:text-white hover:bg-gray-600 rounded-lg p-2.5 transition-colors"
+                className="bg-muted border border-input text-muted-foreground hover:text-foreground hover:bg-muted/80 rounded-lg p-2.5 transition-colors"
                 title={`Sort ${sort.direction === 'asc' ? 'ascending' : 'descending'}`}
               >
                 <Icon
@@ -495,7 +495,7 @@ export const AssetList: React.FC<AssetListProps> = ({ onSelectProject, searchQue
             <div>
               <button
                 onClick={() => setFilters({ status: 'all', projectId: 'all', category: 'all', uploaderId: 'all' })}
-                className="bg-gray-700 hover:bg-gray-600 text-white text-sm rounded-lg px-4 py-2.5 flex items-center gap-2 transition-colors"
+                className="bg-muted hover:bg-muted/80 text-foreground text-sm rounded-lg px-4 py-2.5 flex items-center gap-2 transition-colors"
               >
                 <Icon path="M6 18L18 6M6 6l12 12" className="w-4 h-4" />
                 Clear ({getActiveFilterCount()})
@@ -507,7 +507,7 @@ export const AssetList: React.FC<AssetListProps> = ({ onSelectProject, searchQue
 
       {/* Grid or Empty State */}
       {filteredAndSortedAssets.length === 0 ? (
-        <div className="text-center text-gray-400 mt-12">
+        <div className="text-center text-muted-foreground mt-12">
           <Icon path="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" className="w-16 h-16 mx-auto mb-4 text-gray-600" />
           <p className="text-xl mb-2">
             {getActiveFilterCount() > 0 ? 'No assets match your filters' : 'No assets found'}

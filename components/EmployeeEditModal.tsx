@@ -82,13 +82,13 @@ export const EmployeeEditModal: React.FC<EmployeeEditModalProps> = ({ isOpen, on
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-800 rounded-lg shadow-xl w-full max-w-lg max-h-[90vh] flex flex-col">
+      <div className="bg-card rounded-lg shadow-xl w-full max-w-lg max-h-[90vh] flex flex-col">
         {/* Header */}
-        <div className="flex justify-between items-center p-6 border-b border-gray-700 flex-shrink-0">
-          <h2 className="text-2xl font-bold text-white">Edit Employee</h2>
+        <div className="flex justify-between items-center p-6 border-b border-border flex-shrink-0">
+          <h2 className="text-2xl font-bold text-foreground">Edit Employee</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-white transition-colors"
+            className="text-muted-foreground hover:text-foreground transition-colors"
             disabled={updateMutation.isPending}
           >
             <Icon path="M6 18L18 6M6 6l12 12" className="w-6 h-6" />
@@ -99,7 +99,7 @@ export const EmployeeEditModal: React.FC<EmployeeEditModalProps> = ({ isOpen, on
         <form onSubmit={handleSubmit} className="p-6 space-y-4 flex-1 overflow-y-auto">
           {/* Full Name */}
           <div>
-            <label htmlFor="full_name" className="block text-sm font-medium text-gray-300 mb-2">
+            <label htmlFor="full_name" className="block text-sm font-medium text-muted-foreground mb-2">
               Full Name
             </label>
             <input
@@ -107,7 +107,7 @@ export const EmployeeEditModal: React.FC<EmployeeEditModalProps> = ({ isOpen, on
               id="full_name"
               value={formData.full_name}
               onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
-              className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="John Doe"
               disabled={updateMutation.isPending}
             />
@@ -115,7 +115,7 @@ export const EmployeeEditModal: React.FC<EmployeeEditModalProps> = ({ isOpen, on
 
           {/* Email */}
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
+            <label htmlFor="email" className="block text-sm font-medium text-muted-foreground mb-2">
               Email
             </label>
             <input
@@ -123,25 +123,25 @@ export const EmployeeEditModal: React.FC<EmployeeEditModalProps> = ({ isOpen, on
               id="email"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="john@example.com"
               disabled={updateMutation.isPending}
             />
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               Note: Changing email may require verification
             </p>
           </div>
 
           {/* Role */}
           <div>
-            <label htmlFor="role" className="block text-sm font-medium text-gray-300 mb-2">
+            <label htmlFor="role" className="block text-sm font-medium text-muted-foreground mb-2">
               Role
             </label>
             <select
               id="role"
               value={formData.role}
               onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-              className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               disabled={updateMutation.isPending}
             >
               <option value="admin">Admin</option>
@@ -154,7 +154,7 @@ export const EmployeeEditModal: React.FC<EmployeeEditModalProps> = ({ isOpen, on
 
           {/* Weekly Hours */}
           <div>
-            <label htmlFor="weekly_hours" className="block text-sm font-medium text-gray-300 mb-2">
+            <label htmlFor="weekly_hours" className="block text-sm font-medium text-muted-foreground mb-2">
               Weekly Hours <span className="text-red-500">*</span>
             </label>
             <input
@@ -166,18 +166,18 @@ export const EmployeeEditModal: React.FC<EmployeeEditModalProps> = ({ isOpen, on
               step="0.5"
               value={formData.weekly_hours}
               onChange={(e) => setFormData({ ...formData, weekly_hours: e.target.value })}
-              className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="40"
               disabled={updateMutation.isPending}
             />
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               Contracted weekly working hours
             </p>
           </div>
 
           {/* Billable Hourly Rate */}
           <div>
-            <label htmlFor="billable_rate" className="block text-sm font-medium text-gray-300 mb-2">
+            <label htmlFor="billable_rate" className="block text-sm font-medium text-muted-foreground mb-2">
               Billable Hourly Rate (€) <span className="text-red-500">*</span>
             </label>
             <input
@@ -188,18 +188,18 @@ export const EmployeeEditModal: React.FC<EmployeeEditModalProps> = ({ isOpen, on
               step="0.01"
               value={formData.billable_hourly_rate}
               onChange={(e) => setFormData({ ...formData, billable_hourly_rate: e.target.value })}
-              className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="75.00"
               disabled={updateMutation.isPending}
             />
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               Rate charged to clients for this employee's time
             </p>
           </div>
 
           {/* Internal Cost Per Hour */}
           <div>
-            <label htmlFor="internal_cost" className="block text-sm font-medium text-gray-300 mb-2">
+            <label htmlFor="internal_cost" className="block text-sm font-medium text-muted-foreground mb-2">
               Internal Cost Per Hour (€) <span className="text-red-500">*</span>
             </label>
             <input
@@ -210,11 +210,11 @@ export const EmployeeEditModal: React.FC<EmployeeEditModalProps> = ({ isOpen, on
               step="0.01"
               value={formData.internal_cost_per_hour}
               onChange={(e) => setFormData({ ...formData, internal_cost_per_hour: e.target.value })}
-              className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="50.00"
               disabled={updateMutation.isPending}
             />
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               Internal cost (salary + overhead) per hour
             </p>
           </div>
@@ -224,14 +224,14 @@ export const EmployeeEditModal: React.FC<EmployeeEditModalProps> = ({ isOpen, on
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-gray-300 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+              className="px-4 py-2 text-muted-foreground bg-muted hover:bg-muted/80 rounded-lg transition-colors"
               disabled={updateMutation.isPending}
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              className="px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               disabled={updateMutation.isPending}
             >
               {updateMutation.isPending ? (

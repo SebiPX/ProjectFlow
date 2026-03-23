@@ -90,13 +90,13 @@ export const ProjectFormModal: React.FC<ProjectFormModalProps> = ({ isOpen, onCl
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+      <div className="bg-card rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex justify-between items-center p-6 border-b border-gray-700">
-          <h2 className="text-2xl font-bold text-white">Create New Project</h2>
+        <div className="flex justify-between items-center p-6 border-b border-border">
+          <h2 className="text-2xl font-bold text-foreground">Create New Project</h2>
           <button
             onClick={handleClose}
-            className="text-gray-400 hover:text-white transition-colors"
+            className="text-muted-foreground hover:text-foreground transition-colors"
           >
             <Icon path="M6 18L18 6M6 6l12 12" className="w-6 h-6" />
           </button>
@@ -106,7 +106,7 @@ export const ProjectFormModal: React.FC<ProjectFormModalProps> = ({ isOpen, onCl
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {/* Project Title */}
           <div>
-            <label htmlFor="title" className="block text-sm font-medium text-gray-300 mb-2">
+            <label htmlFor="title" className="block text-sm font-medium text-muted-foreground mb-2">
               Project Title *
             </label>
             <input
@@ -115,14 +115,14 @@ export const ProjectFormModal: React.FC<ProjectFormModalProps> = ({ isOpen, onCl
               required
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="Enter project name"
             />
           </div>
 
           {/* Client Selection */}
           <div>
-            <label htmlFor="client_id" className="block text-sm font-medium text-gray-300 mb-2">
+            <label htmlFor="client_id" className="block text-sm font-medium text-muted-foreground mb-2">
               Client *
             </label>
             <select
@@ -130,7 +130,7 @@ export const ProjectFormModal: React.FC<ProjectFormModalProps> = ({ isOpen, onCl
               required
               value={formData.client_id}
               onChange={(e) => setFormData({ ...formData, client_id: e.target.value })}
-              className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             >
               <option value="">Select a client</option>
               {clients.map((client) => (
@@ -143,7 +143,7 @@ export const ProjectFormModal: React.FC<ProjectFormModalProps> = ({ isOpen, onCl
 
           {/* Description */}
           <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-300 mb-2">
+            <label htmlFor="description" className="block text-sm font-medium text-muted-foreground mb-2">
               Description
             </label>
             <textarea
@@ -151,7 +151,7 @@ export const ProjectFormModal: React.FC<ProjectFormModalProps> = ({ isOpen, onCl
               rows={3}
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="Project description..."
             />
           </div>
@@ -159,14 +159,14 @@ export const ProjectFormModal: React.FC<ProjectFormModalProps> = ({ isOpen, onCl
           {/* Category & Status Row */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label htmlFor="category" className="block text-sm font-medium text-gray-300 mb-2">
+              <label htmlFor="category" className="block text-sm font-medium text-muted-foreground mb-2">
                 Category
               </label>
               <select
                 id="category"
                 value={formData.category}
                 onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               >
                 <option value="web_design">Web Design</option>
                 <option value="app_dev">App Development</option>
@@ -181,14 +181,14 @@ export const ProjectFormModal: React.FC<ProjectFormModalProps> = ({ isOpen, onCl
             </div>
 
             <div>
-              <label htmlFor="status" className="block text-sm font-medium text-gray-300 mb-2">
+              <label htmlFor="status" className="block text-sm font-medium text-muted-foreground mb-2">
                 Status
               </label>
               <select
                 id="status"
                 value={formData.status}
                 onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               >
                 <option value="planning">Planned</option>
                 <option value="active">Active</option>
@@ -201,7 +201,7 @@ export const ProjectFormModal: React.FC<ProjectFormModalProps> = ({ isOpen, onCl
 
           {/* Budget */}
           <div>
-            <label htmlFor="budget_total" className="block text-sm font-medium text-gray-300 mb-2">
+            <label htmlFor="budget_total" className="block text-sm font-medium text-muted-foreground mb-2">
               Total Budget (€)
             </label>
             <input
@@ -211,7 +211,7 @@ export const ProjectFormModal: React.FC<ProjectFormModalProps> = ({ isOpen, onCl
               step="0.01"
               value={formData.budget_total}
               onChange={(e) => setFormData({ ...formData, budget_total: e.target.value })}
-              className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="0.00"
             />
           </div>
@@ -219,7 +219,7 @@ export const ProjectFormModal: React.FC<ProjectFormModalProps> = ({ isOpen, onCl
           {/* Dates Row */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label htmlFor="start_date" className="block text-sm font-medium text-gray-300 mb-2">
+              <label htmlFor="start_date" className="block text-sm font-medium text-muted-foreground mb-2">
                 Start Date
               </label>
               <input
@@ -227,12 +227,12 @@ export const ProjectFormModal: React.FC<ProjectFormModalProps> = ({ isOpen, onCl
                 id="start_date"
                 value={formData.start_date}
                 onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
-                className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
 
             <div>
-              <label htmlFor="deadline" className="block text-sm font-medium text-gray-300 mb-2">
+              <label htmlFor="deadline" className="block text-sm font-medium text-muted-foreground mb-2">
                 Deadline
               </label>
               <input
@@ -240,14 +240,14 @@ export const ProjectFormModal: React.FC<ProjectFormModalProps> = ({ isOpen, onCl
                 id="deadline"
                 value={formData.deadline}
                 onChange={(e) => setFormData({ ...formData, deadline: e.target.value })}
-                className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
           </div>
 
           {/* Color Picker */}
           <div>
-            <label htmlFor="color_code" className="block text-sm font-medium text-gray-300 mb-2">
+            <label htmlFor="color_code" className="block text-sm font-medium text-muted-foreground mb-2">
               Project Color
             </label>
             <div className="flex items-center gap-3">
@@ -258,16 +258,16 @@ export const ProjectFormModal: React.FC<ProjectFormModalProps> = ({ isOpen, onCl
                 onChange={(e) => setFormData({ ...formData, color_code: e.target.value })}
                 className="w-16 h-10 rounded cursor-pointer"
               />
-              <span className="text-gray-400 text-sm">{formData.color_code}</span>
+              <span className="text-muted-foreground text-sm">{formData.color_code}</span>
             </div>
           </div>
 
           {/* Form Actions */}
-          <div className="flex justify-end gap-3 pt-4 border-t border-gray-700">
+          <div className="flex justify-end gap-3 pt-4 border-t border-border">
             <button
               type="button"
               onClick={handleClose}
-              className="px-6 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors"
+              className="px-6 py-2 bg-muted hover:bg-muted/80 text-foreground rounded-lg transition-colors"
               disabled={createMutation.isPending}
             >
               Cancel
@@ -275,7 +275,7 @@ export const ProjectFormModal: React.FC<ProjectFormModalProps> = ({ isOpen, onCl
             <button
               type="submit"
               disabled={createMutation.isPending}
-              className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              className="px-6 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
               {createMutation.isPending ? (
                 <>

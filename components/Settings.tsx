@@ -210,24 +210,24 @@ export const Settings: React.FC = () => {
 
   return (
     <div className="p-8 max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold text-white mb-8">Account Settings</h1>
+      <h1 className="text-3xl font-bold text-foreground mb-8">Account Settings</h1>
 
       <div className="space-y-6">
         {/* Profile Picture Section */}
-        <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
-          <h2 className="text-xl font-semibold text-white mb-4">Profile Picture</h2>
+        <div className="bg-card rounded-lg p-6 border border-border">
+          <h2 className="text-xl font-semibold text-foreground mb-4">Profile Picture</h2>
           <div className="flex items-center gap-6">
             <div className="relative">
               <img
                 src={avatarPreview || avatarDisplayUrl || 'https://picsum.photos/seed/default/200/200'}
                 alt="Profile"
-                className="w-32 h-32 rounded-full object-cover border-4 border-gray-700"
+                className="w-32 h-32 rounded-full object-cover border-4 border-border"
               />
               {uploadingAvatar && (
                 <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full">
                   <Icon
                     path="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    className="w-8 h-8 text-white animate-spin"
+                    className="w-8 h-8 text-foreground animate-spin"
                   />
                 </div>
               )}
@@ -243,7 +243,7 @@ export const Settings: React.FC = () => {
               />
               <label
                 htmlFor="avatar-upload"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg cursor-pointer transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg cursor-pointer transition-colors"
               >
                 <Icon path="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" className="w-5 h-5" />
                 Choose Image
@@ -252,12 +252,12 @@ export const Settings: React.FC = () => {
                 <button
                   onClick={handleAvatarUpload}
                   disabled={uploadingAvatar}
-                  className="ml-3 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors disabled:opacity-50"
+                  className="ml-3 px-4 py-2 bg-green-600 hover:bg-green-700 text-foreground rounded-lg transition-colors disabled:opacity-50"
                 >
                   {uploadingAvatar ? 'Uploading...' : 'Upload'}
                 </button>
               )}
-              <p className="text-sm text-gray-400 mt-2">
+              <p className="text-sm text-muted-foreground mt-2">
                 JPG, PNG or GIF. Max size 5MB.
               </p>
             </div>
@@ -265,47 +265,47 @@ export const Settings: React.FC = () => {
         </div>
 
         {/* Profile Information Section */}
-        <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
-          <h2 className="text-xl font-semibold text-white mb-4">Profile Information</h2>
+        <div className="bg-card rounded-lg p-6 border border-border">
+          <h2 className="text-xl font-semibold text-foreground mb-4">Profile Information</h2>
           <form onSubmit={handleProfileSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-muted-foreground mb-2">
                 Full Name
               </label>
               <input
                 type="text"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                className="w-full bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5"
+                className="w-full bg-muted border border-input text-foreground text-sm rounded-lg focus:ring-primary focus:border-primary p-2.5"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-muted-foreground mb-2">
                 Email
               </label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5"
+                className="w-full bg-muted border border-input text-foreground text-sm rounded-lg focus:ring-primary focus:border-primary p-2.5"
                 required
               />
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 Changing email will require verification
               </p>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-muted-foreground mb-2">
                 Role
               </label>
               <input
                 type="text"
                 value={profile?.role || 'employee'}
                 disabled
-                className="w-full bg-gray-900 border border-gray-600 text-gray-400 text-sm rounded-lg p-2.5 capitalize cursor-not-allowed"
+                className="w-full bg-background border border-input text-muted-foreground text-sm rounded-lg p-2.5 capitalize cursor-not-allowed"
               />
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 Contact an admin to change your role
               </p>
             </div>
@@ -313,7 +313,7 @@ export const Settings: React.FC = () => {
               <button
                 type="submit"
                 disabled={updateProfileMutation.isPending}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50 flex items-center gap-2"
+                className="px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-colors disabled:opacity-50 flex items-center gap-2"
               >
                 {updateProfileMutation.isPending ? (
                   <>
@@ -335,11 +335,11 @@ export const Settings: React.FC = () => {
         </div>
 
         {/* Change Password Section */}
-        <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
-          <h2 className="text-xl font-semibold text-white mb-4">Change Password</h2>
+        <div className="bg-card rounded-lg p-6 border border-border">
+          <h2 className="text-xl font-semibold text-foreground mb-4">Change Password</h2>
           <form onSubmit={handlePasswordSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-muted-foreground mb-2">
                 New Password
               </label>
               <input
@@ -347,13 +347,13 @@ export const Settings: React.FC = () => {
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 placeholder="Enter new password"
-                className="w-full bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5"
+                className="w-full bg-muted border border-input text-foreground text-sm rounded-lg focus:ring-primary focus:border-primary p-2.5"
                 required
                 minLength={6}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-muted-foreground mb-2">
                 Confirm New Password
               </label>
               <input
@@ -361,7 +361,7 @@ export const Settings: React.FC = () => {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="Confirm new password"
-                className="w-full bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5"
+                className="w-full bg-muted border border-input text-foreground text-sm rounded-lg focus:ring-primary focus:border-primary p-2.5"
                 required
                 minLength={6}
               />
@@ -378,7 +378,7 @@ export const Settings: React.FC = () => {
                   !confirmPassword ||
                   newPassword !== confirmPassword
                 }
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50 flex items-center gap-2"
+                className="px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-colors disabled:opacity-50 flex items-center gap-2"
               >
                 {changePasswordMutation.isPending ? (
                   <>
@@ -400,24 +400,24 @@ export const Settings: React.FC = () => {
         </div>
 
         {/* Account Information */}
-        <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
-          <h2 className="text-xl font-semibold text-white mb-4">Account Information</h2>
+        <div className="bg-card rounded-lg p-6 border border-border">
+          <h2 className="text-xl font-semibold text-foreground mb-4">Account Information</h2>
           <div className="space-y-3 text-sm">
             <div className="flex justify-between">
-              <span className="text-gray-400">User ID:</span>
-              <span className="text-gray-300 font-mono">{user?.id}</span>
+              <span className="text-muted-foreground">User ID:</span>
+              <span className="text-muted-foreground font-mono">{user?.id}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-400">Account Created:</span>
-              <span className="text-gray-300">
+              <span className="text-muted-foreground">Account Created:</span>
+              <span className="text-muted-foreground">
                 {profile?.created_at
                   ? new Date(profile.created_at).toLocaleDateString()
                   : 'N/A'}
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-400">Last Sign In:</span>
-              <span className="text-gray-300">
+              <span className="text-muted-foreground">Last Sign In:</span>
+              <span className="text-muted-foreground">
                 {user?.last_sign_in_at
                   ? new Date(user.last_sign_in_at).toLocaleDateString()
                   : 'N/A'}
@@ -429,23 +429,23 @@ export const Settings: React.FC = () => {
         {/* Administrative Actions (Admin Only) */}
         {profile?.role === 'admin' && (
           <div className="bg-red-900 bg-opacity-20 rounded-lg p-6 border border-red-800">
-            <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+            <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
               <Icon path="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" className="w-5 h-5 text-red-500" />
               Administrative Actions
             </h2>
             <form onSubmit={handleAdminPasswordSubmit} className="space-y-4">
-              <p className="text-sm text-gray-400">
+              <p className="text-sm text-muted-foreground">
                 As an administrator, you can force reset the password for any user in the system.
               </p>
               
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-muted-foreground mb-2">
                   Select User
                 </label>
                 <select
                   value={selectedUserId}
                   onChange={(e) => setSelectedUserId(e.target.value)}
-                  className="w-full bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-red-500 focus:border-red-500 p-2.5"
+                  className="w-full bg-muted border border-input text-foreground text-sm rounded-lg focus:ring-red-500 focus:border-red-500 p-2.5"
                   required
                 >
                   <option value="" disabled>Select a user to reset password</option>
@@ -458,7 +458,7 @@ export const Settings: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-muted-foreground mb-2">
                   New Password for User
                 </label>
                 <input
@@ -466,14 +466,14 @@ export const Settings: React.FC = () => {
                   value={adminNewPassword}
                   onChange={(e) => setAdminNewPassword(e.target.value)}
                   placeholder="Enter new password"
-                  className="w-full bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-red-500 focus:border-red-500 p-2.5"
+                  className="w-full bg-muted border border-input text-foreground text-sm rounded-lg focus:ring-red-500 focus:border-red-500 p-2.5"
                   required
                   minLength={6}
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-muted-foreground mb-2">
                   Confirm New Password
                 </label>
                 <input
@@ -481,7 +481,7 @@ export const Settings: React.FC = () => {
                   value={adminConfirmPassword}
                   onChange={(e) => setAdminConfirmPassword(e.target.value)}
                   placeholder="Confirm new password"
-                  className="w-full bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-red-500 focus:border-red-500 p-2.5"
+                  className="w-full bg-muted border border-input text-foreground text-sm rounded-lg focus:ring-red-500 focus:border-red-500 p-2.5"
                   required
                   minLength={6}
                 />
@@ -501,7 +501,7 @@ export const Settings: React.FC = () => {
                     !adminConfirmPassword ||
                     adminNewPassword !== adminConfirmPassword
                   }
-                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors disabled:opacity-50 flex items-center gap-2"
+                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-foreground rounded-lg transition-colors disabled:opacity-50 flex items-center gap-2"
                 >
                   {adminResetPasswordMutation.isPending ? (
                     <>

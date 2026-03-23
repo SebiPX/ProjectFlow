@@ -77,11 +77,11 @@ export const AssetPreviewModal: React.FC<AssetPreviewModalProps> = ({
       onClick={onClose}
     >
       <div
-        className="bg-gray-800 rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-hidden flex flex-col"
+        className="bg-card rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-hidden flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-700">
+        <div className="flex items-center justify-between p-4 border-b border-border">
           <div className="flex items-center gap-3 flex-1 min-w-0">
             <FileIcon
               fileType={asset.file_type}
@@ -89,8 +89,8 @@ export const AssetPreviewModal: React.FC<AssetPreviewModalProps> = ({
               className="w-10 h-10 flex-shrink-0"
             />
             <div className="flex-1 min-w-0">
-              <h2 className="text-xl font-bold text-white truncate">{asset.name}</h2>
-              <p className="text-sm text-gray-400">
+              <h2 className="text-xl font-bold text-foreground truncate">{asset.name}</h2>
+              <p className="text-sm text-muted-foreground">
                 {asset.category && <span className="capitalize">{asset.category.replace('_', ' ')}</span>}
                 {asset.category && asset.file_size && ' • '}
                 {asset.file_size && formatFileSize(asset.file_size)}
@@ -101,7 +101,7 @@ export const AssetPreviewModal: React.FC<AssetPreviewModalProps> = ({
             {onDownload && assetUrl && (
               <button
                 onClick={onDownload}
-                className="p-2 text-blue-400 hover:text-blue-300 hover:bg-gray-700 rounded-lg transition-colors"
+                className="p-2 text-primary hover:text-blue-300 hover:bg-muted rounded-lg transition-colors"
                 title="Download"
               >
                 <Icon path="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" className="w-6 h-6" />
@@ -109,7 +109,7 @@ export const AssetPreviewModal: React.FC<AssetPreviewModalProps> = ({
             )}
             <button
               onClick={onClose}
-              className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-colors"
+              className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
               title="Close"
             >
               <Icon path="M6 18L18 6M6 6l12 12" className="w-6 h-6" />
@@ -118,20 +118,20 @@ export const AssetPreviewModal: React.FC<AssetPreviewModalProps> = ({
         </div>
 
         {/* Preview Content */}
-        <div className="flex-1 overflow-auto bg-gray-900 flex items-center justify-center p-4">
+        <div className="flex-1 overflow-auto bg-background flex items-center justify-center p-4">
           {isLoadingUrl ? (
-            <div className="text-center text-gray-400">
-              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500 mx-auto mb-4"></div>
+            <div className="text-center text-muted-foreground">
+              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto mb-4"></div>
               <p>Loading preview...</p>
             </div>
           ) : urlError ? (
-            <div className="text-center text-gray-400">
+            <div className="text-center text-muted-foreground">
               <Icon path="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" className="w-16 h-16 mx-auto mb-4 text-gray-600" />
               <p className="text-xl mb-2">Failed to load preview</p>
               <p className="text-sm">{urlError}</p>
             </div>
           ) : !assetUrl ? (
-            <div className="text-center text-gray-400">
+            <div className="text-center text-muted-foreground">
               <Icon path="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" className="w-16 h-16 mx-auto mb-4 text-gray-600" />
               <p>No preview available</p>
               <p className="text-sm mt-2">File path not found</p>
@@ -146,7 +146,7 @@ export const AssetPreviewModal: React.FC<AssetPreviewModalProps> = ({
                   const target = e.target as HTMLImageElement;
                   target.style.display = 'none';
                   target.parentElement!.innerHTML = `
-                    <div class="text-center text-gray-400">
+                    <div class="text-center text-muted-foreground">
                       <p>Failed to load image</p>
                     </div>
                   `;
@@ -180,7 +180,7 @@ export const AssetPreviewModal: React.FC<AssetPreviewModalProps> = ({
               </audio>
             </div>
           ) : (
-            <div className="text-center text-gray-400">
+            <div className="text-center text-muted-foreground">
               <FileIcon
                 fileType={asset.file_type}
                 fileName={asset.name}
@@ -191,7 +191,7 @@ export const AssetPreviewModal: React.FC<AssetPreviewModalProps> = ({
               {onDownload && (
                 <button
                   onClick={onDownload}
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg flex items-center gap-2 mx-auto transition-colors"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-2 px-6 rounded-lg flex items-center gap-2 mx-auto transition-colors"
                 >
                   <Icon path="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" className="w-5 h-5" />
                   Download File
@@ -203,9 +203,9 @@ export const AssetPreviewModal: React.FC<AssetPreviewModalProps> = ({
 
         {/* Footer with metadata */}
         {asset.description && (
-          <div className="p-4 border-t border-gray-700 bg-gray-800">
-            <p className="text-sm text-gray-400">
-              <span className="font-semibold text-gray-300">Description: </span>
+          <div className="p-4 border-t border-border bg-card">
+            <p className="text-sm text-muted-foreground">
+              <span className="font-semibold text-muted-foreground">Description: </span>
               {asset.description}
             </p>
           </div>

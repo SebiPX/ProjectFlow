@@ -43,14 +43,14 @@ export default function ResourceTimeline({ resources, startDate, onDateChange, i
 
     const getUtilizationColor = (allocation: ResourceAllocation | undefined, capacity: number) => {
         if (allocation?.absences?.length) {
-            return 'bg-purple-900/40 text-purple-300 border-purple-700 hover:bg-purple-800/60';
+            return 'bg-secondary/40 text-secondary-foreground border-border hover:bg-secondary/60';
         }
-        if (!allocation || allocation.hours === 0) return 'bg-gray-800 border-gray-700 text-gray-500'; // Empty state
+        if (!allocation || allocation.hours === 0) return 'bg-muted/30 border-border text-muted-foreground'; // Empty state
         const utilization = (allocation.hours / capacity) * 100;
 
-        if (utilization > 100) return 'bg-red-900/50 text-red-200 border-red-800 hover:bg-red-900/70';
-        if (utilization >= 80) return 'bg-yellow-900/50 text-yellow-200 border-yellow-800 hover:bg-yellow-900/70';
-        return 'bg-green-900/50 text-green-200 border-green-800 hover:bg-green-900/70';
+        if (utilization > 100) return 'bg-destructive/20 text-destructive border-transparent hover:bg-destructive/30';
+        if (utilization >= 80) return 'bg-orange-500/20 text-orange-600 border-transparent hover:bg-orange-500/30';
+        return 'bg-emerald-500/20 text-emerald-600 border-transparent hover:bg-emerald-500/30';
     };
 
     const formatHours = (hours: number) => {
@@ -63,23 +63,23 @@ export default function ResourceTimeline({ resources, startDate, onDateChange, i
         <>
             <Card className="overflow-hidden">
                 {/* Controls */}
-                <div className="flex items-center justify-between p-4 border-b border-gray-700 bg-gray-800">
-                    <h3 className="text-lg font-semibold text-white">Kapazitätsplanung</h3>
+                <div className="flex items-center justify-between p-4 border-b border-border bg-muted/30">
+                    <h3 className="text-lg font-semibold text-foreground">Kapazitätsplanung</h3>
                     <div className="flex items-center space-x-4">
                         <button
                             onClick={() => onDateChange(addDays(startDate, -7))}
-                            className="p-1 rounded-full hover:bg-gray-700 transition"
+                            className="p-1 rounded-full hover:bg-muted transition"
                         >
-                            <Icon path="M15 19l-7-7 7-7" className="w-5 h-5 text-gray-400" />
+                            <Icon path="M15 19l-7-7 7-7" className="w-5 h-5 text-muted-foreground" />
                         </button>
-                        <span className="text-sm font-medium text-gray-300">
+                        <span className="text-sm font-medium text-foreground">
                             {startDate.toLocaleDateString('de-DE', { day: 'numeric', month: 'long', year: 'numeric' })}
                         </span>
                         <button
                             onClick={() => onDateChange(addDays(startDate, 7))}
-                            className="p-1 rounded-full hover:bg-gray-700 transition"
+                            className="p-1 rounded-full hover:bg-muted transition"
                         >
-                            <Icon path="M9 5l7 7-7 7" className="w-5 h-5 text-gray-400" />
+                            <Icon path="M9 5l7 7-7 7" className="w-5 h-5 text-muted-foreground" />
                         </button>
                     </div>
                 </div>
@@ -89,7 +89,7 @@ export default function ResourceTimeline({ resources, startDate, onDateChange, i
                     <table className="w-full border-collapse">
                         <thead>
                             <tr>
-                                <th className="p-3 text-left bg-gray-800 border-b border-r border-gray-700 min-w-[200px] sticky left-0 z-10 w-64 text-gray-300 shadow-md">
+                                <th className="p-3 text-left bg-muted/50 border-b border-r border-border min-w-[200px] sticky left-0 z-10 w-64 text-muted-foreground shadow-md">
                                     Mitarbeiter
                                 </th>
                                 {dates.map(date => {
@@ -97,12 +97,12 @@ export default function ResourceTimeline({ resources, startDate, onDateChange, i
                                     return (
                                         <th
                                             key={date.toISOString()}
-                                            className={`p-2 text-center border-b border-gray-700 min-w-[60px] ${weekend ? 'bg-gray-800/50 text-gray-600' : 'bg-gray-800 text-gray-300'}`}
+                                            className={`p-2 text-center border-b border-border min-w-[60px] ${weekend ? 'bg-muted/30 text-muted-foreground' : 'bg-background text-foreground'}`}
                                         >
                                             <div className="text-xs font-medium uppercase opacity-70">
                                                 {date.toLocaleDateString('de-DE', { weekday: 'short' })}
                                             </div>
-                                            <div className={`text-sm font-bold ${isSameDay(date, new Date()) ? 'text-blue-500' : ''}`}>
+                                            <div className={`text-sm font-bold ${isSameDay(date, new Date()) ? 'text-primary' : ''}`}>
                                                 {date.getDate()}
                                             </div>
                                         </th>
@@ -110,26 +110,26 @@ export default function ResourceTimeline({ resources, startDate, onDateChange, i
                                 })}
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-700 bg-gray-900">
+                        <tbody className="divide-y divide-border bg-background">
                             {isLoading ? (
                                 // Skeletons
                                 Array.from({ length: 5 }).map((_, i) => (
                                     <tr key={i}>
-                                        <td className="p-3 border-r border-gray-700 sticky left-0 bg-gray-800">
+                                        <td className="p-3 border-r border-border sticky left-0 bg-muted/10">
                                             <div className="flex items-center space-x-3">
-                                                <div className="w-8 h-8 bg-gray-700 rounded-full animate-pulse"></div>
-                                                <div className="h-4 bg-gray-700 rounded w-32 animate-pulse"></div>
+                                                <div className="w-8 h-8 bg-muted rounded-full animate-pulse"></div>
+                                                <div className="h-4 bg-muted rounded w-32 animate-pulse"></div>
                                             </div>
                                         </td>
                                         {dates.map(d => (
-                                            <td key={d.toISOString()} className="p-2 border-b border-gray-700 bg-gray-800/20"></td>
+                                            <td key={d.toISOString()} className="p-2 border-b border-border bg-muted/5"></td>
                                         ))}
                                     </tr>
                                 ))
                             ) : resources.map(resource => (
-                                <tr key={resource.profile.id} className="hover:bg-gray-800/30 transition-colors">
+                                <tr key={resource.profile.id} className="hover:bg-muted/50 transition-colors">
                                     {/* Employee Info */}
-                                    <td className="p-3 border-r border-gray-700 sticky left-0 bg-gray-900 z-10 w-64 shadow-md">
+                                    <td className="p-3 border-r border-border sticky left-0 bg-background z-10 w-64 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">
                                         <div className="flex items-center space-x-3">
                                             <div className="flex-shrink-0">
                                                 <Avatar
@@ -139,10 +139,10 @@ export default function ResourceTimeline({ resources, startDate, onDateChange, i
                                                 />
                                             </div>
                                             <div className="truncate">
-                                                <div className="font-medium text-gray-200 text-sm truncate">
+                                                <div className="font-medium text-foreground text-sm truncate">
                                                     {resource.profile.full_name}
                                                 </div>
-                                                <div className="text-xs text-gray-500">
+                                                <div className="text-xs text-muted-foreground">
                                                     {resource.capacityPerDay}h / Tag
                                                 </div>
                                             </div>
@@ -156,13 +156,13 @@ export default function ResourceTimeline({ resources, startDate, onDateChange, i
                                         const weekend = isWeekend(date);
 
                                         if (weekend) {
-                                            return <td key={dateKey} className="bg-gray-900/50 border-r border-gray-800"></td>;
+                                            return <td key={dateKey} className="bg-muted/20 border-r border-border"></td>;
                                         }
 
                                         const colorClass = getUtilizationColor(allocation, resource.capacityPerDay);
 
                                         return (
-                                            <td key={dateKey} className="p-1 border-r border-gray-800 relative group">
+                                            <td key={dateKey} className="p-1 border-r border-border relative group">
                                                 <button
                                                     onClick={() => {
                                                         if (allocation && allocation.tasks?.length > 0) {
@@ -176,11 +176,11 @@ export default function ResourceTimeline({ resources, startDate, onDateChange, i
 
                                                 {/* Tooltip */}
                                                 {allocation?.absences?.length ? (
-                                                    <div className="absolute opacity-0 group-hover:opacity-100 transition-opacity z-20 bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-purple-800 text-white text-xs rounded pointer-events-none whitespace-nowrap">
+                                                    <div className="absolute opacity-0 group-hover:opacity-100 transition-opacity z-20 bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-purple-800 text-foreground text-xs rounded pointer-events-none whitespace-nowrap">
                                                         {allocation.absences.map((a, i) => <span key={i}>{a.reason}</span>)}
                                                     </div>
                                                 ) : (allocation && allocation.tasks?.length > 0 && (
-                                                    <div className="absolute opacity-0 group-hover:opacity-100 transition-opacity z-20 bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-black text-white text-xs rounded pointer-events-none whitespace-nowrap">
+                                                    <div className="absolute opacity-0 group-hover:opacity-100 transition-opacity z-20 bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-black text-foreground text-xs rounded pointer-events-none whitespace-nowrap">
                                                         {allocation.tasks.length} {allocation.tasks.length === 1 ? 'Task' : 'Tasks'} • Klicken zum Bearbeiten
                                                     </div>
                                                 ))}

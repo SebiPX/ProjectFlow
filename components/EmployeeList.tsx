@@ -49,7 +49,7 @@ export const EmployeeList: React.FC<EmployeeListProps> = ({ searchQuery = '' }) 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-full">
-        <div className="text-white text-xl">Loading employees...</div>
+        <div className="text-foreground text-xl">Loading employees...</div>
       </div>
     );
   }
@@ -68,15 +68,15 @@ export const EmployeeList: React.FC<EmployeeListProps> = ({ searchQuery = '' }) 
     <div className="p-8">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-white">Team Members</h1>
-          <p className="text-gray-400 mt-1">{filteredEmployees.length} {showOnlineOnly ? 'online' : ''} employees</p>
+          <h1 className="text-3xl font-bold text-foreground">Team Members</h1>
+          <p className="text-muted-foreground mt-1">{filteredEmployees.length} {showOnlineOnly ? 'online' : ''} employees</p>
         </div>
 
         <button
           onClick={() => setShowOnlineOnly(!showOnlineOnly)}
           className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors ${showOnlineOnly
               ? 'bg-green-500/20 border-green-500 text-green-400'
-              : 'bg-gray-800 border-gray-700 text-gray-400 hover:border-gray-600'
+              : 'bg-card border-border text-muted-foreground hover:border-input'
             }`}
         >
           <div className={`w-2.5 h-2.5 rounded-full ${showOnlineOnly ? 'bg-green-400' : 'bg-gray-500'}`} />
@@ -85,7 +85,7 @@ export const EmployeeList: React.FC<EmployeeListProps> = ({ searchQuery = '' }) 
       </div>
 
       {filteredEmployees.length === 0 ? (
-        <div className="text-center text-gray-400 py-12">
+        <div className="text-center text-muted-foreground py-12">
           <Icon path="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" className="w-16 h-16 mx-auto mb-4 text-gray-600" />
           <p className="text-xl">No team members found</p>
           <p className="mt-2 text-sm">{searchQuery ? 'Try adjusting your search terms.' : ''}</p>
@@ -95,7 +95,7 @@ export const EmployeeList: React.FC<EmployeeListProps> = ({ searchQuery = '' }) 
           {filteredEmployees.map((employee) => (
             <Card
               key={employee.id}
-              className={`p-6 transition-all duration-200 ${isAdmin ? 'hover:border-blue-500 cursor-pointer' : ''}`}
+              className={`p-6 transition-all duration-200 ${isAdmin ? 'hover:border-primary cursor-pointer' : ''}`}
               onClick={() => isAdmin && setEditingEmployee(employee)}
             >
               <div className="flex flex-col items-center text-center">
@@ -108,10 +108,10 @@ export const EmployeeList: React.FC<EmployeeListProps> = ({ searchQuery = '' }) 
                 />
 
                 {/* Name & Email */}
-                <h3 className="text-lg font-bold text-white mb-1">
+                <h3 className="text-lg font-bold text-foreground mb-1">
                   {employee.full_name || 'Unnamed'}
                 </h3>
-                <p className="text-sm text-gray-400 mb-3">{employee.email}</p>
+                <p className="text-sm text-muted-foreground mb-3">{employee.email}</p>
 
                 {/* Role Badge */}
                 <span
@@ -120,10 +120,10 @@ export const EmployeeList: React.FC<EmployeeListProps> = ({ searchQuery = '' }) 
                     : employee.role === 'pjm'
                       ? 'bg-green-500/20 text-green-400'
                       : employee.role === 'creative'
-                        ? 'bg-blue-500/20 text-blue-400'
+                        ? 'bg-primary/20 text-primary'
                         : employee.role === 'client'
                           ? 'bg-orange-500/20 text-orange-400'
-                          : 'bg-gray-500/20 text-gray-400'
+                          : 'bg-gray-500/20 text-primary-foreground'
                     }`}
                 >
                   {employee.role?.toUpperCase() || 'GUEST'}
@@ -131,22 +131,22 @@ export const EmployeeList: React.FC<EmployeeListProps> = ({ searchQuery = '' }) 
 
                 {/* Stats - ONLY VISIBLE TO ADMINS */}
                 {isAdmin && (
-                  <div className="w-full space-y-2 border-t border-gray-700 pt-4">
+                  <div className="w-full space-y-2 border-t border-border pt-4">
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-400">Weekly Hours:</span>
-                      <span className="text-white font-semibold">
+                      <span className="text-muted-foreground">Weekly Hours:</span>
+                      <span className="text-foreground font-semibold">
                         {employee.weekly_hours || 40}h
                       </span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-400">Billable Rate:</span>
-                      <span className="text-white font-semibold">
+                      <span className="text-muted-foreground">Billable Rate:</span>
+                      <span className="text-foreground font-semibold">
                         €{employee.billable_hourly_rate || 0}/h
                       </span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-400">Internal Cost:</span>
-                      <span className="text-white font-semibold">
+                      <span className="text-muted-foreground">Internal Cost:</span>
+                      <span className="text-foreground font-semibold">
                         €{employee.internal_cost_per_hour || 0}/h
                       </span>
                     </div>
@@ -160,7 +160,7 @@ export const EmployeeList: React.FC<EmployeeListProps> = ({ searchQuery = '' }) 
                       e.stopPropagation();
                       setEditingEmployee(employee);
                     }}
-                    className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors"
+                    className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2 bg-muted hover:bg-muted/80 text-foreground rounded-lg transition-colors"
                   >
                     <Icon path="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" className="w-4 h-4" />
                     Edit Details

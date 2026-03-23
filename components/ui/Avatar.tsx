@@ -63,10 +63,10 @@ export const Avatar: React.FC<AvatarProps> = ({
         <img
           src={finalSrc}
           alt={alt}
-          className={`${currentSize} rounded-full object-cover border-2 border-gray-700 ${className}`}
+          className={`${currentSize} rounded-full object-cover border-2 border-border ${className}`}
         />
       ) : (
-        <div className={`${currentSize} rounded-full bg-gray-700 border-2 border-gray-600 flex items-center justify-center text-gray-400 font-medium ${className}`}>
+        <div className={`${currentSize} rounded-full bg-muted border-2 border-input flex items-center justify-center text-muted-foreground font-medium ${className}`}>
           {alt.charAt(0).toUpperCase()}
         </div>
       )}

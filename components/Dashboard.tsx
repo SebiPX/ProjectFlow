@@ -72,7 +72,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProject }) => {
   if (projectsLoading || timeEntriesLoading || tasksLoading) {
     return (
       <div className="flex items-center justify-center h-full">
-        <div className="text-white text-xl">Loading dashboard...</div>
+        <div className="text-muted-foreground text-xl">Loading dashboard...</div>
       </div>
     );
   }
@@ -81,7 +81,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProject }) => {
   if (projectsError) {
     return (
       <div className="flex items-center justify-center h-full">
-        <div className="text-red-500 text-xl">Error loading dashboard data. Please try again.</div>
+        <div className="text-destructive text-xl">Error loading dashboard data. Please try again.</div>
       </div>
     );
   }
@@ -92,45 +92,45 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProject }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card>
           <div className="flex items-center">
-            <div className="p-3 rounded-full bg-blue-500/20 text-blue-500">
+            <div className="p-3 rounded-full bg-primary/10 text-primary">
               <Icon path="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" className="w-6 h-6" />
             </div>
             <div className="ml-4">
-              <p className="text-sm text-gray-400">Active Projects</p>
-              <p className="text-2xl font-bold text-white">{activeProjects}</p>
+              <p className="text-sm text-muted-foreground">Active Projects</p>
+              <p className="text-2xl font-bold text-foreground">{activeProjects}</p>
             </div>
           </div>
         </Card>
         <Card>
           <div className="flex items-center">
-            <div className="p-3 rounded-full bg-green-500/20 text-green-500">
+            <div className="p-3 rounded-full bg-emerald-500/10 text-emerald-600">
               <Icon path="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01" className="w-6 h-6" />
             </div>
             <div className="ml-4">
-              <p className="text-sm text-gray-400">Total Budget</p>
-              <p className="text-2xl font-bold text-white">€{totalBudget.toLocaleString()}</p>
+              <p className="text-sm text-muted-foreground">Total Budget</p>
+              <p className="text-2xl font-bold text-foreground">€{totalBudget.toLocaleString()}</p>
             </div>
           </div>
         </Card>
         <Card>
           <div className="flex items-center">
-            <div className="p-3 rounded-full bg-orange-500/20 text-orange-500">
+            <div className="p-3 rounded-full bg-orange-500/10 text-orange-500">
               <Icon path="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" className="w-6 h-6" />
             </div>
             <div className="ml-4">
-              <p className="text-sm text-gray-400">Hours Tracked (All)</p>
-              <p className="text-2xl font-bold text-white">{totalHoursTracked.toFixed(1)}h</p>
+              <p className="text-sm text-muted-foreground">Hours Tracked (All)</p>
+              <p className="text-2xl font-bold text-foreground">{totalHoursTracked.toFixed(1)}h</p>
             </div>
           </div>
         </Card>
         <Card>
           <div className="flex items-center">
-            <div className="p-3 rounded-full bg-red-500/20 text-red-500">
+            <div className="p-3 rounded-full bg-destructive/10 text-destructive">
               <Icon path="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" className="w-6 h-6" />
             </div>
             <div className="ml-4">
-              <p className="text-sm text-gray-400">Overdue Tasks</p>
-              <p className="text-2xl font-bold text-white">{overdueTasksCount}</p>
+              <p className="text-sm text-muted-foreground">Overdue Tasks</p>
+              <p className="text-2xl font-bold text-foreground">{overdueTasksCount}</p>
             </div>
           </div>
         </Card>
@@ -144,7 +144,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProject }) => {
         
         <div className="flex flex-col gap-6">
           <Card>
-            <h3 className="text-lg font-semibold text-white">Project Status</h3>
+            <h3 className="text-lg font-semibold text-foreground">Project Status</h3>
             <div className="h-[280px] mt-4 w-full relative">
               <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
                 <PieChart>
@@ -153,7 +153,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProject }) => {
                       <Cell key={`cell-${index}`} fill={statusColors[entry.name.toLowerCase().replace(' ', '_') as ProjectStatus]} />
                     ))}
                   </Pie>
-                  <Tooltip contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151' }} />
+                  <Tooltip contentStyle={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)', borderRadius: '8px' }} itemStyle={{ color: 'var(--foreground)' }} />
                   <Legend />
                 </PieChart>
               </ResponsiveContainer>
@@ -164,10 +164,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProject }) => {
 
       {/* Recent Projects Table */}
       <Card>
-        <h3 className="text-lg font-semibold text-white mb-4">Active Projects</h3>
+        <h3 className="text-lg font-semibold text-foreground mb-4">Active Projects</h3>
         <div className="overflow-x-auto">
-          <table className="w-full text-sm text-left text-gray-400">
-            <thead className="text-xs text-gray-400 uppercase bg-gray-700/50">
+          <table className="w-full text-sm text-left text-muted-foreground">
+            <thead className="text-xs text-muted-foreground uppercase bg-muted/50">
               <tr>
                 <th scope="col" className="px-6 py-3">Project Name</th>
                 <th scope="col" className="px-6 py-3">Client</th>
@@ -179,8 +179,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProject }) => {
             </thead>
             <tbody>
               {projects.filter(p => p.status === 'active').map(project => (
-                <tr key={project.id} className="bg-gray-800 border-b border-gray-700 hover:bg-gray-700/50">
-                  <td className="px-6 py-4 font-medium text-white whitespace-nowrap">{project.title}</td>
+                <tr key={project.id} className="bg-card border-b border-border hover:bg-muted/30">
+                  <td className="px-6 py-4 font-medium text-foreground whitespace-nowrap">{project.title}</td>
                   <td className="px-6 py-4">{project.client?.company_name}</td>
                   <td className="px-6 py-4">{project.deadline}</td>
                   <td className="px-6 py-4">€{project.budget_total?.toLocaleString()}</td>
@@ -190,7 +190,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProject }) => {
                     </span>
                   </td>
                   <td className="px-6 py-4">
-                    <button onClick={() => onSelectProject(project)} className="font-medium text-blue-500 hover:underline">View</button>
+                    <button onClick={() => onSelectProject(project)} className="font-medium text-primary hover:underline">View</button>
                   </td>
                 </tr>
               ))}

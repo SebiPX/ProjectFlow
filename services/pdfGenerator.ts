@@ -23,10 +23,10 @@ export const generateInvoicePDF = (
 
     // -- HEADER --
     pdf.setFontSize(20);
-    pdf.text('AgencyFlow', 14, 22);
+    pdf.text('PX-Flow', 14, 22);
 
     pdf.setFontSize(10);
-    pdf.text('AgencyFlow GmbH & Co. KG', 14, 30);
+    pdf.text('Pixelschickeria', 14, 30);
     pdf.text('Musterstraße 123', 14, 35);
     pdf.text('12345 Berlin', 14, 40);
 

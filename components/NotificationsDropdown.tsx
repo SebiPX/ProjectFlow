@@ -46,9 +46,9 @@ export const NotificationsDropdown: React.FC<Props> = ({ onClose }) => {
 
     if (isLoading) {
         return (
-            <div className="absolute right-0 mt-2 w-80 bg-gray-800 rounded-lg shadow-xl border border-gray-700 p-4 z-50">
+            <div className="absolute right-0 mt-2 w-80 bg-card rounded-lg shadow-xl border border-border p-4 z-50">
                 <div className="flex justify-center">
-                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
                 </div>
             </div>
         );
@@ -59,13 +59,13 @@ export const NotificationsDropdown: React.FC<Props> = ({ onClose }) => {
     return (
         <>
             <div className="fixed inset-0 z-40" onClick={onClose} />
-            <div className="absolute right-0 mt-2 w-96 bg-gray-800 rounded-lg shadow-xl border border-gray-700 z-50 max-h-[80vh] flex flex-col">
-                <div className="p-4 border-b border-gray-700 flex justify-between items-center">
-                    <h3 className="text-white font-semibold">Notifications</h3>
+            <div className="absolute right-0 mt-2 w-96 bg-card rounded-lg shadow-xl border border-border z-50 max-h-[80vh] flex flex-col">
+                <div className="p-4 border-b border-border flex justify-between items-center">
+                    <h3 className="text-foreground font-semibold">Notifications</h3>
                     {unreadCount > 0 && (
                         <button
                             onClick={() => markAllReadMutation.mutate()}
-                            className="text-xs text-blue-400 hover:text-blue-300"
+                            className="text-xs text-primary hover:text-blue-300"
                         >
                             Mark all as read
                         </button>
@@ -74,7 +74,7 @@ export const NotificationsDropdown: React.FC<Props> = ({ onClose }) => {
 
                 <div className="overflow-y-auto flex-1 p-2">
                     {!notifications || notifications.length === 0 ? (
-                        <div className="text-center py-8 text-gray-500">
+                        <div className="text-center py-8 text-muted-foreground">
                             <p>No notifications yet</p>
                         </div>
                     ) : (
@@ -84,22 +84,22 @@ export const NotificationsDropdown: React.FC<Props> = ({ onClose }) => {
                                     key={notification.id}
                                     onClick={() => handleNotificationClick(notification)}
                                     className={`p-3 rounded-md cursor-pointer transition-colors flex gap-3 ${notification.is_read
-                                        ? 'bg-transparent text-gray-400 hover:bg-gray-700/50'
-                                        : 'bg-gray-700/30 text-white hover:bg-gray-700'
+                                        ? 'bg-transparent text-muted-foreground hover:bg-muted/50'
+                                        : 'bg-muted/30 text-foreground hover:bg-muted'
                                         }`}
                                 >
                                     <div className="mt-1 flex-shrink-0">
                                         {notification.type === 'success' && <Icon path="M5 13l4 4L19 7" className="w-5 h-5 text-green-500" />}
                                         {notification.type === 'warning' && <Icon path="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" className="w-5 h-5 text-yellow-500" />}
                                         {notification.type === 'error' && <Icon path="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" className="w-5 h-5 text-red-500" />}
-                                        {notification.type === 'info' && <Icon path="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" className="w-5 h-5 text-blue-500" />}
+                                        {notification.type === 'info' && <Icon path="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" className="w-5 h-5 text-primary" />}
                                     </div>
                                     <div className="flex-1">
-                                        <p className={`text-sm font-medium ${notification.is_read ? 'text-gray-400' : 'text-white'}`}>
+                                        <p className={`text-sm font-medium ${notification.is_read ? 'text-muted-foreground' : 'text-foreground'}`}>
                                             {notification.title}
                                         </p>
                                         {notification.message && (
-                                            <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">
+                                            <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
                                                 {notification.message}
                                             </p>
                                         )}
@@ -109,7 +109,7 @@ export const NotificationsDropdown: React.FC<Props> = ({ onClose }) => {
                                         </p>
                                     </div>
                                     {!notification.is_read && (
-                                        <div className="w-2 h-2 rounded-full bg-blue-500 mt-2 flex-shrink-0" />
+                                        <div className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0 text-primary-foreground" />
                                     )}
                                 </div>
                             ))}

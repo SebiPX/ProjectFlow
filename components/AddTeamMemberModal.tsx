@@ -127,12 +127,12 @@ export const AddTeamMemberModal: React.FC<AddTeamMemberModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] flex flex-col">
-        <div className="flex justify-between items-center p-6 border-b border-gray-700 flex-shrink-0">
-          <h2 className="text-xl font-bold text-white">Add Team Member</h2>
+      <div className="bg-card rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] flex flex-col">
+        <div className="flex justify-between items-center p-6 border-b border-border flex-shrink-0">
+          <h2 className="text-xl font-bold text-foreground">Add Team Member</h2>
           <button
             onClick={handleClose}
-            className="text-gray-400 hover:text-white transition-colors"
+            className="text-muted-foreground hover:text-foreground transition-colors"
             disabled={loading}
           >
             <Icon path="M6 18L18 6M6 6l12 12" className="w-6 h-6" />
@@ -142,16 +142,16 @@ export const AddTeamMemberModal: React.FC<AddTeamMemberModalProps> = ({
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto">
           <div className="p-6 space-y-4">
           {usersLoading ? (
-            <div className="text-gray-400 text-center py-8">Loading team members...</div>
+            <div className="text-muted-foreground text-center py-8">Loading team members...</div>
           ) : availableUsers.length === 0 ? (
-            <div className="text-gray-400 text-center py-8">
+            <div className="text-muted-foreground text-center py-8">
               All team members are already assigned to this project.
             </div>
           ) : (
             <>
               {/* Team Member Select with Workload */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-muted-foreground mb-2">
                   Team Member <span className="text-red-500">*</span>
                 </label>
                 <div className="space-y-2 max-h-64 overflow-y-auto pr-2" style={{
@@ -170,23 +170,23 @@ export const AddTeamMemberModal: React.FC<AddTeamMemberModalProps> = ({
                         className={`
                           p-3 rounded-lg border cursor-pointer transition-colors
                           ${isSelected
-                            ? 'border-blue-500 bg-blue-500/10'
-                            : 'border-gray-600 bg-gray-700 hover:border-gray-500'
+                            ? 'border-primary bg-primary/10'
+                            : 'border-input bg-muted hover:border-gray-500'
                           }
-                        `}
+                         text-primary-foreground`}
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex-1">
                             <div className="flex items-center gap-2">
-                              <span className="text-white font-medium">
+                              <span className="text-foreground font-medium">
                                 {user.full_name || user.email}
                               </span>
-                              <span className="text-xs text-gray-400 capitalize">
+                              <span className="text-xs text-muted-foreground capitalize">
                                 ({user.role})
                               </span>
                             </div>
                             {workload && (
-                              <div className="mt-1 text-xs text-gray-400">
+                              <div className="mt-1 text-xs text-muted-foreground">
                                 {workload.assigned_tasks} tasks · {workload.assigned_projects} projects · {workload.total_planned_hours.toFixed(1)}h planned
                               </div>
                             )}
@@ -198,15 +198,15 @@ export const AddTeamMemberModal: React.FC<AddTeamMemberModalProps> = ({
                               </span>
                             )}
                             <div className={`w-3 h-3 rounded-full border-2 ${
-                              isSelected ? 'border-blue-500 bg-blue-500' : 'border-gray-500'
-                            }`} />
+                              isSelected ? 'border-primary bg-primary' : 'border-gray-500'
+                            } text-primary-foreground`} />
                           </div>
                         </div>
                       </div>
                     );
                   })}
                 </div>
-                <p className="mt-2 text-xs text-gray-500">
+                <p className="mt-2 text-xs text-muted-foreground">
                   Utilization shown as percentage of weekly capacity
                 </p>
               </div>
@@ -221,7 +221,7 @@ export const AddTeamMemberModal: React.FC<AddTeamMemberModalProps> = ({
                       <p className="text-xs text-yellow-300 mt-1">
                         {assignmentCheck.reason}. Current utilization: {assignmentCheck.currentUtilization.toFixed(0)}%
                       </p>
-                      <p className="text-xs text-gray-400 mt-1">
+                      <p className="text-xs text-muted-foreground mt-1">
                         You can still add this member, but they may be overloaded.
                       </p>
                     </div>
@@ -236,7 +236,7 @@ export const AddTeamMemberModal: React.FC<AddTeamMemberModalProps> = ({
                     <Icon path="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
                     <div>
                       <p className="text-sm font-semibold text-green-400">Capacity Available</p>
-                      <p className="text-xs text-gray-400 mt-1">
+                      <p className="text-xs text-muted-foreground mt-1">
                         Current utilization: {assignmentCheck.currentUtilization.toFixed(0)}%. This member has capacity for this project.
                       </p>
                     </div>
@@ -246,7 +246,7 @@ export const AddTeamMemberModal: React.FC<AddTeamMemberModalProps> = ({
 
               {/* Role Input */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-muted-foreground mb-2">
                   Project Role
                 </label>
                 <input
@@ -254,10 +254,10 @@ export const AddTeamMemberModal: React.FC<AddTeamMemberModalProps> = ({
                   value={role}
                   onChange={(e) => setRole(e.target.value)}
                   placeholder="e.g., Lead Developer, Designer, QA"
-                  className="w-full bg-gray-700 border border-gray-600 text-white placeholder-gray-400 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5"
+                  className="w-full bg-muted border border-input text-foreground placeholder-gray-400 text-sm rounded-lg focus:ring-primary focus:border-primary p-2.5"
                   disabled={loading}
                 />
-                <p className="mt-1 text-xs text-gray-500">
+                <p className="mt-1 text-xs text-muted-foreground">
                   Optional: Specify their role in this project
                 </p>
               </div>
@@ -267,14 +267,14 @@ export const AddTeamMemberModal: React.FC<AddTeamMemberModalProps> = ({
                 <button
                   type="button"
                   onClick={handleClose}
-                  className="px-4 py-2 text-gray-300 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+                  className="px-4 py-2 text-muted-foreground bg-muted hover:bg-muted/80 rounded-lg transition-colors"
                   disabled={loading}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  className="px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                   disabled={loading || !selectedUserId}
                 >
                   {loading ? (

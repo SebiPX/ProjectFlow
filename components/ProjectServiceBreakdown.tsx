@@ -25,12 +25,12 @@ export const ProjectServiceBreakdown: React.FC<ProjectServiceBreakdownProps> = (
 
   if (isLoading) {
     return (
-      <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+      <div className="bg-card rounded-lg p-6 border border-border">
         <div className="animate-pulse space-y-4">
-          <div className="h-6 bg-gray-700 rounded w-1/3"></div>
+          <div className="h-6 bg-muted rounded w-1/3"></div>
           <div className="space-y-2">
             {[...Array(3)].map((_, i) => (
-              <div key={i} className="h-12 bg-gray-700 rounded"></div>
+              <div key={i} className="h-12 bg-muted rounded"></div>
             ))}
           </div>
         </div>
@@ -48,14 +48,14 @@ export const ProjectServiceBreakdown: React.FC<ProjectServiceBreakdownProps> = (
 
   if (breakdown.length === 0) {
     return (
-      <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+      <div className="bg-card rounded-lg p-6 border border-border">
         <div className="text-center py-8">
           <Icon
             path="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
             className="w-12 h-12 text-gray-600 mx-auto mb-3"
           />
-          <p className="text-gray-400">No service-tracked tasks yet</p>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-muted-foreground">No service-tracked tasks yet</p>
+          <p className="text-sm text-muted-foreground mt-1">
             Link tasks to services to see Plan vs Actual breakdown
           </p>
         </div>
@@ -69,20 +69,20 @@ export const ProjectServiceBreakdown: React.FC<ProjectServiceBreakdownProps> = (
       case 'under':
         return 'text-green-500';
       case 'on_track':
-        return 'text-blue-500';
+        return 'text-primary';
       case 'over':
         return 'text-red-500';
       default:
-        return 'text-gray-500';
+        return 'text-muted-foreground';
     }
   };
 
   return (
-    <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
-      <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+    <div className="bg-card rounded-lg p-6 border border-border">
+      <h3 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
         <Icon
           path="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
-          className="w-6 h-6 text-blue-500"
+          className="w-6 h-6 text-primary"
         />
         Service Breakdown
       </h3>
@@ -90,45 +90,45 @@ export const ProjectServiceBreakdown: React.FC<ProjectServiceBreakdownProps> = (
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-gray-700">
-              <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Service</th>
-              <th className="text-right py-3 px-4 text-sm font-medium text-gray-400">Tasks</th>
-              <th className="text-right py-3 px-4 text-sm font-medium text-gray-400">Planned Hours</th>
-              <th className="text-right py-3 px-4 text-sm font-medium text-gray-400">Actual Hours</th>
-              <th className="text-right py-3 px-4 text-sm font-medium text-gray-400">Hours Δ</th>
-              <th className="text-right py-3 px-4 text-sm font-medium text-gray-400">Planned Value</th>
-              <th className="text-right py-3 px-4 text-sm font-medium text-gray-400">Actual Value</th>
-              <th className="text-right py-3 px-4 text-sm font-medium text-gray-400">Value Δ</th>
+            <tr className="border-b border-border">
+              <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Service</th>
+              <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">Tasks</th>
+              <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">Planned Hours</th>
+              <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">Actual Hours</th>
+              <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">Hours Δ</th>
+              <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">Planned Value</th>
+              <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">Actual Value</th>
+              <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">Value Δ</th>
             </tr>
           </thead>
           <tbody>
             {breakdown.map((item, index) => (
               <tr
                 key={`${item.service_module_id}_${item.seniority_level_id || 'none'}`}
-                className={`border-b border-gray-700 hover:bg-gray-750 ${
-                  index % 2 === 0 ? 'bg-gray-800' : 'bg-gray-750/50'
+                className={`border-b border-border hover:bg-gray-750 ${
+                  index % 2 === 0 ? 'bg-card' : 'bg-gray-750/50'
                 }`}
               >
                 {/* Service Name + Level */}
                 <td className="py-3 px-4">
                   <div>
-                    <p className="text-white font-medium">{item.service_module_name}</p>
+                    <p className="text-foreground font-medium">{item.service_module_name}</p>
                     {item.seniority_level_name && (
-                      <p className="text-xs text-gray-400">{item.seniority_level_name}</p>
+                      <p className="text-xs text-muted-foreground">{item.seniority_level_name}</p>
                     )}
                   </div>
                 </td>
 
                 {/* Task Count */}
-                <td className="text-right py-3 px-4 text-gray-300">{item.task_count}</td>
+                <td className="text-right py-3 px-4 text-muted-foreground">{item.task_count}</td>
 
                 {/* Planned Hours */}
-                <td className="text-right py-3 px-4 text-gray-300">
+                <td className="text-right py-3 px-4 text-muted-foreground">
                   {item.total_estimated_hours.toFixed(1)}h
                 </td>
 
                 {/* Actual Hours */}
-                <td className="text-right py-3 px-4 text-gray-300">
+                <td className="text-right py-3 px-4 text-muted-foreground">
                   {item.total_actual_hours.toFixed(1)}h
                 </td>
 
@@ -143,12 +143,12 @@ export const ProjectServiceBreakdown: React.FC<ProjectServiceBreakdownProps> = (
                 </td>
 
                 {/* Planned Value */}
-                <td className="text-right py-3 px-4 text-gray-300">
+                <td className="text-right py-3 px-4 text-muted-foreground">
                   {item.total_planned_value.toFixed(2)} €
                 </td>
 
                 {/* Actual Value */}
-                <td className="text-right py-3 px-4 text-gray-300">
+                <td className="text-right py-3 px-4 text-muted-foreground">
                   {item.total_actual_value.toFixed(2)} €
                 </td>
 
@@ -167,27 +167,27 @@ export const ProjectServiceBreakdown: React.FC<ProjectServiceBreakdownProps> = (
 
           {/* Total Row */}
           <tfoot>
-            <tr className="border-t-2 border-gray-600 font-bold">
-              <td className="py-3 px-4 text-white">TOTAL</td>
-              <td className="text-right py-3 px-4 text-white">
+            <tr className="border-t-2 border-input font-bold">
+              <td className="py-3 px-4 text-foreground">TOTAL</td>
+              <td className="text-right py-3 px-4 text-foreground">
                 {breakdown.reduce((sum, item) => sum + item.task_count, 0)}
               </td>
-              <td className="text-right py-3 px-4 text-white">
+              <td className="text-right py-3 px-4 text-foreground">
                 {breakdown.reduce((sum, item) => sum + item.total_estimated_hours, 0).toFixed(1)}h
               </td>
-              <td className="text-right py-3 px-4 text-white">
+              <td className="text-right py-3 px-4 text-foreground">
                 {breakdown.reduce((sum, item) => sum + item.total_actual_hours, 0).toFixed(1)}h
               </td>
-              <td className="text-right py-3 px-4 text-white">
+              <td className="text-right py-3 px-4 text-foreground">
                 {breakdown.reduce((sum, item) => sum + item.hours_variance, 0).toFixed(1)}h
               </td>
-              <td className="text-right py-3 px-4 text-white">
+              <td className="text-right py-3 px-4 text-foreground">
                 {breakdown.reduce((sum, item) => sum + item.total_planned_value, 0).toFixed(2)} €
               </td>
-              <td className="text-right py-3 px-4 text-white">
+              <td className="text-right py-3 px-4 text-foreground">
                 {breakdown.reduce((sum, item) => sum + item.total_actual_value, 0).toFixed(2)} €
               </td>
-              <td className="text-right py-3 px-4 text-white">
+              <td className="text-right py-3 px-4 text-foreground">
                 {breakdown.reduce((sum, item) => sum + item.value_variance, 0).toFixed(2)} €
               </td>
             </tr>

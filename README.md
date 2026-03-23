@@ -1,10 +1,10 @@
-# AgencyFlow - Modern Project Management for Agencies
+# PX-Flow - Modern Project Management for Pixelschickeria
 
-![AgencyFlow Dashboard](https://i.imgur.com/gKj7XyC.png)
+![PX-Flow Dashboard](https://i.imgur.com/gKj7XyC.png)
 
 ## 🎯 Vision & Purpose
 
-**AgencyFlow** is a modern, professional web application specifically designed for creative, digital, and advertising agencies. The goal is to manage the entire lifecycle of a project – from initial inquiry through quote creation, task management, and resource planning to final billing – in one central, intuitive platform.
+**PX-Flow** (formerly AgencyFlow) is a modern, professional web application specifically designed for creative agencies like Pixelschickeria. The platform utilizes a custom-built Tailwind design system with vibrant neon accents and robust light/dark mode support. The goal is to manage the entire lifecycle of a project – from initial inquiry through quote creation, task management, and resource planning to final billing – in one central, intuitive platform.
 
 This app aims to increase efficiency, improve transparency for internal teams and clients, and make collaboration seamless.
 
@@ -576,4 +576,4 @@ Built with:
 
 ---
 
-**AgencyFlow** - Making project management efficient, transparent, and enjoyable! 🚀
+**PX-Flow** - Making project management efficient, transparent, and enjoyable! 🚀
