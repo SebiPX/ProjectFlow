@@ -31,12 +31,13 @@ import { FinancialDocumentFormModal } from './FinancialDocumentFormModal';
 import { generateInvoicePDF } from '../services/pdfGenerator';
 import { getFinancialDocuments, deleteFinancialDocument } from '../services/api/financialDocuments';
 import { FinancialDocument, FinancialItem, DocType, DocStatus } from '../types/supabase';
+import { DocumentList } from './documents/DocumentList';
 
 interface ProjectDetailProps {
   project: Project;
 }
 
-type ProjectTab = 'overview' | 'tasks' | 'finances' | 'assets' | 'team' | 'services';
+type ProjectTab = 'overview' | 'tasks' | 'finances' | 'assets' | 'team' | 'services' | 'documents';
 
 const tabs: { id: ProjectTab; label: string }[] = [
   { id: 'overview', label: 'Overview' },
@@ -45,6 +46,7 @@ const tabs: { id: ProjectTab; label: string }[] = [
   { id: 'assets', label: 'Assets' },
   { id: 'team', label: 'Team' },
   { id: 'services', label: 'Services' },
+  { id: 'documents', label: 'Documents' },
 ];
 
 export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialProject }) => {
@@ -55,7 +57,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
 
   const visibleTabs = tabs.filter(tab => {
     if (isClient) {
-      return ['overview', 'tasks', 'finances', 'assets'].includes(tab.id);
+      return ['overview', 'tasks', 'finances', 'assets', 'documents'].includes(tab.id);
     }
     return true;
   });
@@ -645,6 +647,8 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
             <ProjectServiceBreakdown projectId={project.id} />
           </div>
         );
+      case 'documents':
+        return <DocumentList projectId={project.id} isClient={isClient} isAdminOrPJM={isAdminOrPJM} />;
       default:
         return <div className="p-6 text-muted-foreground">{project.description}</div>;
     }
