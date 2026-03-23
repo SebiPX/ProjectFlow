@@ -31,6 +31,8 @@ export interface CallSheetData {
   shoot_date?: string;
   location_name: string;
   location_address: string;
+  location_lat?: string;
+  location_lng?: string;
   weather_info: string;
   hospital_info: string;
   general_notes: string;

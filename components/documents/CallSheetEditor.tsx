@@ -17,6 +17,7 @@ import {
 } from '../../services/api/documents';
 import { Icon } from '../ui/Icon';
 import { toast } from 'react-toastify';
+import { LocationAutocomplete } from './LocationAutocomplete';
 
 interface CallSheetEditorProps {
   documentId: string;
@@ -112,6 +113,52 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
 
   const handleDataChange = (field: keyof CallSheetData, value: string) => {
     updateDataMutation.mutate({ [field]: value });
+  };
+
+  const [isWeatherLoading, setIsWeatherLoading] = useState(false);
+
+  const fetchWeather = async (lat: string, lng: string, date: string) => {
+    if (!lat || !lng || !date) {
+      toast.error('Bitte erst eine Location (mit Autocomplete) auswählen und das Drehtag-Datum festlegen!');
+      return;
+    }
+    setIsWeatherLoading(true);
+    try {
+      // Open-Meteo expects YYYY-MM-DD
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=auto&start_date=${date}&end_date=${date}`;
+      const res = await fetch(url);
+      const json = await res.json();
+      
+      if (json.daily && json.daily.time && json.daily.time.length > 0) {
+        const tMax = json.daily.temperature_2m_max[0];
+        const tMin = json.daily.temperature_2m_min[0];
+        const code = json.daily.weathercode[0];
+
+        const getWmoCodeText = (c: number) => {
+          if (c === 0) return 'Sonnig/Klar';
+          if (c === 1 || c === 2 || c === 3) return 'Heiter bis wolkig';
+          if (c === 45 || c === 48) return 'Nebel';
+          if (c >= 51 && c <= 55) return 'Nieselregen';
+          if (c >= 61 && c <= 65) return 'Regen';
+          if (c >= 71 && c <= 77) return 'Schnee';
+          if (c >= 80 && c <= 82) return 'Schauer';
+          if (c >= 95 && c <= 99) return 'Gewitter';
+          return 'Gemixt';
+        };
+
+        const weatherDesc = getWmoCodeText(code);
+        const forecastText = `${weatherDesc}, ${Math.round(tMin)}°C bis ${Math.round(tMax)}°C`;
+        handleDataChange('weather_info', forecastText);
+        toast.success('Wetter erfolgreich geladen!');
+      } else {
+        toast.info('Für dieses Datum (zu weit in der Zukunft?) sind keine Daten verfügbar.');
+      }
+    } catch (e) {
+      console.error(e);
+      toast.error('Wetter abrufen fehlgeschlagen.');
+    } finally {
+      setIsWeatherLoading(false);
+    }
   };
 
   const printDocument = () => {
@@ -211,25 +258,44 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-muted-foreground uppercase mb-1 print:text-gray-500">Adresse</label>
-                  <textarea 
-                    defaultValue={data.location_address || ''} 
-                    onBlur={(e) => handleDataChange('location_address', e.target.value)}
-                    placeholder="Musterstraße 1..."
-                    className="w-full bg-transparent text-sm border border-transparent hover:border-border focus:border-primary rounded resize-none h-16 p-1 focus:outline-none print:border-none print:p-0"
+                  <LocationAutocomplete 
+                    value={data.location_address || ''} 
+                    onChange={(val) => handleDataChange('location_address', val)}
+                    onSelectCallback={(lat, lon) => {
+                      handleDataChange('location_lat', lat);
+                      handleDataChange('location_lng', lon);
+                    }}
                     disabled={!isAdminOrPJM}
                   />
                 </div>
               </div>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-xs font-bold text-muted-foreground uppercase mb-1 flex items-center gap-1 print:text-gray-500">
-                    <Icon path="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" className="w-3 h-3" /> Wetter
-                  </label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-bold text-muted-foreground uppercase flex items-center gap-1 print:text-gray-500">
+                      <Icon path="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" className="w-3 h-3" /> Wetter
+                    </label>
+                    {isAdminOrPJM && (
+                      <button 
+                        onClick={() => fetchWeather(data.location_lat as string, data.location_lng as string, data.shoot_date as string)}
+                        disabled={isWeatherLoading || !data.location_lat || !data.shoot_date}
+                        className="text-[10px] font-bold bg-primary/10 text-primary hover:bg-primary/20 px-2 rounded disabled:opacity-50 print:hidden transition-colors"
+                        title="Benötigt Datum & Adresse (Autocomplete)"
+                      >
+                        {isWeatherLoading ? 'Lade...' : 'Auto-Fill'}
+                      </button>
+                    )}
+                  </div>
                   <input 
+                    key={`weather-${data.weather_info}`} // Forces remount with new default value when updated
                     type="text" 
                     defaultValue={data.weather_info || ''} 
-                    onBlur={(e) => handleDataChange('weather_info', e.target.value)}
-                    placeholder="Sonnig, 20°C"
+                    onBlur={(e) => {
+                      if (e.target.value !== data.weather_info) {
+                        handleDataChange('weather_info', e.target.value);
+                      }
+                    }}
+                    placeholder={data.location_lat && data.shoot_date ? "Sonnig, 20°C" : "Sonnig, 20°C"}
                     className="w-full bg-transparent text-sm border border-transparent hover:border-border focus:border-primary rounded p-1 focus:outline-none print:border-none print:p-0"
                     disabled={!isAdminOrPJM}
                   />
