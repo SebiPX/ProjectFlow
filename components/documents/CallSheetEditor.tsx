@@ -202,10 +202,16 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
           const name = h.name || h.operator || 'Krankenhaus';
           const road = h['addr:street'] || '';
           const house = h['addr:housenumber'] || '';
-          const city = h['addr:city'] || '';
+          const postcode = h['addr:postcode'] || '';
+          const city = h['addr:city'] || h['addr:suburb'] || '';
           
           let info = `${name}`;
-          if (road || city) info += `\n${road} ${house}, ${city}`.trim();
+          if (road || house) {
+            info += `\n${road} ${house}`.trim();
+          }
+          if (postcode || city) {
+            info += `\n${postcode} ${city}`.trim();
+          }
           
           handleDataChange('hospital_info', info);
           toast.success('Nächstes Krankenhaus gefunden!');

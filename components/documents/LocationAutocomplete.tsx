@@ -4,7 +4,27 @@ interface LocationResult {
   display_name: string;
   lat: string;
   lon: string;
+  name?: string;
+  address?: any;
 }
+
+const formatLocationAddress = (r: LocationResult) => {
+  if (!r.address) return r.display_name;
+  
+  const addr = r.address;
+  const name = r.name || addr.amenity || addr.shop || addr.building || addr.office || addr.craft || addr.historic || addr.leisure || '';
+  const road = addr.road || addr.street || addr.pedestrian || addr.footway || addr.path || '';
+  const house = addr.house_number || '';
+  const postcode = addr.postcode || '';
+  const city = addr.city || addr.town || addr.village || addr.municipality || addr.county || '';
+  
+  let lines = [];
+  if (name && name !== road && name !== city) lines.push(name);
+  if (road || house) lines.push(`${road} ${house}`.trim());
+  if (postcode || city) lines.push(`${postcode} ${city}`.trim());
+  
+  return lines.length > 0 ? lines.join('\n') : r.display_name;
+};
 
 interface LocationAutocompleteProps {
   value: string;
@@ -88,9 +108,10 @@ export const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({ valu
               key={i} 
               className="p-3 border-b border-border/50 hover:bg-muted cursor-pointer text-sm transition-colors last:border-0"
               onClick={() => {
-                setQuery(r.display_name);
-                onChange(r.display_name);
-                onSelectCallback(r.lat, r.lon, r.display_name);
+                const formatted = formatLocationAddress(r);
+                setQuery(formatted);
+                onChange(formatted);
+                onSelectCallback(r.lat, r.lon, formatted);
                 setIsOpen(false);
               }}
             >
