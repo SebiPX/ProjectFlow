@@ -206,13 +206,14 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
         const postcode = addr.postcode || '';
         const city = addr.city || addr.town || addr.village || addr.suburb || '';
         
-        let info = `${name}`;
+        let lines = [name];
         if (road || house) {
-          info += `\n${road} ${house}`.trim();
+          lines.push(`${road} ${house}`.trim());
         }
         if (postcode || city) {
-          info += `\n${postcode} ${city}`.trim();
+          lines.push(`${postcode} ${city}`.trim());
         }
+        const info = lines.filter(Boolean).join('\n');
         
         handleDataChange('hospital_info', info);
         toast.success('Nächstes Krankenhaus gefunden!');
@@ -396,7 +397,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                       }
                     }}
                     placeholder={data.location_lat ? "Auto-Fill klicken für Krankenhaus..." : "Krankenhaus X... (erst Adresse setzen)"}
-                    className="w-full bg-transparent text-sm border border-transparent hover:border-border focus:border-primary rounded resize-none h-10 p-1 focus:outline-none print:border-none print:p-0"
+                    className="w-full bg-transparent text-sm border border-transparent hover:border-border focus:border-primary rounded resize-none min-h-[60px] p-1 focus:outline-none print:border-none print:p-0"
                     disabled={!isAdminOrPJM}
                   />
                 </div>
