@@ -170,18 +170,20 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
     }
     setIsHospitalLoading(true);
     try {
-      const query = `[out:json];(node["amenity"="hospital"](around:5000,${lat},${lng});way["amenity"="hospital"](around:5000,${lat},${lng});relation["amenity"="hospital"](around:5000,${lat},${lng}););out center;`;
-      const res = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`);
+      const boxSize = 0.2; // approx 22km radius bounding box
+      const url = `https://nominatim.openstreetmap.org/search?amenity=hospital&format=json&addressdetails=1&viewbox=${parseFloat(lng)-boxSize},${parseFloat(lat)+boxSize},${parseFloat(lng)+boxSize},${parseFloat(lat)-boxSize}&bounded=1&limit=5`;
+      
+      const res = await fetch(url);
       const data = await res.json();
       
-      if (data.elements && data.elements.length > 0) {
-        let closest = data.elements[0];
+      if (data && data.length > 0) {
+        let closest = data[0];
         let minD = Infinity;
         const R = 6371; // Erdradius km
         
-        data.elements.forEach((el: any) => {
-          const elLat = el.lat || el.center?.lat;
-          const elLng = el.lon || el.center?.lon;
+        data.forEach((el: any) => {
+          const elLat = parseFloat(el.lat);
+          const elLng = parseFloat(el.lon);
           if (!elLat || !elLng) return;
           
           const dLat = (elLat - parseFloat(lat)) * Math.PI / 180;
@@ -197,29 +199,25 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
           }
         });
 
-        if (closest && closest.tags) {
-          const h = closest.tags;
-          const name = h.name || h.operator || 'Krankenhaus';
-          const road = h['addr:street'] || '';
-          const house = h['addr:housenumber'] || '';
-          const postcode = h['addr:postcode'] || '';
-          const city = h['addr:city'] || h['addr:suburb'] || '';
-          
-          let info = `${name}`;
-          if (road || house) {
-            info += `\n${road} ${house}`.trim();
-          }
-          if (postcode || city) {
-            info += `\n${postcode} ${city}`.trim();
-          }
-          
-          handleDataChange('hospital_info', info);
-          toast.success('Nächstes Krankenhaus gefunden!');
-        } else {
-          toast.info('Keine Details zum gefundenen Krankenhaus.');
+        const addr = closest.address || {};
+        const name = closest.name || addr.amenity || addr.hospital || addr.clinic || 'Krankenhaus';
+        const road = addr.road || addr.street || '';
+        const house = addr.house_number || '';
+        const postcode = addr.postcode || '';
+        const city = addr.city || addr.town || addr.village || addr.suburb || '';
+        
+        let info = `${name}`;
+        if (road || house) {
+          info += `\n${road} ${house}`.trim();
         }
+        if (postcode || city) {
+          info += `\n${postcode} ${city}`.trim();
+        }
+        
+        handleDataChange('hospital_info', info);
+        toast.success('Nächstes Krankenhaus gefunden!');
       } else {
-        toast.info('Kein Krankenhaus im Umkreis von 5km gefunden.');
+        toast.info('Kein Krankenhaus im direkten Umkreis gefunden.');
       }
     } catch (e) {
       console.error(e);
