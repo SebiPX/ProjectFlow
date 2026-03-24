@@ -397,7 +397,8 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                       }
                     }}
                     placeholder={data.location_lat ? "Auto-Fill klicken für Krankenhaus..." : "Krankenhaus X... (erst Adresse setzen)"}
-                    className="w-full bg-transparent text-sm border border-transparent hover:border-border focus:border-primary rounded resize-none min-h-[60px] p-1 focus:outline-none print:border-none print:p-0"
+                    className="w-full bg-transparent text-sm border border-transparent hover:border-border focus:border-primary rounded resize-none p-1 focus:outline-none print:border-none print:p-0"
+                    rows={3}
                     disabled={!isAdminOrPJM}
                   />
                 </div>

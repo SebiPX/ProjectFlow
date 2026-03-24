@@ -96,7 +96,8 @@ export const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({ valu
           onChange(query);
         }}
         placeholder="Musterstraße 1..."
-        className="w-full bg-transparent text-sm border border-transparent hover:border-border focus:border-primary rounded resize-none h-16 p-1 focus:outline-none print:border-none print:p-0"
+        className="w-full bg-transparent text-sm border border-transparent hover:border-border focus:border-primary rounded resize-none p-1 focus:outline-none print:border-none print:p-0"
+        rows={3}
         disabled={disabled}
       />
       {isLoading && <div className="absolute right-2 top-2 text-xs text-muted-foreground">Sucht...</div>}
