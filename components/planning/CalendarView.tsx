@@ -103,9 +103,19 @@ export const CalendarView: React.FC = () => {
                             }
 
                             const dayTasks = tasks.filter(task => {
-                                if (!task.due_date) return false;
-                                const taskDate = new Date(task.due_date);
-                                return isSameDay(taskDate, date);
+                                if (!task.due_date && !task.start_date) return false;
+                                
+                                const start = new Date(task.start_date || task.due_date!);
+                                const end = new Date(task.due_date || task.start_date!);
+                                
+                                // Strip time to ensure day-level comparison is accurate
+                                start.setHours(0, 0, 0, 0);
+                                end.setHours(23, 59, 59, 999);
+                                
+                                const current = new Date(date);
+                                current.setHours(12, 0, 0, 0);
+
+                                return current >= start && current <= end;
                             });
 
                             // Is Today?
