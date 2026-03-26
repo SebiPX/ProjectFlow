@@ -36,11 +36,12 @@ export const ChatView: React.FC = () => {
 
   const activeChannel = channels.find(c => c.id === activeChannelId);
 
-  // Fetch messages every 5 seconds (Short Polling)
+  // Fetch messages every 3 seconds (Short Polling)
   const { data: messages = [] } = useQuery({
     queryKey: ['chat', activeChannelId],
     queryFn: () => getChatMessages(activeChannelId),
-    refetchInterval: 5000,
+    refetchInterval: 3000,
+    staleTime: 0,
     enabled: !!activeChannelId
   });
 
@@ -56,7 +57,9 @@ export const ChatView: React.FC = () => {
   });
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
   };
 
   useEffect(() => {

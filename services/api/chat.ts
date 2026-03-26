@@ -18,7 +18,7 @@ export interface ChatMessage {
 }
 
 export const getChatMessages = async (channelId: string): Promise<ChatMessage[]> => {
-  return await fetchApi(`/api/chat/${channelId}`);
+  return await fetchApi(`/api/chat/${channelId}`, { cache: 'no-store' });
 };
 
 export const sendChatMessage = async (channelId: string, content: string): Promise<ChatMessage> => {
