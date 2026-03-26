@@ -443,6 +443,14 @@ Don't try to create RLS policies for admin access to all profiles - use service 
 - ✅ **Shotlist Editor**: Airtable-style grid for building structured shotlists with drag & drop functionality. (Image Upload feature upcoming).
 - ✅ **Drehdispo (Call Sheet)**: Form-based document builder combining Schedule, Contacts, Location, and Weather info. Includes Native PDF Print via browser `print:hidden` CSS logic, dynamic Drehtag, and PJM emails.
 
+### Completed in v2.4.0 ✅ (March 2026) - REAL-TIME CHAT SYSTEM
+
+- ✅ **Agency Messaging**: Built a complete Slack/Teams-style UI inside the browser for global and project-specific chat.
+- ✅ **Backend Integration**: Created `agency_chat_messages` table and custom REST endpoints in `labs-api`.
+- ✅ **Real-Time Polling**: React Query interval-based fetching tuned for instant messaging, optimized for background tabs.
+- ✅ **Smart Read-Receipts**: Unread notification red dots per channel, powered by `localStorage` cross-tab sync and a fast `GET /api/chat/summary` endpoint.
+- ✅ **Auto-Scroll & UX**: Messages auto-scroll to bottom, optimistic UI updates, integrated user avatars and timestamps.
+
 1. **Integrations & Export (Phase 2)**
    - [x] Automation email notifications (Edge Functions)
    - [ ] API for external tool integration
