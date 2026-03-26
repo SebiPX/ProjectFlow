@@ -86,10 +86,26 @@ export const TaskCard: React.FC<TaskCardProps> = ({
           </p>
         )}
 
-        {/* Assignee */}
+        {/* Assignees */}
         <div className="flex items-center gap-2 mb-3">
           <Icon path="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" className="w-4 h-4 text-muted-foreground" />
-          {task.assignee ? (
+          {task.assignees && task.assignees.length > 0 ? (
+            <div className="flex items-center -space-x-2">
+              {task.assignees.map((assignee, index) => (
+                <div key={assignee.id || index} className="relative group" style={{ zIndex: 10 - index }}>
+                  <Avatar
+                    avatarPath={assignee.avatar_url}
+                    alt={assignee.full_name || ''}
+                    className="w-6 h-6 rounded-full border-2 border-card relative"
+                  />
+                  {/* Tooltip on hover */}
+                  <div className="absolute opacity-0 group-hover:opacity-100 transition-opacity bg-popover text-popover-foreground text-xs rounded px-2 py-1 -top-8 left-1/2 -translate-x-1/2 pointer-events-none whitespace-nowrap z-50 shadow-md border border-border">
+                    {assignee.full_name || assignee.email}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : task.assignee ? (
             <div className="flex items-center gap-2">
               <Avatar
                 avatarPath={task.assignee.avatar_url}

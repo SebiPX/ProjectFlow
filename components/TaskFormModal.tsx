@@ -9,6 +9,7 @@ import { getSeniorityLevels } from '../services/api/seniorityLevels';
 import { getServicePricingRate } from '../services/api/taskVariance';
 import type { Task } from '../types/supabase';
 import { Icon } from './ui/Icon';
+import { Avatar } from './ui/Avatar';
 
 interface TaskFormModalProps {
   isOpen: boolean;
@@ -23,7 +24,7 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
     description: '',
     project_id: preSelectedProjectId || '',
     status: 'todo',
-    assigned_to: '',
+    assignee_ids: [] as string[],
     start_date: '',
     due_date: '',
     planned_minutes: '',
@@ -99,7 +100,7 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
       description: '',
       project_id: preSelectedProjectId || '',
       status: 'todo',
-      assigned_to: '',
+      assignee_ids: [],
       start_date: '',
       due_date: '',
       planned_minutes: '',
@@ -131,7 +132,7 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
       description: formData.description.trim() || null,
       project_id: formData.project_id,
       status: formData.status as any,
-      assigned_to: formData.assigned_to || null,
+      assignee_ids: formData.assignee_ids,
       start_date: formData.start_date || undefined,
       due_date: formData.due_date || null,
       planned_minutes: formData.planned_minutes ? parseInt(formData.planned_minutes) : undefined,
@@ -234,22 +235,33 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
             </div>
 
             <div>
-              <label htmlFor="assigned_to" className="block text-sm font-medium text-muted-foreground mb-2">
-                Assign To
+              <label className="block text-sm font-medium text-muted-foreground mb-2">
+                Assignees
               </label>
-              <select
-                id="assigned_to"
-                value={formData.assigned_to}
-                onChange={(e) => setFormData({ ...formData, assigned_to: e.target.value })}
-                className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-              >
-                <option value="">Unassigned</option>
+              <div className="w-full max-h-48 overflow-y-auto bg-muted border border-input rounded-lg p-2 space-y-1">
                 {profiles.map((profile) => (
-                  <option key={profile.id} value={profile.id}>
-                    {profile.full_name || profile.email}
-                  </option>
+                  <label key={profile.id} className="flex items-center p-2 hover:bg-background rounded cursor-pointer transition-colors">
+                    <input
+                      type="checkbox"
+                      checked={formData.assignee_ids.includes(profile.id)}
+                      onChange={(e) => {
+                        const newIds = e.target.checked 
+                          ? [...formData.assignee_ids, profile.id]
+                          : formData.assignee_ids.filter(id => id !== profile.id);
+                        setFormData({ ...formData, assignee_ids: newIds });
+                      }}
+                      className="w-4 h-4 bg-background border-input rounded focus:ring-2 focus:ring-primary flex-shrink-0"
+                    />
+                    <div className="ml-3 flex items-center gap-2 overflow-hidden">
+                      <Avatar src={profile.avatar_url} alt={profile.full_name || ''} size="sm" />
+                      <span className="text-sm text-foreground truncate">{profile.full_name || profile.email}</span>
+                    </div>
+                  </label>
                 ))}
-              </select>
+                {profiles.length === 0 && (
+                  <div className="text-sm text-muted-foreground p-2">No profiles found</div>
+                )}
+              </div>
             </div>
           </div>
 

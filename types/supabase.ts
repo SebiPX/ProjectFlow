@@ -211,8 +211,9 @@ export interface Task {
   description?: string | null;
   status?: TaskStatus;
   position?: number; // NUMERIC
-  assigned_to?: string | null; // UUID
+  assigned_to?: string | string[] | null; // UUID or Array (legacy)
   assignee_id?: string | null; // UUID (from SQL response)
+  assignee_ids?: string[]; // Array of UUIDs
   start_date?: string; // TIMESTAMPTZ
   due_date?: string | null; // TIMESTAMPTZ
   planned_minutes?: number;
@@ -225,7 +226,8 @@ export interface Task {
   estimated_rate?: number | null; // Estimated hourly rate in € (from service_pricing or custom)
 
   // Enriched data
-  assignee?: Profile;
+  assignee?: Profile; // Legacy single assignee
+  assignees?: Profile[]; // Array of full profiles
   service_module?: ServiceModule;
   seniority_level?: SeniorityLevel;
 }

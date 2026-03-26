@@ -61,9 +61,17 @@ export const TaskList: React.FC<TaskListProps> = ({ onSelectProject, searchQuery
   // Filter Logic
   const filterTasks = (tasks: Task[]): Task[] => {
     return tasks.filter(task => {
-      const taskAssigneeId = task.assignee_id || task.assigned_to;
+      const isUnassigned = (!task.assignee_ids || task.assignee_ids.length === 0) && !task.assignee_id && !task.assigned_to;
+      const isAssignedToUser = (userId: string) => {
+        if (task.assignee_ids?.includes(userId)) return true;
+        if (task.assignee_id === userId) return true;
+        if (task.assigned_to === userId) return true;
+        if (Array.isArray(task.assigned_to) && task.assigned_to.includes(userId)) return true;
+        return false;
+      };
+
       // Only Me filter
-      if (onlyMe && taskAssigneeId !== user?.id) return false;
+      if (onlyMe && user?.id && !isAssignedToUser(user.id)) return false;
 
       // Search Query Filter
       if (searchQuery) {
@@ -75,8 +83,10 @@ export const TaskList: React.FC<TaskListProps> = ({ onSelectProject, searchQuery
 
       if (filters.status !== 'all' && task.status !== filters.status) return false;
       if (filters.projectId !== 'all' && task.project_id !== filters.projectId) return false;
-      if (filters.assigneeId === 'unassigned' && taskAssigneeId != null) return false;
-      if (filters.assigneeId !== 'all' && filters.assigneeId !== 'unassigned' && taskAssigneeId !== filters.assigneeId) return false;
+      
+      if (filters.assigneeId === 'unassigned' && !isUnassigned) return false;
+      if (filters.assigneeId !== 'all' && filters.assigneeId !== 'unassigned' && !isAssignedToUser(filters.assigneeId)) return false;
+      
       return true;
     });
   };
@@ -128,12 +138,29 @@ export const TaskList: React.FC<TaskListProps> = ({ onSelectProject, searchQuery
   };
 
   // Get unique assignees from tasks
-  const uniqueAssignees = Array.from(
-    new Set(tasks.filter(t => t.assignee).map(t => t.assignee_id || t.assigned_to))
-  ).map(assigneeId => {
-    const assignee = tasks.find(t => (t.assignee_id || t.assigned_to) === assigneeId)?.assignee;
-    return { id: assigneeId, name: assignee?.full_name || 'Unknown' };
+  const uniqueAssigneeIds = new Set<string>();
+  const assigneeMap = new Map<string, string>(); // id -> name
+
+  tasks.forEach(t => {
+    if (t.assignees && t.assignees.length > 0) {
+      t.assignees.forEach(a => {
+        uniqueAssigneeIds.add(a.id);
+        assigneeMap.set(a.id, a.full_name || a.email || 'Unknown');
+      });
+    } else if (t.assignee) {
+      // Legacy single assignee fallback
+      const id = t.assignee_id || (typeof t.assigned_to === 'string' ? t.assigned_to : null);
+      if (id) {
+        uniqueAssigneeIds.add(id);
+        assigneeMap.set(id, t.assignee.full_name || t.assignee.email || 'Unknown');
+      }
+    }
   });
+
+  const uniqueAssignees = Array.from(uniqueAssigneeIds).map(id => ({
+    id,
+    name: assigneeMap.get(id) || 'Unknown'
+  }));
 
   if (tasksLoading) {
     return (
