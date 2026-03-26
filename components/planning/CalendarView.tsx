@@ -4,10 +4,12 @@ import { getTasks } from '../../services/api/tasks';
 import { getProjects } from '../../services/api/projects';
 import { Icon } from '../ui/Icon';
 import { getDaysInMonth, getFirstDayOfMonth, addDays, isSameDay, getMonthName } from '../../lib/dateUtils';
+import { TaskEditModal } from '../TaskEditModal';
 import type { Task, Project } from '../../types/supabase';
 
 export const CalendarView: React.FC = () => {
     const [currentDate, setCurrentDate] = useState(new Date());
+    const [editingTask, setEditingTask] = useState<Task | null>(null);
 
     // Fetch Data
     const { data: tasks = [] } = useQuery({
@@ -122,7 +124,8 @@ export const CalendarView: React.FC = () => {
                                         {dayTasks.map(task => (
                                             <div
                                                 key={task.id}
-                                                className="text-xs px-2 py-1 rounded truncate border-l-2 text-foreground/90"
+                                                onClick={() => setEditingTask(task)}
+                                                className="text-xs px-2 py-1 rounded truncate border-l-2 text-foreground/90 cursor-pointer hover:opacity-80 transition-opacity"
                                                 style={{
                                                     backgroundColor: `${getProjectColor(task.project_id)}20`, // 20% opacity
                                                     borderColor: getProjectColor(task.project_id)
@@ -140,6 +143,15 @@ export const CalendarView: React.FC = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Edit Task Modal */}
+            {editingTask && (
+                <TaskEditModal
+                    isOpen={!!editingTask}
+                    onClose={() => setEditingTask(null)}
+                    task={editingTask}
+                />
+            )}
         </div>
     );
 };

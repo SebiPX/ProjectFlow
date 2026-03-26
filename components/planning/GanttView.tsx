@@ -5,11 +5,13 @@ import { getProjects } from '../../services/api/projects';
 import { getProfiles } from '../../services/api/profiles';
 import { Icon } from '../ui/Icon';
 import { addDays, formatDate, isSameDay } from '../../lib/dateUtils';
+import { TaskEditModal } from '../TaskEditModal';
 import type { Task, Project } from '../../types/supabase';
 
 export const GanttView: React.FC = () => {
     const [viewMode, setViewMode] = useState<'day' | 'week'>('day');
     const [startDate, setStartDate] = useState(new Date());
+    const [editingTask, setEditingTask] = useState<Task | null>(null);
 
     // Fetch Data
     const { data: tasks = [] } = useQuery({ queryKey: ['tasks'], queryFn: getTasks });
@@ -110,7 +112,12 @@ export const GanttView: React.FC = () => {
                             </div>
                             {/* Task Rows */}
                             {group.tasks.map(task => (
-                                <div key={task.id} className="h-8 px-8 flex items-center text-sm text-muted-foreground border-b border-border/30 truncate hover:bg-muted/30">
+                                <div 
+                                    key={task.id} 
+                                    onClick={() => setEditingTask(task)}
+                                    className="h-8 px-8 flex items-center text-sm text-muted-foreground border-b border-border/30 truncate hover:bg-muted/50 cursor-pointer transition-colors"
+                                    title="Edit Task"
+                                >
                                     {task.title}
                                 </div>
                             ))}
@@ -161,14 +168,16 @@ export const GanttView: React.FC = () => {
                                         const barStyle = getBarStyles(task, timelineDays[0]);
 
                                         return (
-                                            <div key={`bar-${task.id}`} className="h-8 relative w-full border-b border-border/30">
+                                            <div key={`bar-${task.id}`} className="h-8 relative w-full border-b border-border/30 group">
                                                 <div
-                                                    className="absolute h-5 top-1.5 rounded-full text-[10px] px-2 flex items-center text-foreground overflow-hidden whitespace-nowrap shadow-sm"
+                                                    onClick={() => setEditingTask(task)}
+                                                    className="absolute h-5 top-1.5 rounded-full text-[10px] px-2 flex items-center text-foreground overflow-hidden whitespace-nowrap shadow-sm cursor-pointer group-hover:opacity-100 transition-opacity"
                                                     style={{
                                                         ...barStyle,
                                                         backgroundColor: group.project.color_code || '#3B82F6',
-                                                        opacity: 0.9
+                                                        opacity: 0.85
                                                     }}
+                                                    title={`Edit ${task.title}`}
                                                 >
                                                     {/* Only show title inside bar if wide enough? */}
                                                     <span className="drop-shadow-md">{task.title}</span>
@@ -182,6 +191,15 @@ export const GanttView: React.FC = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Edit Task Modal */}
+            {editingTask && (
+                <TaskEditModal
+                    isOpen={!!editingTask}
+                    onClose={() => setEditingTask(null)}
+                    task={editingTask}
+                />
+            )}
         </div>
     );
 };
