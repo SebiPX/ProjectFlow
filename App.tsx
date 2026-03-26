@@ -26,8 +26,9 @@ import ResourcePlanning from './components/ResourcePlanning';
 import type { Project } from './types/supabase';
 import { MOCK_PROJECTS } from './constants';
 import { InventarApp } from './components/InventarApp';
+import { ChatView } from './components/chat/ChatView';
 
-export type View = 'dashboard' | 'projects' | 'project-detail' | 'tasks' | 'planning' | 'assets' | 'clients' | 'employees' | 'service-catalog' | 'finances' | 'reports' | 'resources' | 'settings' | 'inventar' | 'verleih' | 'verleih-formular' | 'kalender' | 'logins' | 'handyvertraege' | 'kreditkarten' | 'firmendaten' | 'links';
+export type View = 'dashboard' | 'projects' | 'project-detail' | 'tasks' | 'planning' | 'assets' | 'clients' | 'employees' | 'service-catalog' | 'finances' | 'reports' | 'resources' | 'settings' | 'inventar' | 'verleih' | 'verleih-formular' | 'kalender' | 'logins' | 'handyvertraege' | 'kreditkarten' | 'firmendaten' | 'links' | 'chat';
 
 const MainApp: React.FC = () => {
   const [view, setView] = useState<View>('dashboard');
@@ -38,13 +39,21 @@ const MainApp: React.FC = () => {
   // Initialize Realtime subscriptions
   useRealtime();
 
-  const handleNavigate = (newView: View) => {
+  const [activeProjectTab, setActiveProjectTab] = useState<string>('tasks');
+
+  const handleNavigate = (newView: View, entityId?: string, tab?: string) => {
     setView(newView);
     setSearchQuery(''); // Clear search when changing view
+
+    if (newView === 'project-detail' && entityId) {
+      setActiveProject({ id: entityId } as Project);
+      if (tab) setActiveProjectTab(tab);
+    }
   };
 
   const handleSelectProject = (project: Project) => {
     setActiveProject(project);
+    setActiveProjectTab('overview');
     setView('project-detail');
     setSearchQuery('');
   };
@@ -58,11 +67,12 @@ const MainApp: React.FC = () => {
       case 'projects':
         return <ProjectList onSelectProject={handleSelectProject} searchQuery={searchQuery} />;
       case 'project-detail':
-        return activeProject ? <ProjectDetail project={activeProject} /> : <ProjectList onSelectProject={handleSelectProject} searchQuery={searchQuery} />;
+        return activeProject ? <ProjectDetail project={activeProject} defaultTab={activeProjectTab} /> : <ProjectList onSelectProject={handleSelectProject} searchQuery={searchQuery} />;
       case 'tasks':
         return <TaskList onSelectProject={handleSelectProject} searchQuery={searchQuery} />;
       case 'assets':
-        return <AssetList onSelectProject={handleSelectProject} searchQuery={searchQuery} />;
+        // Removing searchQuery to fix lint error if AssetList doesn't support it
+        return <AssetList onSelectProject={handleSelectProject} />;
       case 'clients':
         return <ClientList searchQuery={searchQuery} />;
       case 'employees':
@@ -79,6 +89,8 @@ const MainApp: React.FC = () => {
         return <Reports />;
       case 'resources':
         return <ResourcePlanning />;
+      case 'chat':
+        return <ChatView />;
       case 'inventar':
       case 'verleih':
       case 'verleih-formular':

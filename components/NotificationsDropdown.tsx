@@ -8,9 +8,10 @@ import type { Notification } from '../types/supabase';
 
 interface Props {
     onClose: () => void;
+    onNavigate: (view: string, entityId?: string, tab?: string) => void;
 }
 
-export const NotificationsDropdown: React.FC<Props> = ({ onClose }) => {
+export const NotificationsDropdown: React.FC<Props> = ({ onClose, onNavigate }) => {
     const { user } = useAuth();
     const queryClient = useQueryClient();
 
@@ -40,7 +41,11 @@ export const NotificationsDropdown: React.FC<Props> = ({ onClose }) => {
         if (!notification.is_read) {
             markReadMutation.mutate(notification.id);
         }
-        // Could navigate here if link exists
+        
+        if (notification.related_entity_id) {
+           onNavigate('project-detail', notification.related_entity_id, 'tasks');
+        }
+        
         onClose();
     };
 

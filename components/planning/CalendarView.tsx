@@ -92,8 +92,9 @@ export const CalendarView: React.FC = () => {
                 </div>
 
                 {/* Calendar Days */}
-                <div className="flex-1 grid grid-cols-7 auto-rows-fr">
-                    {days.map((date, index) => {
+                <div className="flex-1 overflow-y-auto">
+                    <div className="grid grid-cols-7 auto-rows-[minmax(120px,1fr)] min-h-full">
+                        {days.map((date, index) => {
                         if (!date) {
                             return <div key={`empty-${index}`} className="bg-background/40 border-r border-b border-border" />;
                         }
@@ -134,6 +135,7 @@ export const CalendarView: React.FC = () => {
                             </div>
                         );
                     })}
+                    </div>
                 </div>
             </div>
         </div>

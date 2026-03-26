@@ -35,6 +35,7 @@ import { DocumentList } from './documents/DocumentList';
 
 interface ProjectDetailProps {
   project: Project;
+  defaultTab?: string;
 }
 
 type ProjectTab = 'overview' | 'tasks' | 'finances' | 'assets' | 'team' | 'services' | 'documents';
@@ -49,7 +50,7 @@ const tabs: { id: ProjectTab; label: string }[] = [
   { id: 'documents', label: 'Documents' },
 ];
 
-export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialProject }) => {
+export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialProject, defaultTab }) => {
   const queryClient = useQueryClient();
   const { profile } = useAuth(); // Add this hook call
   const isClient = profile?.role === 'client';
@@ -71,7 +72,13 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
     },
     initialData: initialProject,
   });
-  const [activeTab, setActiveTab] = useState<ProjectTab>('tasks');
+  const [activeTab, setActiveTab] = useState<ProjectTab>((defaultTab as ProjectTab) || 'tasks');
+
+  useEffect(() => {
+    if (defaultTab) {
+      setActiveTab(defaultTab as ProjectTab);
+    }
+  }, [defaultTab]);
   const [isTaskFormModalOpen, setIsTaskFormModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAssetUploadModalOpen, setIsAssetUploadModalOpen] = useState(false);
@@ -160,8 +167,8 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
     }
   };
 
-  const handleDeleteAsset = (assetId: string, assetName: string) => {
-    if (confirm(`Are you sure you want to delete "${assetName}"?`)) {
+  const handleDeleteAsset = (assetId: string, assetName?: string) => {
+    if (confirm(`Are you sure you want to delete ${assetName ? `"${assetName}"` : "this asset"}?`)) {
       deleteAssetMutation.mutate(assetId);
     }
   };

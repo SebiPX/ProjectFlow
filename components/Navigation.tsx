@@ -10,7 +10,7 @@ import { NotificationsDropdown } from './NotificationsDropdown';
 
 interface NavigationProps {
   currentView: View;
-  onNavigate: (view: View) => void;
+  onNavigate: (view: View, entityId?: string, tab?: string) => void;
   searchQuery?: string;
   onSearch?: (query: string) => void;
 }
@@ -34,6 +34,7 @@ const navCategories: NavCategory[] = [
     icon: 'M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z', // grid
     items: [
       { view: 'dashboard', label: 'Dashboard', icon: 'M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z' },
+      { view: 'chat', label: 'Chat', icon: 'M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z' },
       { view: 'inventar', label: 'Inventar', icon: 'inventory_2' },
       { view: 'verleih-formular', label: 'Verleih', icon: 'calendar_month' },
       { view: 'kalender', label: 'Kalender', icon: 'event' },
@@ -205,7 +206,7 @@ export const Navigation: React.FC<NavigationProps> = ({ currentView, onNavigate,
                 )}
               </button>
               {showNotifications && (
-                <NotificationsDropdown onClose={() => setShowNotifications(false)} />
+                <NotificationsDropdown onClose={() => setShowNotifications(false)} onNavigate={onNavigate as any} />
               )}
             </div>
 
