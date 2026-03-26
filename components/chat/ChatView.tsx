@@ -37,8 +37,22 @@ export const ChatView: React.FC = () => {
 
   const updateLastRead = (channelId: string, timestamp: string) => {
     localStorage.setItem(`chat_read_${channelId}`, timestamp);
-    setLastReadStates(prev => ({ ...prev, [channelId]: timestamp }));
+    setLastReadStates(prev => {
+      const newVal = { ...prev, [channelId]: timestamp };
+      return newVal;
+    });
   };
+
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key?.startsWith('chat_read_')) {
+        const channelId = e.key.replace('chat_read_', '');
+        setLastReadStates(prev => ({ ...prev, [channelId]: e.newValue || '' }));
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
 
   const { data: projects = [] } = useQuery({
     queryKey: ['projects'],
@@ -61,6 +75,7 @@ export const ChatView: React.FC = () => {
     queryKey: ['chat', activeChannelId],
     queryFn: () => getChatMessages(activeChannelId),
     refetchInterval: 3000,
+    refetchIntervalInBackground: true,
     staleTime: 0,
     enabled: !!activeChannelId
   });
@@ -70,6 +85,7 @@ export const ChatView: React.FC = () => {
     queryKey: ['chat-summary'],
     queryFn: getChatSummary,
     refetchInterval: 5000,
+    refetchIntervalInBackground: true,
     staleTime: 0
   });
 
