@@ -81,60 +81,62 @@ export const CalendarView: React.FC = () => {
             </div>
 
             {/* Grid */}
-            <div className="flex-1 min-h-0 flex flex-col">
-                {/* Weekday Headers */}
-                <div className="grid grid-cols-7 border-b border-border bg-card/50">
-                    {weekdays.map(day => (
-                        <div key={day} className="py-2 text-center text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-                            {day}
-                        </div>
-                    ))}
-                </div>
-
-                {/* Calendar Days */}
-                <div className="flex-1 overflow-y-auto">
-                    <div className="grid grid-cols-7 auto-rows-[minmax(120px,1fr)] min-h-full">
-                        {days.map((date, index) => {
-                        if (!date) {
-                            return <div key={`empty-${index}`} className="bg-background/40 border-r border-b border-border" />;
-                        }
-
-                        const dayTasks = tasks.filter(task => {
-                            if (!task.due_date) return false;
-                            const taskDate = new Date(task.due_date);
-                            return isSameDay(taskDate, date);
-                        });
-
-                        // Is Today?
-                        const isToday = isSameDay(date, new Date());
-
-                        return (
-                            <div
-                                key={date.toISOString()}
-                                className={`border-r border-b border-border p-2 min-h-[100px] relative transition-colors hover:bg-card/80 ${isToday ? 'bg-blue-900/20' : ''}`}
-                            >
-                                <div className={`text-sm font-medium mb-2 w-7 h-7 flex items-center justify-center rounded-full ${isToday ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'}`}>
-                                    {date.getDate()}
-                                </div>
-
-                                <div className="space-y-1 overflow-y-auto max-h-[100px]">
-                                    {dayTasks.map(task => (
-                                        <div
-                                            key={task.id}
-                                            className="text-xs px-2 py-1 rounded truncate border-l-2 text-foreground/90"
-                                            style={{
-                                                backgroundColor: `${getProjectColor(task.project_id)}20`, // 20% opacity
-                                                borderColor: getProjectColor(task.project_id)
-                                            }}
-                                            title={task.title}
-                                        >
-                                            {task.title}
-                                        </div>
-                                    ))}
-                                </div>
+            <div className="flex-1 min-h-0 flex flex-col overflow-x-auto">
+                <div className="min-w-[1000px] flex flex-col h-full">
+                    {/* Weekday Headers */}
+                    <div className="grid grid-cols-7 border-b border-border bg-card/50">
+                        {weekdays.map(day => (
+                            <div key={day} className="py-2 text-center text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                                {day}
                             </div>
-                        );
-                    })}
+                        ))}
+                    </div>
+
+                    {/* Calendar Days */}
+                    <div className="flex-1 overflow-y-auto">
+                        <div className="grid grid-cols-7 auto-rows-[minmax(120px,1fr)] min-h-full">
+                            {days.map((date, index) => {
+                            if (!date) {
+                                return <div key={`empty-${index}`} className="bg-background/40 border-r border-b border-border" />;
+                            }
+
+                            const dayTasks = tasks.filter(task => {
+                                if (!task.due_date) return false;
+                                const taskDate = new Date(task.due_date);
+                                return isSameDay(taskDate, date);
+                            });
+
+                            // Is Today?
+                            const isToday = isSameDay(date, new Date());
+
+                            return (
+                                <div
+                                    key={date.toISOString()}
+                                    className={`border-r border-b border-border p-2 min-h-[100px] relative transition-colors hover:bg-card/80 ${isToday ? 'bg-blue-900/20' : ''}`}
+                                >
+                                    <div className={`text-sm font-medium mb-2 w-7 h-7 flex items-center justify-center rounded-full ${isToday ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'}`}>
+                                        {date.getDate()}
+                                    </div>
+
+                                    <div className="space-y-1 overflow-y-auto max-h-[100px]">
+                                        {dayTasks.map(task => (
+                                            <div
+                                                key={task.id}
+                                                className="text-xs px-2 py-1 rounded truncate border-l-2 text-foreground/90"
+                                                style={{
+                                                    backgroundColor: `${getProjectColor(task.project_id)}20`, // 20% opacity
+                                                    borderColor: getProjectColor(task.project_id)
+                                                }}
+                                                title={task.title}
+                                            >
+                                                {task.title}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            );
+                        })}
+                        </div>
                     </div>
                 </div>
             </div>

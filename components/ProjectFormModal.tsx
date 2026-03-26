@@ -148,10 +148,10 @@ export const ProjectFormModal: React.FC<ProjectFormModalProps> = ({ isOpen, onCl
             </label>
             <textarea
               id="description"
-              rows={8}
+              rows={14}
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-y"
+              className="w-full px-4 py-3 min-h-[250px] bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-y"
               placeholder="Project description..."
             />
           </div>

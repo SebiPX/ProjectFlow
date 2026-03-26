@@ -86,10 +86,10 @@ export default function ResourceTimeline({ resources, startDate, onDateChange, i
 
                 {/* Timeline Grid */}
                 <div className="overflow-x-auto overflow-y-auto max-h-[70vh] relative">
-                    <table className="w-full border-collapse">
-                        <thead className="sticky top-0 z-30">
+                    <table className="w-full border-collapse relative">
+                        <thead>
                             <tr>
-                                <th className="p-3 text-left bg-card border-b border-r border-border min-w-[200px] sticky left-0 z-40 w-64 text-muted-foreground shadow-md outline outline-1 outline-border">
+                                <th className="p-3 text-left bg-card border-b border-r border-border min-w-[200px] sticky top-0 left-0 z-50 w-64 text-muted-foreground shadow-md outline outline-1 outline-border">
                                     Mitarbeiter
                                 </th>
                                 {dates.map(date => {
@@ -97,7 +97,7 @@ export default function ResourceTimeline({ resources, startDate, onDateChange, i
                                     return (
                                         <th
                                             key={date.toISOString()}
-                                            className={`p-2 text-center border-b border-border min-w-[60px] outline outline-1 outline-border outline-offset-[-1px] ${weekend ? 'bg-muted text-muted-foreground' : 'bg-card text-foreground'}`}
+                                            className={`p-2 text-center border-b border-border min-w-[60px] outline outline-1 outline-border outline-offset-[-1px] sticky top-0 z-30 ${weekend ? 'bg-muted text-muted-foreground' : 'bg-card text-foreground'}`}
                                         >
                                             <div className="text-xs font-medium uppercase opacity-70">
                                                 {date.toLocaleDateString('de-DE', { weekday: 'short' })}
