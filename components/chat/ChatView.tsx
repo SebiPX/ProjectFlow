@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../lib/AuthContext';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getProjects } from '../../services/api/projects';
-import { getChatMessages, sendChatMessage, ChatMessage } from '../../services/api/chat';
+import { getChatMessages, sendChatMessage, getChatSummary, ChatMessage, ChatSummary } from '../../services/api/chat';
 import { Icon } from '../ui/Icon';
 import { Avatar } from '../ui/Avatar';
 
@@ -19,6 +19,26 @@ export const ChatView: React.FC = () => {
   const [activeChannelId, setActiveChannelId] = useState<string>('general');
   const [messageText, setMessageText] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Load initial read states from localStorage
+  const getInitialReadStates = () => {
+    const states: Record<string, string> = {};
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key?.startsWith('chat_read_')) {
+        const channelId = key.replace('chat_read_', '');
+        states[channelId] = localStorage.getItem(key) || '';
+      }
+    }
+    return states;
+  };
+
+  const [lastReadStates, setLastReadStates] = useState<Record<string, string>>(getInitialReadStates);
+
+  const updateLastRead = (channelId: string, timestamp: string) => {
+    localStorage.setItem(`chat_read_${channelId}`, timestamp);
+    setLastReadStates(prev => ({ ...prev, [channelId]: timestamp }));
+  };
 
   const { data: projects = [] } = useQuery({
     queryKey: ['projects'],
@@ -44,6 +64,25 @@ export const ChatView: React.FC = () => {
     staleTime: 0,
     enabled: !!activeChannelId
   });
+
+  // Fetch summary of last messages every 5 seconds
+  const { data: chatSummary = [] } = useQuery({
+    queryKey: ['chat-summary'],
+    queryFn: getChatSummary,
+    refetchInterval: 5000,
+    staleTime: 0
+  });
+
+  // Automatically mark as read if channel is active and receives new message
+  useEffect(() => {
+    if (messages.length > 0 && activeChannelId) {
+      const latestMessageAt = messages[messages.length - 1].created_at;
+      const currentRead = lastReadStates[activeChannelId];
+      if (!currentRead || new Date(latestMessageAt) > new Date(currentRead)) {
+         updateLastRead(activeChannelId, latestMessageAt);
+      }
+    }
+  }, [messages, activeChannelId, lastReadStates]);
 
   const sendMessageMutation = useMutation({
     mutationFn: (content: string) => sendChatMessage(activeChannelId, content),
@@ -86,32 +125,53 @@ export const ChatView: React.FC = () => {
           
           <div>
             <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-2">General</h3>
-            <button
-              onClick={() => setActiveChannelId('general')}
-              className={`w-full text-left px-3 py-2 rounded-lg transition-colors flex items-center gap-3 ${activeChannelId === 'general' ? 'bg-primary/10 text-primary' : 'hover:bg-muted text-foreground'}`}
-            >
-              <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary shrink-0">
-                <Icon path="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" className="w-4 h-4" />
-              </div>
-              <span className="font-medium truncate">Agency Chat</span>
-            </button>
+            {(() => {
+              const summary = chatSummary.find((s: ChatSummary) => s.channel_id === 'general');
+              const hasUnread = summary && (!lastReadStates['general'] || new Date(summary.last_message_at) > new Date(lastReadStates['general']));
+              const isActive = activeChannelId === 'general';
+              return (
+                <button
+                  onClick={() => {
+                    setActiveChannelId('general');
+                    if (summary) updateLastRead('general', summary.last_message_at);
+                  }}
+                  className={`w-full text-left px-3 py-2 rounded-lg transition-colors flex items-center gap-3 relative ${isActive ? 'bg-primary/10 text-primary' : 'hover:bg-muted text-foreground'}`}
+                >
+                  <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary shrink-0 relative">
+                    <Icon path="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" className="w-4 h-4" />
+                    {hasUnread && !isActive && <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border border-card"></span>}
+                  </div>
+                  <span className="font-medium truncate">Agency Chat</span>
+                </button>
+              );
+            })()}
           </div>
 
           <div>
             <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-2">Project Groups</h3>
             <div className="space-y-1">
-              {channels.filter(c => c.type === 'project').map(channel => (
-                <button
-                  key={channel.id}
-                  onClick={() => setActiveChannelId(channel.id)}
-                  className={`w-full text-left px-3 py-2 rounded-lg transition-colors flex items-center gap-3 ${activeChannelId === channel.id ? 'bg-primary/10 text-primary font-medium' : 'hover:bg-muted text-foreground'}`}
-                >
-                  <div className="w-8 h-8 rounded shrink-0 bg-muted border border-border flex items-center justify-center text-muted-foreground">
-                    <Icon path="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" className="w-4 h-4" />
-                  </div>
-                  <span className="truncate">{channel.name}</span>
-                </button>
-              ))}
+              {channels.filter(c => c.type === 'project').map(channel => {
+                const summary = chatSummary.find((s: ChatSummary) => s.channel_id === channel.id);
+                const hasUnread = summary && (!lastReadStates[channel.id] || new Date(summary.last_message_at) > new Date(lastReadStates[channel.id]));
+                const isActive = activeChannelId === channel.id;
+
+                return (
+                  <button
+                    key={channel.id}
+                    onClick={() => {
+                      setActiveChannelId(channel.id);
+                      if (summary) updateLastRead(channel.id, summary.last_message_at);
+                    }}
+                    className={`w-full text-left px-3 py-2 rounded-lg transition-colors flex items-center gap-3 relative ${isActive ? 'bg-primary/10 text-primary font-medium' : 'hover:bg-muted text-foreground'}`}
+                  >
+                    <div className="w-8 h-8 rounded shrink-0 bg-muted border border-border flex items-center justify-center text-muted-foreground relative">
+                      <Icon path="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" className="w-4 h-4" />
+                      {hasUnread && !isActive && <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full translate-x-1/2 -translate-y-1/2 border border-card shadow-sm"></span>}
+                    </div>
+                    <span className="truncate">{channel.name}</span>
+                  </button>
+                );
+              })}
               {channels.filter(c => c.type === 'project').length === 0 && (
                  <p className="text-xs text-muted-foreground px-2">No active projects</p>
               )}

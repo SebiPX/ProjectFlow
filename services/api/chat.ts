@@ -17,6 +17,15 @@ export interface ChatMessage {
   };
 }
 
+export interface ChatSummary {
+  channel_id: string;
+  last_message_at: string;
+}
+
+export const getChatSummary = async (): Promise<ChatSummary[]> => {
+  return await fetchApi('/api/chat/summary', { cache: 'no-store' });
+};
+
 export const getChatMessages = async (channelId: string): Promise<ChatMessage[]> => {
   return await fetchApi(`/api/chat/${channelId}`, { cache: 'no-store' });
 };
