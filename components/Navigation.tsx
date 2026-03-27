@@ -30,7 +30,7 @@ interface NavCategory {
 
 const navCategories: NavCategory[] = [
   {
-    label: 'Home',
+    label: 'PX Desk',
     icon: 'M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z', // grid
     items: [
       { view: 'dashboard', label: 'Dashboard', icon: 'M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z' },
@@ -130,11 +130,11 @@ export const Navigation: React.FC<NavigationProps> = ({ currentView, onNavigate,
   // Find the active category based on current view
   let activeCategory = visibleCategories.find(cat => cat.items.some(i => i.view === currentView)) || visibleCategories[0];
 
-  // If view is 'project-detail', set active category to 'Projekte', for 'settings' keep 'Home'
+  // If view is 'project-detail', set active category to 'Projekte', for 'settings' keep 'PX Desk'
   if (currentView === 'project-detail') {
      activeCategory = visibleCategories.find(cat => cat.label === 'Projekte') || visibleCategories[0];
   } else if (currentView === 'settings') {
-     activeCategory = visibleCategories.find(cat => cat.label === 'Home') || visibleCategories[0];
+     activeCategory = visibleCategories.find(cat => cat.label === 'PX Desk') || visibleCategories[0];
   }
 
   const allNavItems = visibleCategories.flatMap(cat => cat.items);
