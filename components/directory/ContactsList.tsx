@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { directory, ApiFreelancer } from '../../lib/apiClient';
 import { useAuth } from '../../lib/AuthContext';
-import { Users, Search, Mail, Phone, Globe, MapPin } from 'lucide-react';
+import { Users, Search, Mail, Phone, Globe, MapPin, Plus, Pencil } from 'lucide-react';
+import { FreelancerFormModal } from './FreelancerFormModal';
 
 export const ContactsList: React.FC = () => {
     const { profile } = useAuth();
@@ -11,6 +12,9 @@ export const ContactsList: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
     const [categoryFilter, setCategoryFilter] = useState('Alle');
+    
+    const [isModalOpen, setModalOpen] = useState(false);
+    const [selectedFreelancer, setSelectedFreelancer] = useState<ApiFreelancer | null>(null);
 
     useEffect(() => {
         fetchData();
@@ -62,6 +66,12 @@ export const ContactsList: React.FC = () => {
                         Agentur-Netzwerk ({filtered.length} Einträge)
                     </p>
                 </div>
+                <button
+                    onClick={() => { setSelectedFreelancer(null); setModalOpen(true); }}
+                    className="flex items-center gap-2 px-4 py-2.5 bg-primary text-primary-foreground text-sm font-semibold rounded-xl hover:bg-primary/90 transition-colors"
+                >
+                    <Plus size={18} /> Neu
+                </button>
             </div>
 
             <div className="flex flex-wrap gap-4 items-center">
@@ -95,7 +105,14 @@ export const ContactsList: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {filtered.map(contact => (
                     <div key={contact.id} className="bg-card border border-border p-5 rounded-2xl shadow-sm hover:shadow-md transition-shadow relative group">
-                        <div className="mb-3">
+                        <button 
+                            onClick={() => { setSelectedFreelancer(contact); setModalOpen(true); }}
+                            className="absolute top-4 right-4 p-2 text-muted-foreground hover:text-primary bg-background/50 backdrop-blur rounded-full opacity-0 group-hover:opacity-100 transition-all border border-border"
+                        >
+                            <Pencil size={14} />
+                        </button>
+
+                        <div className="mb-3 pr-8">
                             <h3 className="text-lg font-bold text-foreground">
                                 {contact.first_name} {contact.last_name}
                             </h3>
@@ -120,7 +137,7 @@ export const ContactsList: React.FC = () => {
                             {contact.email && (
                                 <div className="flex items-center gap-2">
                                     <Mail size={16} className="shrink-0 opacity-70" />
-                                    <a href={`mailto:${contact.email}`} className="hover:text-primary transition-colors">{contact.email}</a>
+                                    <a href={`mailto:${contact.email}`} className="hover:text-primary transition-colors truncate">{contact.email}</a>
                                 </div>
                             )}
                             {contact.phone && (
@@ -160,6 +177,13 @@ export const ContactsList: React.FC = () => {
                     </div>
                 )}
             </div>
+            
+            <FreelancerFormModal 
+                isOpen={isModalOpen} 
+                onClose={() => setModalOpen(false)} 
+                onSave={fetchData} 
+                freelancer={selectedFreelancer} 
+            />
         </div>
     );
 };

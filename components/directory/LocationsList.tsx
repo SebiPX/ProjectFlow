@@ -1,12 +1,16 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { directory, ApiLocation } from '../../lib/apiClient';
-import { Building2, Search, MapPin, ExternalLink, Euro, Maximize, Users } from 'lucide-react';
+import { Building2, Search, MapPin, ExternalLink, Euro, Maximize, Users, Plus, Pencil } from 'lucide-react';
+import { LocationFormModal } from './LocationFormModal';
 
 export const LocationsList: React.FC = () => {
     const [locations, setLocations] = useState<ApiLocation[]>([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
     const [categoryFilter, setCategoryFilter] = useState('Alle');
+    
+    const [isModalOpen, setModalOpen] = useState(false);
+    const [selectedLocation, setSelectedLocation] = useState<ApiLocation | null>(null);
 
     useEffect(() => {
         fetchData();
@@ -58,6 +62,12 @@ export const LocationsList: React.FC = () => {
                         Drehorte, Studios & Event Spaces ({filtered.length} Einträge)
                     </p>
                 </div>
+                <button
+                    onClick={() => { setSelectedLocation(null); setModalOpen(true); }}
+                    className="flex items-center gap-2 px-4 py-2.5 bg-primary text-primary-foreground text-sm font-semibold rounded-xl hover:bg-primary/90 transition-colors"
+                >
+                    <Plus size={18} /> Neu
+                </button>
             </div>
 
             <div className="flex flex-wrap gap-4 items-center">
@@ -90,9 +100,16 @@ export const LocationsList: React.FC = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                 {filtered.map(loc => (
-                    <div key={loc.id} className="bg-card border border-border rounded-2xl shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col">
+                    <div key={loc.id} className="bg-card border border-border rounded-2xl shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col relative group">
+                        <button 
+                            onClick={() => { setSelectedLocation(loc); setModalOpen(true); }}
+                            className="absolute top-4 right-4 p-2 text-muted-foreground hover:text-primary bg-background/50 backdrop-blur rounded-full opacity-0 group-hover:opacity-100 transition-all border border-border z-10"
+                        >
+                            <Pencil size={14} />
+                        </button>
+                        
                         <div className="p-5 border-b border-border/50 bg-muted/20">
-                            <div className="flexjustify-between items-start gap-3">
+                            <div className="flex justify-between items-start gap-3 pr-8">
                                 <h3 className="text-xl font-bold text-foreground leading-tight flex-1">
                                     {loc.name}
                                 </h3>
@@ -111,7 +128,7 @@ export const LocationsList: React.FC = () => {
                             )}
                         </div>
 
-                        <div className="p-5 p-5 flex flex-wrap gap-4 bg-muted/10 border-b border-border/50">
+                        <div className="p-5 flex flex-wrap gap-4 bg-muted/10 border-b border-border/50">
                             <div className="flex flex-col">
                                 <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Fläche</span>
                                 <div className="text-foreground font-semibold flex items-center gap-1 mt-0.5">
@@ -172,6 +189,13 @@ export const LocationsList: React.FC = () => {
                     </div>
                 )}
             </div>
+            
+            <LocationFormModal
+                isOpen={isModalOpen}
+                onClose={() => setModalOpen(false)}
+                onSave={fetchData}
+                location={selectedLocation}
+            />
         </div>
     );
 };

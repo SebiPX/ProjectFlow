@@ -288,13 +288,21 @@ export interface ApiLocation {
 export const directory = {
     freelancers: {
         list: () => request<ApiFreelancer[]>('/api/directory-freelancers'),
+        create: (data: Partial<ApiFreelancer>) =>
+            request<ApiFreelancer>('/api/directory-freelancers', { method: 'POST', body: JSON.stringify(data) }),
         update: (id: string, data: Partial<ApiFreelancer>) =>
-            request<ApiFreelancer>(`/api/directory-freelancers/${id}`, { method: 'PATCH', body: JSON.stringify(data) })
+            request<ApiFreelancer>(`/api/directory-freelancers/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+        delete: (id: string) =>
+            request<void>(`/api/directory-freelancers/${id}`, { method: 'DELETE' })
     },
     locations: {
         list: () => request<ApiLocation[]>('/api/directory-locations'),
+        create: (data: Partial<ApiLocation>) =>
+            request<ApiLocation>('/api/directory-locations', { method: 'POST', body: JSON.stringify(data) }),
         update: (id: string, data: Partial<ApiLocation>) =>
-            request<ApiLocation>(`/api/directory-locations/${id}`, { method: 'PATCH', body: JSON.stringify(data) })
+            request<ApiLocation>(`/api/directory-locations/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+        delete: (id: string) =>
+            request<void>(`/api/directory-locations/${id}`, { method: 'DELETE' })
     }
 };
 
