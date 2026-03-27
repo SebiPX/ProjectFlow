@@ -139,25 +139,7 @@ export const ProjectList: React.FC<({ onSelectProject: (project: Project) => voi
     queryFn: getProjects,
   });
 
-  const [isSyncing, setIsSyncing] = useState(false);
-  const handleMocoSync = async () => {
-    try {
-      setIsSyncing(true);
-      const data = await fetchApi('/api/projects/sync-moco', { method: 'POST' });
-      
-      if (data?.success) {
-         toast.success(`${data.imported || 0} Projekte aus MOCO importiert!`);
-         await refetchProjects();
-      } else {
-         toast.error(`Fehler: ${data?.error || 'Unknown error'}`);
-      }
-    } catch (e: any) {
-      toast.error(`Sync fehlgeschlagen: ${e.message}`);
-    } finally {
-      setIsSyncing(false);
-    }
-  };
-
+// Removed handleMocoSync
   const { data: financialOverview = {} } = useQuery({
     queryKey: ['projects-financial-overview'],
     queryFn: getProjectsFinancialOverview,
@@ -245,26 +227,7 @@ export const ProjectList: React.FC<({ onSelectProject: (project: Project) => voi
             </svg>
             Show Archive
           </button>
-          {isAdminOrPJM && (
-            <>
-              <button
-                onClick={handleMocoSync}
-                disabled={isSyncing}
-                className={`font-semibold py-2 px-4 rounded-lg flex items-center transition-colors ${isSyncing ? 'bg-secondary text-muted-foreground cursor-wait' : 'bg-primary hover:bg-primary/90 text-primary-foreground'}`}
-              >
-                {isSyncing ? 'Lädt...' : 'Alle aus MOCO importieren'}
-              </button>
-              <button
-                onClick={() => toast.info('Projekte werden zentral in MOCO erfasst. Bitte lege das neue Projekt in MOCO an, es erscheint hier automatisch in wenigen Sekunden.', { autoClose: 6000 })}
-                className="bg-secondary hover:bg-secondary/80 text-secondary-foreground font-semibold py-2 px-4 rounded-lg flex items-center"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                Neu via MOCO
-              </button>
-            </>
-          )}
+// Buttons removed as they are now automated
         </div>
       </div>
       {filteredProjects.length === 0 ? (

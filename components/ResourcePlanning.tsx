@@ -40,31 +40,7 @@ export default function ResourcePlanning() {
                         Überblick über Team-Auslastung und Verfügbarkeit
                     </p>
                 </div>
-                <div className="flex gap-4">
-                    <button
-                        onClick={async () => {
-                            try {
-                                const { fetchApi } = await import('../services/api/client');
-                                const { toast } = await import('react-toastify');
-                                toast.info('MOCO Sync gestartet...', { autoClose: 2000 });
-                                const data = await fetchApi('/api/resources/sync-moco-data', { method: 'POST' });
-                                if (data?.success) {
-                                    toast.success(`${data.absencesImported || 0} Abwesenheiten und ${data.usersMapped || 0} User synchronisiert!`);
-                                    refetch();
-                                } else {
-                                    toast.error(`Fehler beim Sync: ${data?.error || 'Unknown error'}`);
-                                }
-                            } catch (e: any) {
-                                const { toast } = await import('react-toastify');
-                                toast.error(`Sync fehlgeschlagen: ${e.message}`);
-                            }
-                        }}
-                        className="bg-secondary text-secondary-foreground hover:bg-secondary/80 px-4 py-2 flex items-center gap-2 rounded-lg font-medium transition-colors"
-                    >
-                        <Icon path="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" className="w-5 h-5" />
-                        MOCO Abwesenheiten & User Sync
-                    </button>
-                </div>
+{/* Automatisierter Sync im Backend */}
             </div>
 
             <ResourceTimeline
