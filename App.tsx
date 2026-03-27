@@ -27,8 +27,10 @@ import type { Project } from './types/supabase';
 import { MOCK_PROJECTS } from './constants';
 import { InventarApp } from './components/InventarApp';
 import { ChatView } from './components/chat/ChatView';
+import { ContactsList } from './components/directory/ContactsList';
+import { LocationsList } from './components/directory/LocationsList';
 
-export type View = 'dashboard' | 'projects' | 'project-detail' | 'tasks' | 'planning' | 'assets' | 'clients' | 'employees' | 'service-catalog' | 'finances' | 'reports' | 'resources' | 'settings' | 'inventar' | 'verleih' | 'verleih-formular' | 'kalender' | 'logins' | 'handyvertraege' | 'kreditkarten' | 'firmendaten' | 'links' | 'chat';
+export type View = 'dashboard' | 'projects' | 'project-detail' | 'tasks' | 'planning' | 'assets' | 'clients' | 'employees' | 'service-catalog' | 'finances' | 'reports' | 'resources' | 'settings' | 'inventar' | 'verleih' | 'verleih-formular' | 'kalender' | 'logins' | 'handyvertraege' | 'kreditkarten' | 'firmendaten' | 'links' | 'chat' | 'directory-freelancers' | 'directory-locations';
 
 const MainApp: React.FC = () => {
   const [view, setView] = useState<View>('dashboard');
@@ -77,6 +79,10 @@ const MainApp: React.FC = () => {
         return <ClientList searchQuery={searchQuery} />;
       case 'employees':
         return <EmployeeList searchQuery={searchQuery} />;
+      case 'directory-freelancers':
+        return <ContactsList />;
+      case 'directory-locations':
+        return <LocationsList />;
       case 'planning':
         return <Planning />;
       case 'service-catalog':

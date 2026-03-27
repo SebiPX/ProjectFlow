@@ -250,6 +250,54 @@ export interface ApiUser {
     created_at: string;
 }
 
+export interface ApiFreelancer {
+    id: string;
+    company?: string;
+    first_name?: string;
+    last_name?: string;
+    phone?: string;
+    email?: string;
+    city?: string;
+    country?: string;
+    daily_rate?: number;
+    notes?: string;
+    website?: string;
+    category?: string;
+    created_at: string;
+}
+
+export interface ApiLocation {
+    id: string;
+    name?: string;
+    sqm?: number;
+    pax?: number;
+    cost?: number;
+    setup_cost?: number;
+    notes?: string;
+    address?: string;
+    phone?: string;
+    contact_person?: string;
+    email?: string;
+    website?: string;
+    city?: string;
+    country?: string;
+    category?: string;
+    created_at: string;
+}
+
+export const directory = {
+    freelancers: {
+        list: () => request<ApiFreelancer[]>('/api/directory-freelancers'),
+        update: (id: string, data: Partial<ApiFreelancer>) =>
+            request<ApiFreelancer>(`/api/directory-freelancers/${id}`, { method: 'PATCH', body: JSON.stringify(data) })
+    },
+    locations: {
+        list: () => request<ApiLocation[]>('/api/directory-locations'),
+        update: (id: string, data: Partial<ApiLocation>) =>
+            request<ApiLocation>(`/api/directory-locations/${id}`, { method: 'PATCH', body: JSON.stringify(data) })
+    }
+};
+
 export interface ApiImage {
     id: string;
     user_id: string;
