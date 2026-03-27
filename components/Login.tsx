@@ -31,95 +31,78 @@ export const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-      <div className="max-w-md w-full space-y-8 p-8 bg-card rounded-xl shadow-2xl border border-border">
-        {/* Logo/Header */}
-        <div className="text-center">
-          <h1 className="text-4xl font-bold text-foreground mb-2">PX-Flow</h1>
+    <div className="min-h-screen w-full flex items-center justify-center bg-background p-4">
+      <div className="w-full max-w-md">
+        {/* Logo/Title */}
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-[#135bec] to-[#4a90ff] bg-clip-text text-transparent mb-2">
+            PX-Flow
+          </h1>
           <p className="text-muted-foreground">Project Management for Agencies</p>
         </div>
 
-        {/* Login Form */}
-        <form onSubmit={handleSubmit} className="mt-8 space-y-6">
-          <div className="space-y-4">
+        {/* Login Card */}
+        <div className="bg-muted/40 backdrop-blur-xl border border-border/50 rounded-2xl p-8 shadow-2xl shadow-[#135bec]/10">
+          <h2 className="text-2xl font-semibold text-foreground mb-6">Welcome Back</h2>
+
+          <form onSubmit={handleSubmit} className="space-y-5">
             {/* Email Input */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-muted-foreground mb-2">
-                Email Address
+              <label htmlFor="email" className="block text-sm font-medium text-foreground/90 mb-2">
+                Email
               </label>
               <input
                 id="email"
-                name="email"
                 type="email"
-                autoComplete="email"
-                required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="appearance-none relative block w-full px-4 py-3 border border-input placeholder-gray-500 text-foreground bg-muted rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                placeholder="alex@agency.com"
+                required
+                className="w-full px-4 py-3 bg-card/50 border border-border/80/50 rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#135bec] focus:border-transparent transition-all"
+                placeholder="you@example.com"
               />
             </div>
 
             {/* Password Input */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-muted-foreground mb-2">
-                Password
-              </label>
+              <div className="flex items-center justify-between mb-2">
+                <label htmlFor="password" className="block text-sm font-medium text-foreground/90">
+                  Password
+                </label>
+              </div>
               <input
                 id="password"
-                name="password"
                 type="password"
-                autoComplete="current-password"
-                required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="appearance-none relative block w-full px-4 py-3 border border-input placeholder-gray-500 text-foreground bg-muted rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                placeholder="Enter your password"
+                required
+                className="w-full px-4 py-3 bg-card/50 border border-border/80/50 rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#135bec] focus:border-transparent transition-all"
+                placeholder="••••••••"
               />
             </div>
-          </div>
 
-          {/* Submit Button */}
-          <div>
+            {/* Submit Button */}
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-primary-foreground bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              className="w-full py-3 bg-gradient-to-r from-[#135bec] to-[#4a90ff] text-foreground font-semibold rounded-lg shadow-lg shadow-[#135bec]/30 hover:shadow-[#135bec]/50 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? (
-                <span className="flex items-center">
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-foreground" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Signing in...
-                </span>
-              ) : (
-                'Sign In'
-              )}
+              {loading ? 'Signing In...' : 'Sign In'}
             </button>
-          </div>
-
-          {/* Demo Credentials Info */}
-          <div className="mt-4 p-4 bg-muted rounded-lg border border-input">
-            <p className="text-xs text-muted-foreground text-center mb-2">Demo Credentials:</p>
-            <p className="text-sm text-muted-foreground text-center">
-              <strong>Email:</strong> alex@agency.com<br />
-              <strong>Password:</strong> Admin123!
-            </p>
-          </div>
+          </form>
 
           {/* Switch to Signup */}
-          <div className="text-center mt-4">
-            <button
-              type="button"
-              onClick={() => setShowSignup(true)}
-              className="text-sm text-primary hover:text-blue-300 transition-colors"
-            >
-              Don't have an account? Create one
-            </button>
+          <div className="mt-6 text-center">
+            <p className="text-muted-foreground text-sm">
+              Don't have an account?{' '}
+              <button
+                onClick={() => setShowSignup(true)}
+                className="text-[#135bec] hover:text-[#4a90ff] font-medium transition-colors"
+              >
+                Sign Up
+              </button>
+            </p>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );
