@@ -451,6 +451,12 @@ Don't try to create RLS policies for admin access to all profiles - use service 
 - ✅ **Smart Read-Receipts**: Unread notification red dots per channel, powered by `localStorage` cross-tab sync and a fast `GET /api/chat/summary` endpoint.
 - ✅ **Auto-Scroll & UX**: Messages auto-scroll to bottom, optimistic UI updates, integrated user avatars and timestamps.
 
+### Completed in v2.5.0 ✅ (March 2026) - UI/UX ALIGNMENT & ECOSYSTEM SYNC
+
+- ✅ **Unified Styling**: Replaced generic text logos with adaptive the PX Logo images supporting strict Light & Dark mode variants explicitly via CSS.
+- ✅ **Category Naming**: Renamed the generic "Home" sidebar category string cleanly to "PX Desk" to enforce ecosystem nomenclature globally.
+- ✅ **Ecosystem Linking**: Implemented a responsive direct external linking button in the top header bridging users instantly back and forth between "PX-Studio" and "PX-Flow".
+
 1. **Integrations & Export (Phase 2)**
    - [x] Automation email notifications (Edge Functions)
    - [ ] API for external tool integration
