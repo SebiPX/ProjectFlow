@@ -9,9 +9,9 @@ echo "📥 Pulling latest changes from Git repository..."
 git pull origin main
 
 echo "🛑 Stopping existing containers..."
-docker compose down
+docker compose -f docker-compose.prod.yml down
 
 echo "🏗️ Building and starting new containers..."
-docker compose up -d --build
+docker compose -f docker-compose.prod.yml up -d --build
 
 echo "✅ PX-Flow successfully deployed and running in background!"
