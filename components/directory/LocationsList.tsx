@@ -195,6 +195,7 @@ export const LocationsList: React.FC = () => {
                 onClose={() => setModalOpen(false)}
                 onSave={fetchData}
                 location={selectedLocation}
+                existingCategories={categories.filter(c => c !== 'Alle')}
             />
         </div>
     );

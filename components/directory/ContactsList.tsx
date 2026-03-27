@@ -182,7 +182,8 @@ export const ContactsList: React.FC = () => {
                 isOpen={isModalOpen} 
                 onClose={() => setModalOpen(false)} 
                 onSave={fetchData} 
-                freelancer={selectedFreelancer} 
+                freelancer={selectedFreelancer}
+                existingCategories={categories.filter(c => c !== 'Alle')}
             />
         </div>
     );

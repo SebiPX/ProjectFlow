@@ -8,9 +8,10 @@ interface LocationFormModalProps {
     onClose: () => void;
     onSave: () => void;
     location?: ApiLocation | null;
+    existingCategories?: string[];
 }
 
-export const LocationFormModal: React.FC<LocationFormModalProps> = ({ isOpen, onClose, onSave, location }) => {
+export const LocationFormModal: React.FC<LocationFormModalProps> = ({ isOpen, onClose, onSave, location, existingCategories = [] }) => {
     const { profile } = useAuth();
     const isAdmin = profile?.role === 'admin';
     
@@ -89,7 +90,17 @@ export const LocationFormModal: React.FC<LocationFormModalProps> = ({ isOpen, on
 
                         <div className="col-span-2 sm:col-span-1">
                             <label className={labelClass}>Kategorie</label>
-                            <input name="category" value={formData.category || ''} onChange={handleChange} className={inputClass} placeholder="z.B. Fotostudio" />
+                            <input 
+                                list="location-categories"
+                                name="category" 
+                                value={formData.category || ''} 
+                                onChange={handleChange} 
+                                className={inputClass} 
+                                placeholder="Auswählen oder eintippen..." 
+                            />
+                            <datalist id="location-categories">
+                                {existingCategories.map(c => <option key={c} value={c} />)}
+                            </datalist>
                         </div>
                         
                         <div className="col-span-2 sm:col-span-1">

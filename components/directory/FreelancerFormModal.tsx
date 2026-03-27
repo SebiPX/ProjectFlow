@@ -8,9 +8,10 @@ interface FreelancerFormModalProps {
     onClose: () => void;
     onSave: () => void;
     freelancer?: ApiFreelancer | null;
+    existingCategories?: string[];
 }
 
-export const FreelancerFormModal: React.FC<FreelancerFormModalProps> = ({ isOpen, onClose, onSave, freelancer }) => {
+export const FreelancerFormModal: React.FC<FreelancerFormModalProps> = ({ isOpen, onClose, onSave, freelancer, existingCategories = [] }) => {
     const { profile } = useAuth();
     const isAdmin = profile?.role === 'admin';
     
@@ -98,7 +99,17 @@ export const FreelancerFormModal: React.FC<FreelancerFormModalProps> = ({ isOpen
 
                         <div className="col-span-2 sm:col-span-1">
                             <label className={labelClass}>Kategorie / Skill</label>
-                            <input name="category" value={formData.category || ''} onChange={handleChange} className={inputClass} placeholder="z.B. Motion Design" />
+                            <input 
+                                list="freelancer-categories"
+                                name="category" 
+                                value={formData.category || ''} 
+                                onChange={handleChange} 
+                                className={inputClass} 
+                                placeholder="Auswählen oder eintippen..." 
+                            />
+                            <datalist id="freelancer-categories">
+                                {existingCategories.map(c => <option key={c} value={c} />)}
+                            </datalist>
                         </div>
                         
                         {isAdmin && (
