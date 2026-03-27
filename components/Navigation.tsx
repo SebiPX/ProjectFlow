@@ -145,13 +145,43 @@ export const Navigation: React.FC<NavigationProps> = ({ currentView, onNavigate,
       <nav className="bg-background border-b border-border">
         <div className="max-w-[1920px] mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
           {/* Logo / Title */}
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shadow-lg shadow-primary/20 text-primary-foreground">
-              <Icon path="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 6a.75.75 0 00-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 000-1.5h-3.75V6z" className="w-5 h-5 text-primary-foreground" />
+          <div className="flex items-center gap-6">
+            <button 
+              onClick={() => onNavigate('dashboard')}
+              className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+            >
+              <div className="flex items-center justify-center pt-1.5 transition-all">
+                <img 
+                  src="/logos/px-black.png" 
+                  alt="PX Logo" 
+                  className="h-9 w-auto object-contain drop-shadow-sm dark:hidden block"
+                />
+                <img 
+                  src="/logos/px-alpha.png" 
+                  alt="PX Logo" 
+                  className="h-9 w-auto object-contain drop-shadow-sm hidden dark:block"
+                />
+              </div>
+              <h1 className="text-xl font-bold tracking-tight text-foreground hidden xl:block mt-1">
+                Flow
+              </h1>
+            </button>
+
+            {/* External Links */}
+            <div className="hidden md:flex items-center pl-4 border-l border-border h-8">
+              <a
+                href={import.meta.env.VITE_PX_STUDIO_URL || "https://px-studio.labs-schickeria.com/"}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 text-xs font-bold text-muted-foreground hover:text-primary transition-colors"
+              >
+                <div className="w-5 h-5 rounded flex items-center justify-center bg-primary/10 text-primary">
+                  <span className="material-icons-round text-[14px]">auto_awesome</span>
+                </div>
+                PX-Studio
+                <span className="material-icons-round text-[12px] opacity-50 ml-0.5">open_in_new</span>
+              </a>
             </div>
-            <h1 className="text-xl font-bold tracking-tight text-foreground hidden md:block">
-              PX-Flow
-            </h1>
           </div>
 
           {/* Desktop Categories */}
