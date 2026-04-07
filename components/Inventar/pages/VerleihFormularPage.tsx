@@ -235,7 +235,7 @@ export function VerleihFormularPage({
     doc.setTextColor(30, 41, 59) // Dark Slate for text
     
     try {
-      doc.addImage(PX_LOGO_B64, 'PNG', W - 60, 8, 40, 19)
+      doc.addImage(PX_LOGO_B64, 'PNG', W - 40, 8, 20, 20)
     } catch(e) {}
     
     doc.setFontSize(22); doc.setFont('helvetica', 'bold')
@@ -287,17 +287,16 @@ export function VerleihFormularPage({
     doc.line(margin, y + 3, W - margin, y + 3)
     
     doc.setTextColor(51, 65, 85); doc.setFontSize(8.5); doc.setFont('helvetica', 'bold')
-    doc.text('Gerät / Modell', margin + 2, y); doc.text('PX-Nr.', margin + 75, y)
-    doc.text('Kaufpreis', margin + 103, y); doc.text(`Tagesrate (${percent}%)`, margin + 127, y)
+    doc.text('Gerät / Modell', margin + 2, y); doc.text('PX-Nr.', margin + 85, y)
+    doc.text(`Tagesrate (${percent}%)`, margin + 125, y)
     doc.text('Gesamt', margin + 158, y); y += 5
     doc.setFont('helvetica', 'normal')
     itemCosts.forEach((r, idx) => {
       if (idx % 2 === 0) { doc.setFillColor(241, 245, 249); doc.rect(margin, y - 4, W - 2 * margin, 7, 'F') }
       doc.setTextColor(15, 23, 42); doc.setFontSize(9)
-      doc.text(`${r.item.geraet}${r.item.modell ? ' – ' + r.item.modell : ''}`.slice(0, 35), margin + 2, y)
-      doc.text(r.item.px_nummer || '–', margin + 75, y)
-      doc.text(toNum(r.item.anschaffungspreis) > 0 ? `€ ${toNum(r.item.anschaffungspreis).toFixed(2)}` : '–', margin + 103, y)
-      doc.text(r.tagespreis > 0 ? `€ ${r.tagespreis.toFixed(2)}` : '–', margin + 127, y)
+      doc.text(`${r.item.geraet}${r.item.modell ? ' – ' + r.item.modell : ''}`.slice(0, 40), margin + 2, y)
+      doc.text(r.item.px_nummer || '–', margin + 85, y)
+      doc.text(r.tagespreis > 0 ? `€ ${r.tagespreis.toFixed(2)}` : '–', margin + 125, y)
       doc.text(r.gesamtpreis > 0 ? `€ ${r.gesamtpreis.toFixed(2)}` : '–', margin + 158, y); y += 7
     })
     y += 2
@@ -330,6 +329,44 @@ export function VerleihFormularPage({
     doc.text('Unterschrift PX-Mitarbeiter', W - margin - 70, y + 5); doc.text('Pixelschickeria', W - margin - 70, y + 10)
     doc.setFontSize(7.5); doc.setTextColor(180, 180, 180)
     doc.text('Pixelschickeria GmbH · PX Inventar Management', margin, 290)
+
+    // Append photos if present
+    if (fotosVorher.length > 0) {
+      doc.addPage()
+      doc.setFontSize(14); doc.setTextColor(30, 41, 59); doc.setFont('helvetica', 'bold')
+      doc.text('Anlage: Protokoll Fotos (Ausgabe)', margin, 20)
+      
+      let imgY = 30
+      let rowHeight = 60
+      const imgWidth = 70
+      
+      for (let i = 0; i < fotosVorher.length; i++) {
+        try {
+          const resp = await fetch(fotosVorher[i])
+          if (!resp.ok) continue
+          const blob = await resp.blob()
+          const b64 = await new Promise<string>((res) => {
+            const r = new FileReader()
+            r.onloadend = () => res(r.result as string)
+            r.readAsDataURL(blob)
+          })
+          
+          if (imgY + rowHeight > 280) {
+            doc.addPage()
+            imgY = 20
+          }
+          
+          doc.addImage(b64, 'JPEG', margin + (i % 2 === 0 ? 0 : 80), imgY, imgWidth, rowHeight)
+          
+          if (i % 2 !== 0) {
+            imgY += rowHeight + 10
+          }
+        } catch(e) {
+          console.error("Failed to append image to PDF", e)
+        }
+      }
+    }
+
     doc.save(`PX-Verleihschein_${bName.replace(/\s+/g, '_') || 'Extern'}_${new Date().toISOString().slice(0, 10)}.pdf`)
   }
 
