@@ -366,7 +366,8 @@ export function VerleihFormularPage({
       
       for (let i = 0; i < _fotosVorher.length; i++) {
         try {
-          const resp = await fetch(_fotosVorher[i])
+          const proxiedUrl = `/api/proxy/image?url=${encodeURIComponent(_fotosVorher[i])}`;
+          const resp = await fetch(proxiedUrl)
           if (!resp.ok) continue
           const blob = await resp.blob()
           const b64 = await new Promise<string>((res) => {
