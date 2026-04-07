@@ -219,7 +219,22 @@ export function VerleihFormularPage({
     }
   }
 
-  async function generatePDF(bName: string) {
+  async function generatePDF(bName: string, o?: any) {
+    const _borrowerType = o?.borrowerType ?? borrowerType;
+    const _borrower = o?.borrower ?? borrower;
+    const _clientId = o?.clientId ?? clientId;
+    const _extern = o?.extern ?? extern;
+    const _abholzeit = o?.abholzeit ?? abholzeit;
+    const _rueckgabezeit = o?.rueckgabezeit ?? rueckgabezeit;
+    const _dauer = o?.dauer ?? dauer;
+    const _zweck = o?.zweck ?? zweck;
+    const _percent = o?.percent ?? percent;
+    const _itemCosts = o?.itemCosts ?? itemCosts;
+    const _gesamtkosten = o?.gesamtkosten ?? gesamtkosten;
+    const _zustandVorher = o?.zustandVorher ?? zustandVorher;
+    const _notizen = o?.notizen ?? notizen;
+    const _fotosVorher = o?.fotosVorher ?? fotosVorher;
+
     const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
     const W = 210, margin = 20
     let y = margin
@@ -264,10 +279,10 @@ export function VerleihFormularPage({
     }
 
     sectionHeader('Ausleiher'); y += 2
-    if (borrowerType === 'team') {
-      row('Name:', borrower?.full_name || '–'); row('E-Mail:', borrower?.email || '–')
-    } else if (borrowerType === 'client') {
-      const cli = clients.find(c => c.id === clientId)
+    if (_borrowerType === 'team') {
+      row('Name:', _borrower?.full_name || '–'); row('E-Mail:', _borrower?.email || '–')
+    } else if (_borrowerType === 'client') {
+      const cli = clients.find(c => c.id === _clientId)
       row('Firma:', cli?.company_name || '–')
       if (cli?.address_line1 || cli?.zip_code || cli?.city) {
         row('Adresse:', [cli?.address_line1, cli?.zip_code, cli?.city].filter(Boolean).join(' '))
@@ -279,15 +294,15 @@ export function VerleihFormularPage({
         row('Kontakt:', `${p.full_name}${p.phone ? ` (${p.phone})` : ''}`)
       }
     } else {
-      row('Name:', extern.name || '–'); row('Firma:', extern.firma || '–')
-      row('E-Mail:', extern.email || '–'); row('Telefon:', extern.telefon || '–')
+      row('Name:', _extern.name || '–'); row('Firma:', _extern.firma || '–')
+      row('E-Mail:', _extern.email || '–'); row('Telefon:', _extern.telefon || '–')
     }
     y += 4
 
     sectionHeader('Zeitraum'); y += 2
-    row('Abholung:', formatDT(abholzeit)); row('Rückgabe:', formatDT(rueckgabezeit))
-    row('Dauer:', dauer ? `${dauer.toFixed(1)} Tag(e)` : '–')
-    if (zweck) row('Zweck:', zweck); y += 4
+    row('Abholung:', formatDT(_abholzeit)); row('Rückgabe:', formatDT(_rueckgabezeit))
+    row('Dauer:', _dauer ? `${_dauer.toFixed(1)} Tag(e)` : '–')
+    if (_zweck) row('Zweck:', _zweck); y += 4
 
     sectionHeader('Verliehene Artikel'); y += 2
     doc.setFillColor(241, 245, 249); doc.rect(margin, y - 4, W - 2 * margin, 7, 'F')
@@ -297,10 +312,10 @@ export function VerleihFormularPage({
     
     doc.setTextColor(51, 65, 85); doc.setFontSize(8.5); doc.setFont('helvetica', 'bold')
     doc.text('Gerät / Modell', margin + 2, y); doc.text('PX-Nr.', margin + 85, y)
-    doc.text(`Tagesrate (${percent}%)`, margin + 125, y)
+    doc.text(`Tagesrate (${_percent}%)`, margin + 125, y)
     doc.text('Gesamt', margin + 158, y); y += 5
     doc.setFont('helvetica', 'normal')
-    itemCosts.forEach((r, idx) => {
+    _itemCosts.forEach((r: any, idx: number) => {
       if (idx % 2 === 0) { doc.setFillColor(241, 245, 249); doc.rect(margin, y - 4, W - 2 * margin, 7, 'F') }
       doc.setTextColor(15, 23, 42); doc.setFontSize(9)
       doc.text(`${r.item.geraet}${r.item.modell ? ' – ' + r.item.modell : ''}`.slice(0, 40), margin + 2, y)
@@ -312,19 +327,19 @@ export function VerleihFormularPage({
     doc.setFillColor(241, 245, 249); doc.rect(margin, y - 4, W - 2 * margin, 8, 'F')
     doc.setTextColor(15, 23, 42); doc.setFont('helvetica', 'bold'); doc.setFontSize(10)
     doc.text('GESAMTBETRAG:', margin + 2, y + 1)
-    doc.text(gesamtkosten > 0 ? `€ ${gesamtkosten.toFixed(2)}` : '–', margin + 158, y + 1); y += 14
+    doc.text(_gesamtkosten > 0 ? `€ ${_gesamtkosten.toFixed(2)}` : '–', margin + 158, y + 1); y += 14
 
-    if (zustandVorher) {
+    if (_zustandVorher) {
       sectionHeader('Übergabeprotokoll (Abholung)'); y += 2
       doc.setTextColor(60, 60, 60); doc.setFontSize(9); doc.setFont('helvetica', 'normal')
-      const lines = doc.splitTextToSize('Zustand vorher: ' + zustandVorher, W - 2 * margin - 4)
+      const lines = doc.splitTextToSize('Zustand vorher: ' + _zustandVorher, W - 2 * margin - 4)
       doc.text(lines, margin + 2, y); y += lines.length * 5 + 8
     }
 
-    if (notizen) {
+    if (_notizen) {
       sectionHeader('Notizen'); y += 2
       doc.setTextColor(60, 60, 60); doc.setFontSize(9); doc.setFont('helvetica', 'normal')
-      const lines = doc.splitTextToSize(notizen, W - 2 * margin - 4)
+      const lines = doc.splitTextToSize(_notizen, W - 2 * margin - 4)
       doc.text(lines, margin + 2, y); y += lines.length * 5 + 8
     }
 
@@ -340,7 +355,7 @@ export function VerleihFormularPage({
     doc.text('Pixelschickeria GmbH · PX Inventar Management', margin, 290)
 
     // Append photos if present
-    if (fotosVorher.length > 0) {
+    if (_fotosVorher && _fotosVorher.length > 0) {
       doc.addPage()
       doc.setFontSize(14); doc.setTextColor(30, 41, 59); doc.setFont('helvetica', 'bold')
       doc.text('Anlage: Protokoll Fotos (Ausgabe)', margin, 20)
@@ -349,9 +364,9 @@ export function VerleihFormularPage({
       let rowHeight = 60
       const imgWidth = 70
       
-      for (let i = 0; i < fotosVorher.length; i++) {
+      for (let i = 0; i < _fotosVorher.length; i++) {
         try {
-          const resp = await fetch(fotosVorher[i])
+          const resp = await fetch(_fotosVorher[i])
           if (!resp.ok) continue
           const blob = await resp.blob()
           const b64 = await new Promise<string>((res) => {
@@ -377,6 +392,36 @@ export function VerleihFormularPage({
     }
 
     doc.save(`PX-Verleihschein_${bName.replace(/\s+/g, '_') || 'Extern'}_${new Date().toISOString().slice(0, 10)}.pdf`)
+  }
+
+  async function reprintSchein(schein: Verleihschein) {
+    const bName = schein.borrower_type === 'team' ? (schein.profile?.full_name || schein.profile?.email || '–') : schein.borrower_type === 'client' ? clients.find(c => c.id === schein.client_id)?.company_name || '–' : schein.extern_name || '–';
+    
+    const diff = new Date(schein.rueckgabezeit).getTime() - new Date(schein.abholzeit).getTime()
+    const dauer = diff > 0 ? diff / (1000 * 60 * 60 * 24) : null
+
+    const itemCosts = (schein.items || []).map(li => ({
+      item: li.item as InventarItem,
+      tagespreis: toNum(li.tagespreis),
+      gesamtpreis: toNum(li.gesamtpreis)
+    }))
+
+    await generatePDF(bName, {
+      borrowerType: schein.borrower_type,
+      borrower: schein.profile,
+      clientId: schein.client_id,
+      extern: { name: schein.extern_name || '', firma: schein.extern_firma || '', email: schein.extern_email || '', telefon: schein.extern_telefon || '' },
+      abholzeit: schein.abholzeit,
+      rueckgabezeit: schein.rueckgabezeit,
+      dauer,
+      zweck: schein.zweck || '',
+      percent: schein.prozentsatz || 0,
+      itemCosts,
+      gesamtkosten: schein.gesamtkosten || 0,
+      zustandVorher: schein.zustand_vorher || '',
+      notizen: schein.notizen || '',
+      fotosVorher: schein.fotos_vorher || []
+    })
   }
 
   // ── Erledigt handler ───────────────────────────────────────
@@ -664,10 +709,16 @@ export function VerleihFormularPage({
                     {schein.zweck && <p className="text-xs text-muted-foreground">Zweck: {schein.zweck}</p>}
                     {schein.gesamtkosten != null && toNum(schein.gesamtkosten) > 0 && <p className="text-xs text-brand-300 font-semibold">€ {toNum(schein.gesamtkosten).toFixed(2)}</p>}
                   </div>
-                  <button onClick={() => setRueckgabeSchein(schein)}
-                    className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-foreground text-sm font-semibold rounded-xl transition-colors shrink-0">
-                    <CheckCircle size={15} /> Rückgabe
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button onClick={() => reprintSchein(schein)}
+                      className="flex items-center gap-2 px-3 py-2 bg-card hover:bg-muted border border-border text-foreground text-sm font-semibold rounded-xl transition-colors shrink-0">
+                      <Download size={15} /> PDF
+                    </button>
+                    <button onClick={() => setRueckgabeSchein(schein)}
+                      className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-foreground text-sm font-semibold rounded-xl transition-colors shrink-0">
+                      <CheckCircle size={15} /> Rückgabe
+                    </button>
+                  </div>
                 </div>
                 {schein.items && schein.items.length > 0 && (
                   <div className="border-t border-border divide-y divide-slate-800">
@@ -721,9 +772,14 @@ export function VerleihFormularPage({
                       <p className="text-xs text-muted-foreground font-semibold">€ {toNum(schein.gesamtkosten).toFixed(2)}</p>
                     )}
                   </div>
-                  <span className="text-xs px-2.5 py-1 rounded-full bg-muted/60 text-muted-foreground border border-input/40 shrink-0 mt-1">
-                    Erledigt
-                  </span>
+                  <div className="flex items-center gap-2 shrink-0 mt-1">
+                    <button onClick={() => reprintSchein(schein)} className="flex items-center gap-2 px-3 py-1 bg-card hover:bg-muted border border-border text-foreground text-xs font-semibold rounded-lg transition-colors">
+                      <Download size={13} /> PDF
+                    </button>
+                    <span className="text-xs px-2.5 py-1 rounded-full bg-muted/60 text-muted-foreground border border-input/40">
+                      Erledigt
+                    </span>
+                  </div>
                 </div>
                 {schein.items && schein.items.length > 0 && (
                   <div className="border-t border-border/40 divide-y divide-slate-800/60">
