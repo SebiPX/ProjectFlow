@@ -355,7 +355,14 @@ export function VerleihFormularPage({
     doc.text('Pixelschickeria GmbH · PX Inventar Management', margin, 290)
 
     // Append photos if present
-    if (_fotosVorher && _fotosVorher.length > 0) {
+    let parsedFotos: string[] = [];
+    if (Array.isArray(_fotosVorher)) {
+      parsedFotos = _fotosVorher;
+    } else if (typeof _fotosVorher === 'string' && _fotosVorher.startsWith('{')) {
+      parsedFotos = _fotosVorher.slice(1, -1).split(',').map(s => s.trim().replace(/^"|"$/g, '')).filter(Boolean);
+    }
+    
+    if (parsedFotos.length > 0) {
       doc.addPage()
       doc.setFontSize(14); doc.setTextColor(30, 41, 59); doc.setFont('helvetica', 'bold')
       doc.text('Anlage: Protokoll Fotos (Ausgabe)', margin, 20)
@@ -364,9 +371,9 @@ export function VerleihFormularPage({
       let rowHeight = 60
       const imgWidth = 70
       
-      for (let i = 0; i < _fotosVorher.length; i++) {
+      for (let i = 0; i < parsedFotos.length; i++) {
         try {
-          const proxiedUrl = `${API_URL}/api/proxy/image?url=${encodeURIComponent(_fotosVorher[i])}`;
+          const proxiedUrl = `${API_URL}/api/proxy/image?url=${encodeURIComponent(parsedFotos[i])}`;
           const resp = await fetch(proxiedUrl)
           if (!resp.ok) continue
           const contentType = resp.headers.get('content-type')
