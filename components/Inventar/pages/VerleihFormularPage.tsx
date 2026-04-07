@@ -226,11 +226,11 @@ export function VerleihFormularPage({
     const _extern = o?.extern ?? extern;
     const _abholzeit = o?.abholzeit ?? abholzeit;
     const _rueckgabezeit = o?.rueckgabezeit ?? rueckgabezeit;
-    const _dauer = o?.dauer ?? dauer;
+    const _dauer = toNum(o?.dauer ?? dauer);
     const _zweck = o?.zweck ?? zweck;
-    const _percent = o?.percent ?? percent;
+    const _percent = toNum(o?.percent ?? percent);
     const _itemCosts = o?.itemCosts ?? itemCosts;
-    const _gesamtkosten = o?.gesamtkosten ?? gesamtkosten;
+    const _gesamtkosten = toNum(o?.gesamtkosten ?? gesamtkosten);
     const _zustandVorher = o?.zustandVorher ?? zustandVorher;
     const _notizen = o?.notizen ?? notizen;
     const _fotosVorher = o?.fotosVorher ?? fotosVorher;
