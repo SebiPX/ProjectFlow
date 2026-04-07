@@ -244,7 +244,7 @@ export function VerleihFormularPage({
     doc.setFontSize(10); doc.setFont('helvetica', 'normal')
     doc.setTextColor(100, 116, 139)
     doc.text('Pixelschickeria GmbH', margin, 27)
-    doc.text('Fraunhoferstraße 23h, 80469 München', margin, 32)
+    doc.text('Infanteriestrasse 11, 80797 München', margin, 32)
     y = 45
 
     doc.setTextColor(80, 90, 110); doc.setFontSize(9); doc.setFont('helvetica', 'normal')
@@ -268,7 +268,16 @@ export function VerleihFormularPage({
       row('Name:', borrower?.full_name || '–'); row('E-Mail:', borrower?.email || '–')
     } else if (borrowerType === 'client') {
       const cli = clients.find(c => c.id === clientId)
-      row('Firma:', cli?.company_name || '–'); row('Ort:', cli?.city || '–')
+      row('Firma:', cli?.company_name || '–')
+      if (cli?.address_line1 || cli?.zip_code || cli?.city) {
+        row('Adresse:', [cli?.address_line1, cli?.zip_code, cli?.city].filter(Boolean).join(' '))
+      } else {
+        row('Ort:', cli?.city || '–')
+      }
+      const p = cli?.contacts?.find((c: any) => c.is_primary) || cli?.contacts?.[0]
+      if (p) {
+        row('Kontakt:', `${p.full_name}${p.phone ? ` (${p.phone})` : ''}`)
+      }
     } else {
       row('Name:', extern.name || '–'); row('Firma:', extern.firma || '–')
       row('E-Mail:', extern.email || '–'); row('Telefon:', extern.telefon || '–')
