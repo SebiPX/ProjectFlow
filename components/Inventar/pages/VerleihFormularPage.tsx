@@ -179,7 +179,7 @@ export function VerleihFormularPage({
     setZweck(''); setNotizen(''); setZustandVorher(''); setFotosVorher([])
   }
 
-  async function handleSubmit() {
+  async function handleSubmit(hideCosts: boolean = false) {
     if (!canSubmit) return
     setSaving(true)
     try {
@@ -208,7 +208,7 @@ export function VerleihFormularPage({
         gesamtpreis: r.gesamtpreis,
       }))
       await onSaveVerleihschein(header, lineItems)
-      await generatePDF(borrowerName)
+      await generatePDF(borrowerName, { hideCosts })
       toast.success('Verleihschein gespeichert! Geräte sind als Ausgeliehen markiert.')
       resetForm()
       setTab('aktiv')
@@ -234,6 +234,7 @@ export function VerleihFormularPage({
     const _zustandVorher = o?.zustandVorher ?? zustandVorher;
     const _notizen = o?.notizen ?? notizen;
     const _fotosVorher = o?.fotosVorher ?? fotosVorher;
+    const _hideCosts = o?.hideCosts ?? false;
 
     const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
     const W = 210, margin = 20
@@ -312,22 +313,34 @@ export function VerleihFormularPage({
     
     doc.setTextColor(51, 65, 85); doc.setFontSize(8.5); doc.setFont('helvetica', 'bold')
     doc.text('Gerät / Modell', margin + 2, y); doc.text('PX-Nr.', margin + 85, y)
-    doc.text(`Tagesrate (${_percent}%)`, margin + 125, y)
-    doc.text('Gesamt', margin + 158, y); y += 5
+    if (!_hideCosts) {
+      doc.text(`Tagesrate (${_percent}%)`, margin + 125, y)
+      doc.text('Gesamt', margin + 158, y)
+    }
+    y += 5
     doc.setFont('helvetica', 'normal')
     _itemCosts.forEach((r: any, idx: number) => {
       if (idx % 2 === 0) { doc.setFillColor(241, 245, 249); doc.rect(margin, y - 4, W - 2 * margin, 7, 'F') }
       doc.setTextColor(15, 23, 42); doc.setFontSize(9)
       doc.text(`${r.item.geraet}${r.item.modell ? ' – ' + r.item.modell : ''}`.slice(0, 40), margin + 2, y)
       doc.text(r.item.px_nummer || '–', margin + 85, y)
-      doc.text(r.tagespreis > 0 ? `€ ${r.tagespreis.toFixed(2)}` : '–', margin + 125, y)
-      doc.text(r.gesamtpreis > 0 ? `€ ${r.gesamtpreis.toFixed(2)}` : '–', margin + 158, y); y += 7
+      if (!_hideCosts) {
+        doc.text(r.tagespreis > 0 ? `€ ${r.tagespreis.toFixed(2)}` : '–', margin + 125, y)
+        doc.text(r.gesamtpreis > 0 ? `€ ${r.gesamtpreis.toFixed(2)}` : '–', margin + 158, y); 
+      }
+      y += 7
     })
     y += 2
-    doc.setFillColor(241, 245, 249); doc.rect(margin, y - 4, W - 2 * margin, 8, 'F')
-    doc.setTextColor(15, 23, 42); doc.setFont('helvetica', 'bold'); doc.setFontSize(10)
-    doc.text('GESAMTBETRAG:', margin + 2, y + 1)
-    doc.text(_gesamtkosten > 0 ? `€ ${_gesamtkosten.toFixed(2)}` : '–', margin + 158, y + 1); y += 14
+    
+    if (!_hideCosts) {
+      doc.setFillColor(241, 245, 249); doc.rect(margin, y - 4, W - 2 * margin, 8, 'F')
+      doc.setTextColor(15, 23, 42); doc.setFont('helvetica', 'bold'); doc.setFontSize(10)
+      doc.text('GESAMTBETRAG:', margin + 2, y + 1)
+      doc.text(_gesamtkosten > 0 ? `€ ${_gesamtkosten.toFixed(2)}` : '–', margin + 158, y + 1); 
+      y += 14
+    } else {
+      y += 6
+    }
 
     if (_zustandVorher) {
       sectionHeader('Übergabeprotokoll (Abholung)'); y += 2
@@ -407,7 +420,7 @@ export function VerleihFormularPage({
     doc.save(`PX-Verleihschein_${bName.replace(/\s+/g, '_') || 'Extern'}_${new Date().toISOString().slice(0, 10)}.pdf`)
   }
 
-  async function reprintSchein(schein: Verleihschein) {
+  async function reprintSchein(schein: Verleihschein, hideCosts: boolean = false) {
     const bName = schein.borrower_type === 'team' ? (schein.profile?.full_name || schein.profile?.email || '–') : schein.borrower_type === 'client' ? clients.find(c => c.id === schein.client_id)?.company_name || '–' : schein.extern_name || '–';
     
     const diff = new Date(schein.rueckgabezeit).getTime() - new Date(schein.abholzeit).getTime()
@@ -433,7 +446,8 @@ export function VerleihFormularPage({
       gesamtkosten: schein.gesamtkosten || 0,
       zustandVorher: schein.zustand_vorher || '',
       notizen: schein.notizen || '',
-      fotosVorher: schein.fotos_vorher || []
+      fotosVorher: schein.fotos_vorher || [],
+      hideCosts
     })
   }
 
@@ -683,11 +697,19 @@ export function VerleihFormularPage({
               </p>}
               {canSubmit && gesamtkosten > 0 && <p className="text-sm text-foreground">Gesamt: <span className="font-bold text-brand-300 text-lg">€ {gesamtkosten.toFixed(2)}</span></p>}
             </div>
-            <button onClick={handleSubmit} disabled={!canSubmit}
-              className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all ${canSubmit ? 'bg-brand-600 hover:bg-brand-500 text-foreground shadow-lg shadow-brand-900/40' : 'bg-muted text-muted-foreground cursor-not-allowed'}`}>
-              {saving ? <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Download size={18} />}
-              {saving ? 'Wird gespeichert…' : 'Speichern & PDF herunterladen'}
-            </button>
+            
+            <div className="flex gap-2">
+              <button onClick={() => handleSubmit(false)} disabled={!canSubmit || saving}
+                className={`flex items-center gap-2 px-5 py-3 rounded-xl font-semibold transition-all ${canSubmit && !saving ? 'bg-brand-600 hover:bg-brand-500 text-foreground shadow-lg shadow-brand-900/40' : 'bg-muted text-muted-foreground cursor-not-allowed'}`}>
+                {saving ? <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Download size={18} />}
+                {saving ? 'Speichert…' : 'Speichern & PDF (€)'}
+              </button>
+              <button onClick={() => handleSubmit(true)} disabled={!canSubmit || saving}
+                className={`flex items-center gap-2 px-5 py-3 rounded-xl font-semibold transition-all ${canSubmit && !saving ? 'bg-slate-700 hover:bg-slate-600 text-foreground shadow-lg' : 'bg-muted text-muted-foreground cursor-not-allowed'}`}>
+                <Download size={18} />
+                Ohne Preise
+              </button>
+            </div>
           </div>
         </>
       )}
@@ -723,10 +745,16 @@ export function VerleihFormularPage({
                     {schein.gesamtkosten != null && toNum(schein.gesamtkosten) > 0 && <p className="text-xs text-brand-300 font-semibold">€ {toNum(schein.gesamtkosten).toFixed(2)}</p>}
                   </div>
                   <div className="flex items-center gap-2">
-                    <button onClick={() => reprintSchein(schein)}
-                      className="flex items-center gap-2 px-3 py-2 bg-card hover:bg-muted border border-border text-foreground text-sm font-semibold rounded-xl transition-colors shrink-0">
-                      <Download size={15} /> PDF
-                    </button>
+                    <div className="flex items-center gap-px bg-border/50 p-[2px] rounded-xl overflow-hidden shrink-0">
+                      <button onClick={() => reprintSchein(schein, false)}
+                        className="flex items-center gap-1.5 px-2.5 py-1.5 bg-card hover:bg-muted text-foreground text-xs font-semibold rounded-l-[10px] transition-colors shrink-0" title="PDF mit Preisen">
+                        <Download size={14} /> PDF (€)
+                      </button>
+                      <button onClick={() => reprintSchein(schein, true)}
+                        className="flex items-center gap-1.5 px-2.5 py-1.5 bg-card hover:bg-muted text-foreground text-xs font-semibold rounded-r-[10px] transition-colors shrink-0" title="PDF ohne Preise">
+                        <Download size={14} /> PDF
+                      </button>
+                    </div>
                     <button onClick={() => setRueckgabeSchein(schein)}
                       className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-foreground text-sm font-semibold rounded-xl transition-colors shrink-0">
                       <CheckCircle size={15} /> Rückgabe
@@ -786,9 +814,14 @@ export function VerleihFormularPage({
                     )}
                   </div>
                   <div className="flex items-center gap-2 shrink-0 mt-1">
-                    <button onClick={() => reprintSchein(schein)} className="flex items-center gap-2 px-3 py-1 bg-card hover:bg-muted border border-border text-foreground text-xs font-semibold rounded-lg transition-colors">
-                      <Download size={13} /> PDF
-                    </button>
+                    <div className="flex items-center gap-px bg-border/50 p-[2px] rounded-lg overflow-hidden shrink-0">
+                      <button onClick={() => reprintSchein(schein, false)} className="flex items-center gap-1.5 px-2.5 py-1 bg-card hover:bg-muted text-foreground text-xs font-semibold rounded-l-md transition-colors" title="PDF mit Preisen">
+                        <Download size={13} /> PDF (€)
+                      </button>
+                      <button onClick={() => reprintSchein(schein, true)} className="flex items-center gap-1.5 px-2.5 py-1 bg-card hover:bg-muted text-foreground text-xs font-semibold rounded-r-md transition-colors" title="PDF ohne Preise">
+                        <Download size={13} /> PDF
+                      </button>
+                    </div>
                     <span className="text-xs px-2.5 py-1 rounded-full bg-muted/60 text-muted-foreground border border-input/40">
                       Erledigt
                     </span>
