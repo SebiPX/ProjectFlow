@@ -424,14 +424,17 @@ export interface VerleihscheinItem {
     item?: { id: string; geraet: string; modell?: string; px_nummer?: string; status?: string } | null;
 }
 export interface Verleihschein {
-    id: string; created_at: string; borrower_type: 'team' | 'extern';
-    profile_id?: string; extern_name?: string; extern_firma?: string;
+    id: string; created_at: string; borrower_type: 'team' | 'extern' | 'client';
+    profile_id?: string; client_id?: string | null; extern_name?: string; extern_firma?: string;
     extern_email?: string; extern_telefon?: string;
     abholzeit: string; rueckgabezeit: string;
     prozentsatz?: number; gesamtkosten?: number;
-    zweck?: string; notizen?: string; status?: string; erledigt_am?: string;
+    zweck?: string; notizen?: string; zustand_vorher?: string | null;
+    zustand_nachher?: string | null; fotos_vorher?: string[] | null; fotos_nachher?: string[] | null;
+    status?: string; erledigt_am?: string;
     created_by?: string;
     profile?: { id: string; full_name: string; email: string } | null;
+    client?: { id: string; company_name: string } | null;
     items?: VerleihscheinItem[];
 }
 export interface InventarProfile {
@@ -464,9 +467,9 @@ export const inventar = {
             request<Verleihschein>('/api/inventar/verleihscheine', {
                 method: 'POST', body: JSON.stringify({ header, items }),
             }),
-        markErledigt: (id: string, itemIds: string[]) =>
+        markErledigt: (id: string, itemIds: string[], zustand_nachher?: string, fotos_nachher?: string[]) =>
             request<void>(`/api/inventar/verleihscheine/${id}/erledigt`, {
-                method: 'PATCH', body: JSON.stringify({ itemIds }),
+                method: 'PATCH', body: JSON.stringify({ itemIds, zustand_nachher, fotos_nachher }),
             }),
     },
     links: {
