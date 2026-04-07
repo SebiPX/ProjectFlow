@@ -6,6 +6,7 @@ import toast from 'react-hot-toast'
 import { useQuery } from '@tanstack/react-query'
 import { getClients } from '../../../services/api/clients'
 import { uploadFile } from '../../../lib/apiClient'
+import { PX_LOGO_B64 } from './logoB64'
 import type { InventarItem, Profile, Verleihschein } from '../types'
 
 interface HeaderInput {
@@ -226,16 +227,7 @@ export function VerleihFormularPage({
     doc.setTextColor(255, 255, 255)
     
     try {
-      const resp = await fetch('/logos/px-black.png')
-      if (resp.ok) {
-        const blob = await resp.blob()
-        const b64 = await new Promise<string>((res) => {
-          const r = new FileReader()
-          r.onloadend = () => res(r.result as string)
-          r.readAsDataURL(blob)
-        })
-        doc.addImage(b64, 'PNG', W - 60, 8, 40, 19)
-      }
+      doc.addImage(PX_LOGO_B64, 'PNG', W - 60, 8, 40, 19)
     } catch(e) {}
     
     doc.setFontSize(18); doc.setFont('helvetica', 'bold')
