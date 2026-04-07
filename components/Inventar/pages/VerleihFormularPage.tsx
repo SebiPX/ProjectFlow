@@ -4,7 +4,7 @@ import { FileText, Plus, Minus, User, Building2, Download, Calculator, Clock, Ch
 import { jsPDF } from 'jspdf'
 import toast from 'react-hot-toast'
 import { getClients } from '../../../services/api/clients'
-import { uploadFile } from '../../../lib/apiClient'
+import { uploadFile, API_URL } from '../../../lib/apiClient'
 import { PX_LOGO_B64 } from './logoB64'
 import type { InventarItem, Profile, Verleihschein } from '../types'
 
@@ -366,9 +366,14 @@ export function VerleihFormularPage({
       
       for (let i = 0; i < _fotosVorher.length; i++) {
         try {
-          const proxiedUrl = `/api/proxy/image?url=${encodeURIComponent(_fotosVorher[i])}`;
+          const proxiedUrl = `${API_URL}/api/proxy/image?url=${encodeURIComponent(_fotosVorher[i])}`;
           const resp = await fetch(proxiedUrl)
           if (!resp.ok) continue
+          const contentType = resp.headers.get('content-type')
+          if (contentType && contentType.includes('text/html')) {
+            console.error("Received HTML instead of image. API_URL might be wrong.");
+            continue;
+          }
           const blob = await resp.blob()
           const b64 = await new Promise<string>((res) => {
             const r = new FileReader()

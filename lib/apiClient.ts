@@ -5,7 +5,7 @@
  * JWT token is stored in localStorage under 'labs_token'.
  */
 
-const API_URL = import.meta.env.VITE_API_URL as string || 'http://localhost:4000';
+export const API_URL = import.meta.env.VITE_API_URL as string || 'http://localhost:4000';
 
 /**
  * R2 URLs are already proper HTTPS — no normalization needed.
