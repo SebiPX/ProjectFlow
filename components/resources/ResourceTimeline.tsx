@@ -43,13 +43,14 @@ export default function ResourceTimeline({ resources, startDate, onDateChange, i
 
     const getUtilizationColor = (allocation: ResourceAllocation | undefined, capacity: number) => {
         if (allocation?.absences?.length) {
-            return 'bg-secondary/40 text-secondary-foreground border-border hover:bg-secondary/60';
+            return 'bg-purple-500/20 text-purple-600 border-transparent hover:bg-purple-500/30';
         }
-        if (!allocation || allocation.hours === 0) return 'bg-muted/30 border-border text-muted-foreground'; // Empty state
+        if (!allocation || allocation.hours === 0) return 'bg-emerald-500/10 text-emerald-600/50 border-transparent hover:bg-emerald-500/20'; // Empty state
+        
         const utilization = (allocation.hours / capacity) * 100;
 
-        if (utilization > 100) return 'bg-destructive/20 text-destructive border-transparent hover:bg-destructive/30';
-        if (utilization >= 80) return 'bg-orange-500/20 text-orange-600 border-transparent hover:bg-orange-500/30';
+        if (utilization > 100) return 'bg-red-500/20 text-red-600 border-transparent hover:bg-red-500/30';
+        if (utilization >= 80) return 'bg-yellow-500/20 text-yellow-600 border-transparent hover:bg-yellow-500/30';
         return 'bg-emerald-500/20 text-emerald-600 border-transparent hover:bg-emerald-500/30';
     };
 
@@ -169,18 +170,18 @@ export default function ResourceTimeline({ resources, startDate, onDateChange, i
                                                             setSelectedCell({ date, resource, allocation });
                                                         }
                                                     }}
-                                                    className={`w-full h-10 rounded flex items-center justify-center text-xs font-medium border transition-all duration-200 ${colorClass} ${allocation && (allocation.tasks?.length > 0 || allocation.absences?.length) ? 'cursor-pointer transform hover:scale-105 shadow-sm' : 'cursor-default opacity-50'}`}
+                                                    className={`w-full h-10 rounded flex items-center justify-center text-xs font-medium border transition-all duration-200 ${colorClass} ${allocation && (allocation.tasks?.length > 0 || allocation.absences?.length) ? 'cursor-pointer transform hover:scale-105 shadow-sm opacity-100' : 'cursor-default opacity-80'}`}
                                                 >
                                                     {allocation?.absences?.length ? 'Abwesend' : (allocation && allocation.hours > 0 ? `${formatHours(allocation.hours)}h` : '-')}
                                                 </button>
 
                                                 {/* Tooltip */}
                                                 {allocation?.absences?.length ? (
-                                                    <div className="absolute opacity-0 group-hover:opacity-100 transition-opacity z-20 bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-purple-800 text-foreground text-xs rounded pointer-events-none whitespace-nowrap">
+                                                    <div className="absolute opacity-0 group-hover:opacity-100 transition-opacity z-20 bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-purple-800 text-white text-xs rounded pointer-events-none whitespace-nowrap shadow-lg">
                                                         {allocation.absences.map((a, i) => <span key={i}>{a.reason}</span>)}
                                                     </div>
                                                 ) : (allocation && allocation.tasks?.length > 0 && (
-                                                    <div className="absolute opacity-0 group-hover:opacity-100 transition-opacity z-20 bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-black text-foreground text-xs rounded pointer-events-none whitespace-nowrap">
+                                                    <div className="absolute opacity-0 group-hover:opacity-100 transition-opacity z-20 bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-black text-white text-xs rounded pointer-events-none whitespace-nowrap shadow-lg">
                                                         {allocation.tasks.length} {allocation.tasks.length === 1 ? 'Task' : 'Tasks'} • Klicken zum Bearbeiten
                                                     </div>
                                                 ))}
