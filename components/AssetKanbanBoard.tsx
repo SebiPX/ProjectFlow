@@ -80,6 +80,7 @@ const KanbanColumn = ({ id, title, assets, assetCardProps, isClient }: { id: Ass
                             asset={asset}
                             // Pass down props for AssetCard
                             {...assetCardProps}
+                            onClick={() => assetCardProps.onPreview(asset)}
                         />
                     ))}
                     {assets.length === 0 && (
@@ -182,7 +183,7 @@ export const AssetKanbanBoard: React.FC<AssetKanbanBoardProps> = ({
                         id={col.id}
                         title={col.title}
                         assets={assets.filter(a => a.status === col.id)}
-                        assetCardProps={{ onDownload, onDelete, onClick: () => { }, onPreview, onChangeStatus }}
+                        assetCardProps={{ onDownload, onDelete, onPreview, onChangeStatus }}
                         isClient={isClient}
                     />
                 ))}
