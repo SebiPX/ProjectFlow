@@ -116,14 +116,14 @@ export const GanttView: React.FC = () => {
             {/* Timeline Area */}
             <div className="flex-1 overflow-auto relative flex">
                 {/* Sidebar (Project Names) - Fixed Left */}
-                <div className="w-64 flex-shrink-0 bg-card border-r border-border z-10 sticky left-0 shadow-xl">
-                    <div className="h-10 border-b border-border bg-background/50 flex items-center px-4 font-semibold text-muted-foreground text-sm">
+                <div className="w-64 flex-shrink-0 bg-card border-r border-border z-20 sticky left-0 shadow-xl">
+                    <div className="h-10 border-b border-border bg-card flex items-center px-4 font-semibold text-muted-foreground text-sm sticky top-0 z-30">
                         Projects / Tasks
                     </div>
                     {groupedTasks.map(group => (
                         <div key={group.project.id}>
                             {/* Project Row */}
-                            <div className="h-10 px-4 flex items-center bg-card border-b border-border/50 font-bold text-foreground truncate sticky top-0">
+                            <div className="h-10 px-4 flex items-center bg-card border-b border-border/50 font-bold text-foreground truncate">
                                 <span className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: group.project.color_code || '#777' }} />
                                 {group.project.title}
                             </div>
@@ -143,11 +143,11 @@ export const GanttView: React.FC = () => {
                 </div>
 
                 {/* Scrollable Timeline Grid */}
-                <div className="flex-1 overflow-x-auto">
+                <div className="flex-1">
                     <div className="relative min-w-full" style={{ width: `${timelineDays.length * CELL_WIDTH}px` }}> {/* Explicit width container */}
 
                         {/* Header Dates */}
-                        <div className="flex h-10 border-b border-border bg-background/50">
+                        <div className="flex h-10 border-b border-border bg-card sticky top-0 z-10">
                             {timelineDays.map(day => (
                                 <div
                                     key={day.toISOString()}
