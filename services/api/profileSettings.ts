@@ -54,11 +54,12 @@ export async function updateAvatarPath(
  * Change user password
  */
 export async function changePassword(
+  currentPassword: string,
   newPassword: string
 ): Promise<void> {
   await fetchApi('/auth/password', {
     method: 'PATCH',
-    body: JSON.stringify({ new_password: newPassword, current_password: 'prompt_user_for_this' }), // Note: frontend might need update to provide current password
+    body: JSON.stringify({ new_password: newPassword, current_password: currentPassword }),
   });
 }
 

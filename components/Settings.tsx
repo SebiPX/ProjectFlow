@@ -147,7 +147,11 @@ export const Settings: React.FC = () => {
         throw new Error('Password must be at least 6 characters');
       }
 
-      return changePassword(newPassword);
+      if (!currentPassword) {
+        throw new Error('Current password is required');
+      }
+
+      return changePassword(currentPassword, newPassword);
     },
     onSuccess: () => {
       toast.success('Password changed successfully!');
@@ -340,6 +344,19 @@ export const Settings: React.FC = () => {
           <form onSubmit={handlePasswordSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-muted-foreground mb-2">
+                Current Password
+              </label>
+              <input
+                type="password"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                placeholder="Enter current password"
+                className="w-full bg-muted border border-input text-foreground text-sm rounded-lg focus:ring-primary focus:border-primary p-2.5"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-muted-foreground mb-2">
                 New Password
               </label>
               <input
@@ -374,6 +391,7 @@ export const Settings: React.FC = () => {
                 type="submit"
                 disabled={
                   changePasswordMutation.isPending ||
+                  !currentPassword ||
                   !newPassword ||
                   !confirmPassword ||
                   newPassword !== confirmPassword
