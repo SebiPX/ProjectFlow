@@ -7,8 +7,8 @@ export const Planning: React.FC = () => {
     const [activeView, setActiveView] = useState<'calendar' | 'gantt'>('calendar');
 
     return (
-        <div className="p-8 h-full flex flex-col">
-            <div className="flex justify-between items-center mb-6">
+        <div className="h-full flex flex-col p-6 md:p-8 overflow-hidden">
+            <div className="flex justify-between items-center mb-6 flex-shrink-0">
                 <div>
                     <h1 className="text-3xl font-bold text-foreground">Planning</h1>
                     <p className="text-muted-foreground mt-1">Visualize tasks and deadlines</p>
@@ -40,7 +40,7 @@ export const Planning: React.FC = () => {
                 </div>
             </div>
 
-            <div className="flex-1 min-h-0">
+            <div className="flex-1 min-h-0 overflow-hidden rounded-xl">
                 {activeView === 'calendar' ? <CalendarView /> : <GanttView />}
             </div>
         </div>
