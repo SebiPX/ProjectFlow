@@ -182,7 +182,7 @@ export const AssetPreviewModal: React.FC<AssetPreviewModalProps> = ({
             </div>
           ) : isOffice ? (
             <iframe
-              src={`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(assetUrl)}`}
+              src={`https://docs.google.com/viewer?url=${encodeURIComponent(assetUrl)}&embedded=true`}
               className="w-full h-[calc(90vh-200px)] rounded bg-white border-0 shadow-inner"
               title={asset.name}
             />
