@@ -68,8 +68,9 @@ export const AssetPreviewModal: React.FC<AssetPreviewModalProps> = ({
   const isPDF = fileType.includes('pdf') || fileName.endsWith('.pdf');
   const isVideo = fileType.includes('video') || fileName.match(/\.(mp4|mov|webm|ogg)$/);
   const isAudio = fileType.includes('audio') || fileName.match(/\.(mp3|wav|ogg|m4a)$/);
+  const isOffice = fileName.match(/\.(docx|xlsx|pptx|doc|xls|ppt)$/);
 
-  const isPreviewable = isImage || isPDF || isVideo || isAudio;
+  const isPreviewable = isImage || isPDF || isVideo || isAudio || isOffice;
 
   return (
     <div
@@ -179,6 +180,12 @@ export const AssetPreviewModal: React.FC<AssetPreviewModalProps> = ({
                 Your browser does not support the audio tag.
               </audio>
             </div>
+          ) : isOffice ? (
+            <iframe
+              src={`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(assetUrl)}`}
+              className="w-full h-[calc(90vh-200px)] rounded bg-white border-0 shadow-inner"
+              title={asset.name}
+            />
           ) : (
             <div className="text-center text-muted-foreground">
               <FileIcon
