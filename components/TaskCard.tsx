@@ -27,9 +27,38 @@ export const TaskCard: React.FC<TaskCardProps> = ({
   onTimeTrack,
   onSelectProject
 }) => {
-  const isOverdue = task.due_date &&
-    new Date(task.due_date) < new Date() &&
-    task.status !== TaskStatus.Done;
+  const getUpcomingDateInfo = () => {
+    const dates = [
+      { label: 'Freigabe', date: task.review_date },
+      { label: 'Änderungen', date: task.revision_date },
+      { label: 'Final', date: task.due_date }
+    ].filter(d => d.date);
+
+    if (dates.length === 0) return { label: 'Kein Datum', date: null, isOverdue: false };
+
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+
+    // Sort chronologically
+    dates.sort((a, b) => new Date(a.date!).getTime() - new Date(b.date!).getTime());
+
+    // Find first date today or in future
+    const upcoming = dates.find(d => {
+      const dTime = new Date(d.date!);
+      dTime.setHours(0, 0, 0, 0);
+      return dTime >= now;
+    });
+
+    if (upcoming && task.status !== TaskStatus.Done) {
+      return { label: upcoming.label, date: upcoming.date, isOverdue: false };
+    }
+
+    // If all dates in past, return the latest one (usually final due_date) and mark overdue
+    const lastDate = dates[dates.length - 1];
+    return { label: lastDate.label, date: lastDate.date, isOverdue: task.status !== TaskStatus.Done };
+  };
+
+  const upcomingInfo = getUpcomingDateInfo();
 
   return (
     <Card className="hover:border-primary transition-all duration-200 flex flex-col h-full bg-card border-border shadow-sm hover:shadow-md">
@@ -119,12 +148,17 @@ export const TaskCard: React.FC<TaskCardProps> = ({
           )}
         </div>
 
-        {/* Due Date */}
+        {/* Upcoming Date */}
         <div className="flex items-center gap-2">
           <Icon path="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" className="w-4 h-4 text-muted-foreground" />
-          <span className={`text-sm ${isOverdue ? 'text-destructive font-medium' : 'text-muted-foreground'}`}>
-            {task.due_date ? new Date(task.due_date).toLocaleDateString('de-DE') : 'No due date'}
-            {isOverdue && ' (Overdue)'}
+          <span className={`text-sm ${upcomingInfo.isOverdue ? 'text-destructive font-medium' : 'text-muted-foreground'}`}>
+            {upcomingInfo.date ? (
+              <>
+                <span className="font-semibold text-foreground/80">{upcomingInfo.label}: </span>
+                {new Date(upcomingInfo.date).toLocaleDateString('de-DE')}
+                {upcomingInfo.isOverdue && ' (Überfällig)'}
+              </>
+            ) : 'Kein Datum'}
           </span>
         </div>
       </div>

@@ -216,6 +216,8 @@ export interface Task {
   assignee_id?: string | null; // UUID (from SQL response)
   assignee_ids?: string[]; // Array of UUIDs
   start_date?: string; // TIMESTAMPTZ
+  review_date?: string | null; // DATE
+  revision_date?: string | null; // DATE
   due_date?: string | null; // TIMESTAMPTZ
   planned_minutes?: number;
   is_visible_to_client?: boolean;

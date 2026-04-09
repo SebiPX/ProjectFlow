@@ -27,6 +27,8 @@ export const TaskEditModal: React.FC<TaskEditModalProps> = ({ isOpen, onClose, t
     status: task.status || 'todo',
     assignee_ids: task.assignee_ids || (task.assignee_id ? [task.assignee_id] : []),
     start_date: task.start_date ? new Date(task.start_date).toISOString().split('T')[0] : '',
+    review_date: task.review_date ? new Date(task.review_date).toISOString().split('T')[0] : '',
+    revision_date: task.revision_date ? new Date(task.revision_date).toISOString().split('T')[0] : '',
     due_date: task.due_date ? new Date(task.due_date).toISOString().split('T')[0] : '',
     planned_minutes: task.planned_minutes?.toString() || '',
     is_visible_to_client: task.is_visible_to_client ?? true,
@@ -41,6 +43,8 @@ export const TaskEditModal: React.FC<TaskEditModalProps> = ({ isOpen, onClose, t
       status: task.status || 'todo',
       assignee_ids: task.assignee_ids || (task.assignee_id ? [task.assignee_id] : []),
       start_date: task.start_date ? new Date(task.start_date).toISOString().split('T')[0] : '',
+      review_date: task.review_date ? new Date(task.review_date).toISOString().split('T')[0] : '',
+      revision_date: task.revision_date ? new Date(task.revision_date).toISOString().split('T')[0] : '',
       due_date: task.due_date ? new Date(task.due_date).toISOString().split('T')[0] : '',
       planned_minutes: task.planned_minutes?.toString() || '',
       is_visible_to_client: task.is_visible_to_client ?? true,
@@ -133,6 +137,8 @@ export const TaskEditModal: React.FC<TaskEditModalProps> = ({ isOpen, onClose, t
       status: formData.status as any,
       assignee_ids: formData.assignee_ids,
       start_date: formData.start_date || undefined,
+      review_date: formData.review_date || undefined,
+      revision_date: formData.revision_date || undefined,
       due_date: formData.due_date || null,
       planned_minutes: formData.planned_minutes ? parseInt(formData.planned_minutes) : undefined,
       is_visible_to_client: formData.is_visible_to_client,
@@ -264,7 +270,7 @@ export const TaskEditModal: React.FC<TaskEditModalProps> = ({ isOpen, onClose, t
             </div>
           </div>
 
-          {/* Dates Row */}
+          {/* Dates Row 1 */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label htmlFor="start_date" className="block text-sm font-medium text-muted-foreground mb-2">
@@ -280,8 +286,37 @@ export const TaskEditModal: React.FC<TaskEditModalProps> = ({ isOpen, onClose, t
             </div>
 
             <div>
+              <label htmlFor="review_date" className="block text-sm font-medium text-muted-foreground mb-2">
+                Date Freigabe
+              </label>
+              <input
+                type="date"
+                id="review_date"
+                value={formData.review_date}
+                onChange={(e) => setFormData({ ...formData, review_date: e.target.value })}
+                className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </div>
+          </div>
+
+          {/* Dates Row 2 */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="revision_date" className="block text-sm font-medium text-muted-foreground mb-2">
+                Date Änderungen
+              </label>
+              <input
+                type="date"
+                id="revision_date"
+                value={formData.revision_date}
+                onChange={(e) => setFormData({ ...formData, revision_date: e.target.value })}
+                className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </div>
+
+            <div>
               <label htmlFor="due_date" className="block text-sm font-medium text-muted-foreground mb-2">
-                Due Date
+                Date Final (Due)
               </label>
               <input
                 type="date"
