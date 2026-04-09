@@ -177,7 +177,7 @@ export const TimeApprovalList: React.FC = () => {
                             {/* Avatar & User */}
                             <div className="flex-shrink-0">
                                 <Avatar
-                                    src={entry.profile?.avatar_url}
+                                    avatarPath={entry.profile?.avatar_url}
                                     alt={entry.profile?.full_name || 'User'}
                                     size="md"
                                 />

@@ -252,7 +252,7 @@ export const TaskEditModal: React.FC<TaskEditModalProps> = ({ isOpen, onClose, t
                       className="w-4 h-4 bg-background border-input rounded focus:ring-2 focus:ring-primary flex-shrink-0"
                     />
                     <div className="ml-3 flex items-center gap-2 overflow-hidden">
-                      <Avatar src={profile.avatar_url} alt={profile.full_name || ''} size="sm" />
+                      <Avatar avatarPath={profile.avatar_url} alt={profile.full_name || ''} size="sm" />
                       <span className="text-sm text-foreground truncate">{profile.full_name || profile.email}</span>
                     </div>
                   </label>

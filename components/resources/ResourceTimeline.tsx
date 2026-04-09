@@ -133,7 +133,7 @@ export default function ResourceTimeline({ resources, startDate, onDateChange, i
                                         <div className="flex items-center space-x-3">
                                             <div className="flex-shrink-0">
                                                 <Avatar
-                                                    src={resource.profile.avatar_url}
+                                                    avatarPath={resource.profile.avatar_url}
                                                     alt={resource.profile.full_name || 'User'}
                                                     size="sm"
                                                 />
