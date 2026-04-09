@@ -172,7 +172,16 @@ export default function ResourceTimeline({ resources, startDate, onDateChange, i
                                                     }}
                                                     className={`w-full h-10 rounded flex items-center justify-center text-xs font-medium border transition-all duration-200 ${colorClass} ${allocation && (allocation.tasks?.length > 0 || allocation.absences?.length) ? 'cursor-pointer transform hover:scale-105 shadow-sm opacity-100' : 'cursor-default opacity-80'}`}
                                                 >
-                                                    {allocation?.absences?.length ? 'Abwesend' : (allocation && allocation.hours > 0 ? `${formatHours(allocation.hours)}h` : '-')}
+                                                    {allocation?.absences?.length ? (
+                                                        'Abwesend'
+                                                    ) : (
+                                                        <div className="flex items-center gap-1">
+                                                            <span>{allocation && allocation.hours > 0 ? `${formatHours(allocation.hours)}h` : '-'}</span>
+                                                            {allocation && allocation.tasks?.length > 0 && (
+                                                                <Icon path="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" className="w-3 h-3 opacity-70" />
+                                                            )}
+                                                        </div>
+                                                    )}
                                                 </button>
 
                                                 {/* Tooltip */}

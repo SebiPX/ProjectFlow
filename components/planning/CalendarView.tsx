@@ -103,10 +103,17 @@ export const CalendarView: React.FC = () => {
                             }
 
                             const dayTasks = tasks.filter(task => {
-                                if (!task.due_date && !task.start_date) return false;
+                                const dates = [
+                                    task.start_date, 
+                                    task.review_date, 
+                                    task.revision_date, 
+                                    task.due_date
+                                ].filter(Boolean).map(d => new Date(d!));
                                 
-                                const start = new Date(task.start_date || task.due_date!);
-                                const end = new Date(task.due_date || task.start_date!);
+                                if (dates.length === 0) return false;
+                                
+                                const start = new Date(Math.min(...dates.map(d => d.getTime())));
+                                const end = new Date(Math.max(...dates.map(d => d.getTime())));
                                 
                                 // Strip time to ensure day-level comparison is accurate
                                 start.setHours(0, 0, 0, 0);
@@ -131,20 +138,31 @@ export const CalendarView: React.FC = () => {
                                     </div>
 
                                     <div className="space-y-1 overflow-y-auto max-h-[100px]">
-                                        {dayTasks.map(task => (
-                                            <div
-                                                key={task.id}
-                                                onClick={() => setEditingTask(task)}
-                                                className="text-xs px-2 py-1 rounded truncate border-l-2 text-foreground/90 cursor-pointer hover:opacity-80 transition-opacity"
-                                                style={{
-                                                    backgroundColor: `${getProjectColor(task.project_id)}20`, // 20% opacity
-                                                    borderColor: getProjectColor(task.project_id)
-                                                }}
-                                                title={task.title}
-                                            >
-                                                {task.title}
-                                            </div>
-                                        ))}
+                                        {dayTasks.map(task => {
+                                            const isReview = task.review_date && isSameDay(date, new Date(task.review_date));
+                                            const isRevision = task.revision_date && isSameDay(date, new Date(task.revision_date));
+                                            const isDue = task.due_date && isSameDay(date, new Date(task.due_date));
+                                            
+                                            let prefix = '';
+                                            if (isDue) prefix = '🏁 ';
+                                            else if (isReview) prefix = '🎯 ';
+                                            else if (isRevision) prefix = '✍️ ';
+
+                                            return (
+                                                <div
+                                                    key={task.id}
+                                                    onClick={() => setEditingTask(task)}
+                                                    className={`text-xs px-2 py-1 rounded truncate border-l-2 text-foreground/90 cursor-pointer hover:opacity-80 transition-opacity ${prefix ? 'font-bold' : ''}`}
+                                                    style={{
+                                                        backgroundColor: `${getProjectColor(task.project_id)}20`, // 20% opacity
+                                                        borderColor: getProjectColor(task.project_id)
+                                                    }}
+                                                    title={task.title}
+                                                >
+                                                    {prefix}{task.title}
+                                                </div>
+                                            );
+                                        })}
                                     </div>
                                 </div>
                             );

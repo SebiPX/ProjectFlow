@@ -57,9 +57,26 @@ export const GanttView: React.FC = () => {
 
     // Calculate Bar Position
     const getBarStyles = (task: Task, timelineStart: Date) => {
-        // Default duration if missing
-        const tStart = task.start_date ? new Date(task.start_date) : new Date(task.created_at);
-        const tEnd = task.due_date ? new Date(task.due_date) : addDays(tStart, 1);
+        // Determine true start and end dates from all available milestones
+        const dates = [
+            task.start_date, 
+            task.review_date, 
+            task.revision_date, 
+            task.due_date
+        ].filter(Boolean).map(d => new Date(d!));
+
+        let tStart: Date, tEnd: Date;
+        if (dates.length > 0) {
+            tStart = new Date(Math.min(...dates.map(d => d.getTime())));
+            tEnd = new Date(Math.max(...dates.map(d => d.getTime())));
+            // If min and max are the same, make it 1 day long
+            if (tStart.getTime() === tEnd.getTime()) {
+                tEnd = addDays(tStart, 1);
+            }
+        } else {
+            tStart = new Date(task.created_at || new Date());
+            tEnd = addDays(tStart, 1);
+        }
 
         // Normalize to timeline start (0 position)
         const offsetMs = tStart.getTime() - timelineStart.getTime();
