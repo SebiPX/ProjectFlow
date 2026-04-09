@@ -44,8 +44,8 @@ export async function updateAvatarPath(
   userId: string,
   storagePath: string
 ): Promise<Profile> {
-  return await fetchApi(`/api/profiles/${userId}/avatar`, {
-    method: 'PUT',
+  return await fetchApi(`/auth/profile`, {
+    method: 'PATCH',
     body: JSON.stringify({ avatar_url: storagePath }),
   });
 }
@@ -85,8 +85,8 @@ export async function updateUserProfile(
     email?: string;
   }
 ): Promise<Profile> {
-  return await fetchApi(`/api/profiles/${userId}`, {
-    method: 'PUT',
+  return await fetchApi(`/auth/profile`, {
+    method: 'PATCH',
     body: JSON.stringify(updates),
   });
 }
