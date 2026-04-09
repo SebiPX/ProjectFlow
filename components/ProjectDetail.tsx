@@ -659,8 +659,18 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
         const pjmEmail = pjm?.profile?.email || 'hello@pixelschickeria.de';
         return <DocumentList projectId={project.id} projectTitle={project.title} pjmEmail={pjmEmail} isClient={isClient} isAdminOrPJM={isAdminOrPJM} />;
       }
+      case 'overview':
       default:
-        return <div className="p-6 text-muted-foreground">{project.description}</div>;
+        return (
+          <div className="p-6 h-full bg-background/50">
+            <div className="bg-card p-6 md:p-8 rounded-lg border border-border shadow-sm max-w-4xl">
+              <h2 className="text-xl font-bold text-foreground mb-6">Background / Overview</h2>
+              <div className="whitespace-pre-wrap text-[15px] leading-relaxed text-foreground/90 font-sans">
+                {project.description || <span className="text-muted-foreground italic">No description provided for this project.</span>}
+              </div>
+            </div>
+          </div>
+        );
     }
   };
 
