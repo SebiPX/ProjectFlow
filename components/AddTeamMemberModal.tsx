@@ -44,7 +44,7 @@ export const AddTeamMemberModal: React.FC<AddTeamMemberModalProps> = ({
   });
 
   // Filter out users who are already team members
-  const currentMemberIds = new Set(currentMembers.map(m => m.profile_id));
+  const currentMemberIds = new Set(currentMembers.map(m => m.user_id || m.profile_id));
   const availableUsers = allUsers.filter(user => !currentMemberIds.has(user.id));
 
   // Load workload data for all available users

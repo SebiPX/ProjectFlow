@@ -596,7 +596,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {teamMembers.map((member) => (
                   <div
-                    key={`member-${member.project_id}-${member.profile_id}-${Math.random()}`}
+                    key={`member-${member.project_id}-${member.user_id || member.profile_id}-${Math.random()}`}
                     className="bg-card rounded-lg p-4 border border-border hover:border-input transition-colors"
                   >
                     <div className="flex items-start justify-between mb-3">
@@ -619,7 +619,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
                         <button
                           onClick={() =>
                             handleRemoveTeamMember(
-                              member.profile_id,
+                              member.user_id || member.profile_id || '',
                               member.profile?.full_name || 'team member'
                             )
                           }

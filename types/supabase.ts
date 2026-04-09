@@ -199,6 +199,7 @@ export interface Project {
 export interface ProjectMember {
   project_id: string; // UUID
   profile_id: string; // UUID
+  user_id?: string; // UUID (from SQL response where the database column is user_id)
   role?: string | null;
   profile?: Profile; // Enriched data
 }
