@@ -125,6 +125,13 @@ export const TaskCard: React.FC<TaskCardProps> = ({
               <span>{task.materials.length} Material{task.materials.length !== 1 ? 's' : ''}</span>
             </div>
           )}
+
+          {task.depends_on_task_ids && task.depends_on_task_ids.length > 0 && task.status !== TaskStatus.Done && (
+            <div className="flex items-center gap-1 text-xs px-2 py-1 bg-red-500/10 border border-red-500/30 rounded text-red-500" title="This task depends on other tasks">
+              <Icon path="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" className="w-3 h-3" />
+              <span>Blocked by {task.depends_on_task_ids.length} task{task.depends_on_task_ids.length !== 1 ? 's' : ''}</span>
+            </div>
+          )}
         </div>
 
         {/* Description Preview */}

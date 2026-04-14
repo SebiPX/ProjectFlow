@@ -229,6 +229,7 @@ export interface Task {
   estimated_rate?: number | null; // Estimated hourly rate in € (from service_pricing or custom)
   materials?: string[]; // Dynamic list of materials
   custom_dates?: { name: string; date: string }[]; // Dynamic list of dates
+  depends_on_task_ids?: string[]; // Array of task IDs this task is blocked by
 
   // Enriched data
   assignee?: Profile; // Legacy single assignee

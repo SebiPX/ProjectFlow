@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
-import { createTask } from '../services/api/tasks';
+import { createTask, getTasksByProject } from '../services/api/tasks';
 import { getProjects, getProjectServices } from '../services/api/projects';
 import { getProfiles } from '../services/api/profiles';
 import type { Task } from '../types/supabase';
@@ -31,12 +31,20 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
   });
   const [materials, setMaterials] = useState<string[]>([]);
   const [customDates, setCustomDates] = useState<{name: string, date: string}[]>([]);
+  const [dependsOnTaskIds, setDependsOnTaskIds] = useState<string[]>([]);
 
-  // Fetch projects for dropdown
+  // Fetch projects for dropdown (keeping in case of legacy use, but UI removed)
   const { data: projects = [] } = useQuery({
     queryKey: ['projects'],
     queryFn: getProjects,
     enabled: isOpen,
+  });
+
+  // Fetch tasks for dependency dropdown
+  const { data: projectTasks = [] } = useQuery({
+    queryKey: ['tasks', formData.project_id],
+    queryFn: () => getTasksByProject(formData.project_id || ''),
+    enabled: isOpen && !!formData.project_id,
   });
 
   // Fetch profiles for assignee dropdown
@@ -98,6 +106,7 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
     });
     setMaterials([]);
     setCustomDates([]);
+    setDependsOnTaskIds([]);
     // Reset service tracking state
     setProjectServiceId('');
     setEstimatedHours('');
@@ -128,6 +137,7 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
       due_date: formData.due_date || null,
       custom_dates: customDates.filter(c => c.name.trim() && c.date),
       materials: materials.filter(m => m.trim() !== ''),
+      depends_on_task_ids: dependsOnTaskIds,
       planned_minutes: estimatedHours ? Math.round(parseFloat(estimatedHours) * 60) : undefined,
       is_visible_to_client: formData.is_visible_to_client,
       // Service tracking fields (optional)
@@ -138,6 +148,8 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
   };
 
   if (!isOpen) return null;
+  if (!preSelectedProjectId) return null; // Force project context
+
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -171,26 +183,7 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
             />
           </div>
 
-          {/* Project Selection */}
-          <div>
-            <label htmlFor="project_id" className="block text-sm font-medium text-muted-foreground mb-2">
-              Project *
-            </label>
-            <select
-              id="project_id"
-              required
-              value={formData.project_id}
-              onChange={(e) => setFormData({ ...formData, project_id: e.target.value })}
-              className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-            >
-              <option value="">Select a project</option>
-              {projects.map((project) => (
-                <option key={project.id} value={project.id}>
-                  {project.title}
-                </option>
-              ))}
-            </select>
-          </div>
+          {/* Project Blocked - Removed Project Selection since it's forced */}
 
           {/* Description */}
           <div>
@@ -254,6 +247,37 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
                   <div className="text-sm text-muted-foreground p-2">No profiles found</div>
                 )}
               </div>
+            </div>
+          </div>
+
+          {/* Dependencies / Blocked By */}
+          <div>
+            <label className="block text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
+              <Icon path="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" className="w-4 h-4" />
+              Blocked By (Dependencies)
+            </label>
+            <div className="w-full max-h-32 overflow-y-auto bg-muted border border-input rounded-lg p-2 space-y-1">
+              {projectTasks.map((t: Task) => (
+                <label key={t.id} className="flex items-center p-2 hover:bg-background rounded cursor-pointer transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={dependsOnTaskIds.includes(t.id)}
+                    onChange={(e) => {
+                      const newIds = e.target.checked 
+                        ? [...dependsOnTaskIds, t.id]
+                        : dependsOnTaskIds.filter(id => id !== t.id);
+                      setDependsOnTaskIds(newIds);
+                    }}
+                    className="w-4 h-4 bg-background border-input rounded focus:ring-2 focus:ring-primary flex-shrink-0"
+                  />
+                  <div className="ml-3 flex items-center gap-2 overflow-hidden">
+                    <span className="text-sm text-foreground truncate">{t.title}</span>
+                  </div>
+                </label>
+              ))}
+              {projectTasks.length === 0 && (
+                <div className="text-sm text-muted-foreground p-2">No tasks available in this project.</div>
+              )}
             </div>
           </div>
 

@@ -239,13 +239,6 @@ export const TaskList: React.FC<TaskListProps> = ({ onSelectProject, searchQuery
             <Icon path="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" className="w-5 h-5" />
             <span className="hidden sm:inline">Only Me</span>
           </button>
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-2 px-4 rounded-lg flex items-center shadow-sm"
-          >
-            <Icon path="M12 6v6m0 0v6m0-6h6m-6 0H6" className="h-5 w-5 mr-2" />
-            New Task
-          </button>
         </div>
       </div>
 
