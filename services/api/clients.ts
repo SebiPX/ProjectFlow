@@ -50,6 +50,15 @@ export async function deleteClient(id: string): Promise<void> {
 }
 
 /**
+ * Generate a client login for a contact via the backend
+ */
+export async function createClientLogin(contactId: string): Promise<{ success: boolean; message: string; credentials?: { email: string; password: string } }> {
+  return await fetchApi(`/api/client-contacts/${contactId}/create-login`, {
+    method: 'POST',
+  });
+}
+
+/**
  * Upload client logo to storage
  * Returns the storage path (not URL)
  */

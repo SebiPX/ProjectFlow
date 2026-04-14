@@ -10,6 +10,7 @@ import {
 } from '../services/api/clientContacts';
 import type { Client, ClientContact } from '../types/supabase';
 import { Icon } from './ui/Icon';
+import { createClientLogin } from '../services/api/clients';
 
 interface ClientEditModalProps {
   isOpen: boolean;
@@ -43,6 +44,9 @@ export const ClientEditModal: React.FC<ClientEditModalProps> = ({ isOpen, onClos
   });
 
   const [contacts, setContacts] = useState<ContactFormData[]>([]);
+  
+  const [generatedCredentials, setGeneratedCredentials] = useState<{email: string, password: string} | null>(null);
+  const [isGeneratingLogin, setIsGeneratingLogin] = useState<string | null>(null);
 
   // Logo state
   const [logoFile, setLogoFile] = useState<File | null>(null);
@@ -267,6 +271,31 @@ export const ClientEditModal: React.FC<ClientEditModalProps> = ({ isOpen, onClos
     setContacts(updated);
   };
 
+  const handleCreateLogin = async (contactId: string | undefined, contactEmail: string) => {
+    if (!contactId || !contactEmail) return;
+    setIsGeneratingLogin(contactId);
+    try {
+      const res = await createClientLogin(contactId);
+      if (res.success && res.credentials) {
+        setGeneratedCredentials(res.credentials);
+        toast.success('Client login generated successfully!');
+      } else {
+        toast.error('Failed to generate login.');
+      }
+    } catch (err: any) {
+      toast.error(err.message || 'Error generating login');
+    } finally {
+      setIsGeneratingLogin(null);
+    }
+  };
+
+  const copyCredentials = () => {
+    if (!generatedCredentials) return;
+    const text = `Guten Tag,\n\nhier ist Ihr Zugang für das PX-Flow Kundenportal:\n\nLink: ${window.location.origin}/login\nEmail: ${generatedCredentials.email}\nPasswort: ${generatedCredentials.password}\n\nBitte bewahren Sie diese Zugangsdaten sicher auf.`;
+    navigator.clipboard.writeText(text);
+    toast.success('Zugangsdaten kopiert!');
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -485,16 +514,33 @@ export const ClientEditModal: React.FC<ClientEditModalProps> = ({ isOpen, onClos
               {contacts.filter(c => !c.isDeleted).map((contact, index) => (
                 <div key={contact.id || index} className="bg-muted/50 rounded-lg p-4 space-y-3">
                   <div className="flex justify-between items-start">
-                    <h4 className="text-sm font-medium text-muted-foreground">
-                      Contact {index + 1}
-                      {!contact.isNew && contact.id && (
-                        <span className="ml-2 text-xs text-primary">(Existing)</span>
+                    <div className="flex flex-col">
+                      <h4 className="text-sm font-medium text-muted-foreground flex items-center">
+                        Contact {index + 1}
+                        {!contact.isNew && contact.id && (
+                          <span className="ml-2 text-xs text-primary">(Existing)</span>
+                        )}
+                      </h4>
+                      {!contact.isNew && contact.id && contact.email && (
+                        <button
+                          type="button"
+                          onClick={() => handleCreateLogin(contact.id, contact.email)}
+                          disabled={isGeneratingLogin === contact.id}
+                          className="mt-2 flex items-center gap-1 text-xs text-[#E5FF00] hover:text-[#cce600] transition-colors disabled:opacity-50"
+                        >
+                          {isGeneratingLogin === contact.id ? (
+                            <Icon path="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" className="w-3 h-3 animate-spin inline" />
+                          ) : (
+                            <Icon path="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4v-3.832l8.485-8.485A6 6 0 0115 7z" className="w-3 h-3 inline" />
+                          )}
+                          Create Client Login
+                        </button>
                       )}
-                    </h4>
+                    </div>
                     <button
                       type="button"
                       onClick={() => removeContact(index)}
-                      className="text-red-400 hover:text-red-300 transition-colors"
+                      className="text-red-400 hover:text-red-300 transition-colors mt-1"
                       title="Remove contact"
                     >
                       <Icon path="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" className="w-5 h-5" />
@@ -615,6 +661,53 @@ export const ClientEditModal: React.FC<ClientEditModalProps> = ({ isOpen, onClos
           </div>
         </form>
       </div>
+
+      {generatedCredentials && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[60] p-4">
+          <div className="bg-card rounded-lg shadow-xl w-full max-w-md p-6">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="w-12 h-12 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center flex-shrink-0">
+                <Icon path="M5 13l4 4L19 7" className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-foreground">Login Generated!</h3>
+                <p className="text-sm text-muted-foreground">Please copy these credentials and store them securely. You won't see this password again.</p>
+              </div>
+            </div>
+
+            <div className="bg-muted p-4 rounded-lg font-mono text-sm space-y-2 mb-6">
+               <div className="flex justify-between">
+                 <span className="text-muted-foreground">Email:</span>
+                 <span className="text-foreground">{generatedCredentials.email}</span>
+               </div>
+               <div className="flex justify-between">
+                 <span className="text-muted-foreground">Password:</span>
+                 <span className="text-foreground tracking-wider">{generatedCredentials.password}</span>
+               </div>
+               <div className="flex justify-between">
+                 <span className="text-muted-foreground">Login Link:</span>
+                 <span className="text-foreground">{window.location.origin}/login</span>
+               </div>
+            </div>
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setGeneratedCredentials(null)}
+                className="px-4 py-2 bg-muted hover:bg-muted/80 text-foreground rounded-lg transition-colors"
+              >
+                Close
+              </button>
+              <button
+                onClick={copyCredentials}
+                className="px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-colors flex items-center gap-2"
+              >
+                <Icon path="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" className="w-5 h-5" />
+                Copy Access Info
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
