@@ -5,9 +5,9 @@ import { createTask, getTasksByProject } from '../services/api/tasks';
 import { getProjects, getProjectServices } from '../services/api/projects';
 import { getProfiles } from '../services/api/profiles';
 import type { Task } from '../types/supabase';
-import type { Task } from '../types/supabase';
 import { Icon } from './ui/Icon';
 import { Avatar } from './ui/Avatar';
+import CreatableSelect from 'react-select/creatable';
 
 interface TaskFormModalProps {
   isOpen: boolean;
@@ -28,7 +28,14 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
     revision_date: '',
     due_date: '',
     is_visible_to_client: true,
+    brand: '',
+    show: '',
+    legal_line: '',
+    freigabelink: '',
+    rights_expiration_date: '',
+    status_influencerclips: false,
   });
+  const [formats, setFormats] = useState<string[]>([]);
   const [materials, setMaterials] = useState<string[]>([]);
   const [customDates, setCustomDates] = useState<{name: string, date: string}[]>([]);
   const [dependsOnTaskIds, setDependsOnTaskIds] = useState<string[]>([]);
@@ -103,7 +110,14 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
       revision_date: '',
       due_date: '',
       is_visible_to_client: true,
+      brand: '',
+      show: '',
+      legal_line: '',
+      freigabelink: '',
+      rights_expiration_date: '',
+      status_influencerclips: false,
     });
+    setFormats([]);
     setMaterials([]);
     setCustomDates([]);
     setDependsOnTaskIds([]);
@@ -113,6 +127,11 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
     setEstimatedRate('');
     onClose();
   };
+
+  // Extract unique brands and shows from existing project tasks for autocomplete
+  const existingBrands = Array.from(new Set(projectTasks.map(t => t.brand).filter(Boolean))).map(b => ({ value: b, label: b }));
+  const existingShows = Array.from(new Set(projectTasks.map(t => t.show).filter(Boolean))).map(s => ({ value: s, label: s }));
+  const formatOptions = ['16:9', '9:16', '1:1', '4:5'].map(f => ({ value: f, label: f }));
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -144,6 +163,13 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
       project_service_id: projectServiceId || null,
       estimated_hours: estimatedHours ? parseFloat(estimatedHours) : null,
       estimated_rate: estimatedRate ? parseFloat(estimatedRate) : null,
+      brand: formData.brand || null,
+      show: formData.show || null,
+      formats: formats,
+      legal_line: formData.legal_line || null,
+      freigabelink: formData.freigabelink || null,
+      rights_expiration_date: formData.rights_expiration_date || null,
+      status_influencerclips: formData.status_influencerclips,
     });
   };
 
@@ -181,6 +207,174 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
               className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="Enter task name"
             />
+          </div>
+
+          {/* Airtable Brand & Show Row */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-muted-foreground mb-2">
+                Brand
+              </label>
+              <CreatableSelect
+                isClearable
+                options={existingBrands}
+                value={formData.brand ? { value: formData.brand, label: formData.brand } : null}
+                onChange={(newValue: any) => setFormData({ ...formData, brand: newValue?.value || '' })}
+                className="react-select-container"
+                classNamePrefix="react-select"
+                placeholder="Select or type new Brand..."
+                styles={{
+                  control: (base) => ({
+                    ...base,
+                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                  }),
+                  menu: (base) => ({
+                    ...base,
+                    backgroundColor: '#1E1E1E',
+                    color: 'white',
+                  }),
+                  option: (base, state) => ({
+                    ...base,
+                    backgroundColor: state.isFocused ? '#3B82F6' : 'transparent',
+                  }),
+                  singleValue: (base) => ({
+                    ...base,
+                    color: 'white',
+                  }),
+                  input: (base) => ({
+                    ...base,
+                    color: 'white',
+                  }),
+                }}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-muted-foreground mb-2">
+                Show
+              </label>
+              <CreatableSelect
+                isClearable
+                options={existingShows}
+                value={formData.show ? { value: formData.show, label: formData.show } : null}
+                onChange={(newValue: any) => setFormData({ ...formData, show: newValue?.value || '' })}
+                className="react-select-container"
+                classNamePrefix="react-select"
+                placeholder="Select or type new Show..."
+                styles={{
+                  control: (base) => ({
+                     ...base,
+                     backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                     borderColor: 'rgba(255, 255, 255, 0.1)',
+                  }),
+                  menu: (base) => ({
+                    ...base,
+                    backgroundColor: '#1E1E1E',
+                    color: 'white',
+                  }),
+                  option: (base, state) => ({
+                    ...base,
+                    backgroundColor: state.isFocused ? '#3B82F6' : 'transparent',
+                  }),
+                  singleValue: (base) => ({ ...base, color: 'white' }),
+                  input: (base) => ({ ...base, color: 'white' }),
+                }}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 mt-4">
+             {/* Freigabelink */}
+             <div>
+               <label className="block text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
+                 <Icon path="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" className="w-4 h-4 text-primary" />
+                 Freigabelink
+               </label>
+               <input
+                 type="url"
+                 value={formData.freigabelink}
+                 onChange={(e) => setFormData({ ...formData, freigabelink: e.target.value })}
+                 className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                 placeholder="https://..."
+               />
+             </div>
+             {/* Rights Expiration Date */}
+             <div>
+               <label className="block text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
+                  <Icon path="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2h-1m-4-6l-4 4m0 0l-4-4m4 4V4" className="w-4 h-4" />
+                  Rights Expiration Date
+               </label>
+               <input
+                 type="date"
+                 value={formData.rights_expiration_date}
+                 onChange={(e) => setFormData({ ...formData, rights_expiration_date: e.target.value })}
+                 className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+               />
+             </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+             {/* Legal Line */}
+             <div>
+               <label className="block text-sm font-medium text-muted-foreground mb-2">
+                 Legal Line / Copyright
+               </label>
+               <textarea
+                 rows={2}
+                 value={formData.legal_line}
+                 onChange={(e) => setFormData({ ...formData, legal_line: e.target.value })}
+                 className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                 placeholder="e.g. © 2026 WBD..."
+               />
+             </div>
+             {/* Formats */}
+             <div>
+               <label className="block text-sm font-medium text-muted-foreground mb-2">
+                 Formats
+               </label>
+               <CreatableSelect
+                 isMulti
+                 options={formatOptions}
+                 value={formats.map(f => ({ value: f, label: f }))}
+                 onChange={(newValues: any) => setFormats(newValues ? newValues.map((v: any) => v.value) : [])}
+                 className="react-select-container"
+                 classNamePrefix="react-select"
+                 placeholder="e.g. 16:9, 9:16..."
+                 styles={{
+                   control: (base) => ({
+                      ...base,
+                      backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                      borderColor: 'rgba(255, 255, 255, 0.1)',
+                   }),
+                   menu: (base) => ({
+                     ...base,
+                     backgroundColor: '#1E1E1E',
+                     color: 'white',
+                   }),
+                   option: (base, state) => ({
+                     ...base,
+                     backgroundColor: state.isFocused ? '#3B82F6' : 'transparent',
+                   }),
+                   multiValue: (base) => ({ ...base, backgroundColor: 'rgba(59, 130, 246, 0.2)' }),
+                   multiValueLabel: (base) => ({ ...base, color: 'white' }),
+                   input: (base) => ({ ...base, color: 'white' }),
+                 }}
+               />
+             </div>
+          </div>
+
+          {/* Influencer Clips */}
+          <div className="flex items-center gap-3">
+             <input
+               type="checkbox"
+               id="influencerclips"
+               checked={formData.status_influencerclips}
+               onChange={(e) => setFormData({ ...formData, status_influencerclips: e.target.checked })}
+               className="w-4 h-4 bg-background border-input rounded focus:ring-2 focus:ring-primary"
+             />
+             <label htmlFor="influencerclips" className="text-sm font-medium text-muted-foreground cursor-pointer">
+               Status Influencer Clips (Needs clearing)
+             </label>
           </div>
 
           {/* Project Blocked - Removed Project Selection since it's forced */}

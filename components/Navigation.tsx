@@ -121,7 +121,7 @@ export const Navigation: React.FC<NavigationProps> = ({ currentView, onNavigate,
       items: cat.items.filter(item => {
         if (item.adminOnly && !isAdmin) return false;
         if (isClient) {
-          const allowedClientViews: View[] = ['dashboard', 'projects', 'tasks', 'assets', 'finances'];
+          const allowedClientViews: View[] = ['dashboard', 'projects', 'tasks', 'assets'];
           return allowedClientViews.includes(item.view);
         }
         return true;

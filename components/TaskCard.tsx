@@ -141,6 +141,32 @@ export const TaskCard: React.FC<TaskCardProps> = ({
           </p>
         )}
 
+        {/* Brand & Show / Freigabelink */}
+        {(task.brand || task.show || task.freigabelink) && (
+          <div className="flex flex-col gap-2 mb-3 bg-muted/20 p-2 rounded border border-border">
+            {(task.brand || task.show) && (
+              <div className="text-xs text-foreground font-medium flex items-center gap-1">
+                 <Icon path="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" className="w-3 h-3 text-primary" />
+                 {task.brand && <span>{task.brand}</span>}
+                 {task.brand && task.show && <span className="text-muted-foreground mx-1">/</span>}
+                 {task.show && <span className="text-muted-foreground">{task.show}</span>}
+              </div>
+            )}
+            {task.freigabelink && (
+              <a 
+                href={task.freigabelink} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="text-xs text-primary hover:text-blue-400 flex items-center gap-1 transition-colors hover:underline"
+              >
+                 <Icon path="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" className="w-3 h-3" />
+                 Review / Approval Link
+              </a>
+            )}
+          </div>
+        )}
+
         {/* Assignees */}
         <div className="flex items-center gap-2 mb-3">
           <Icon path="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" className="w-4 h-4 text-muted-foreground" />

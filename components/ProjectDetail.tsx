@@ -58,7 +58,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
 
   const visibleTabs = tabs.filter(tab => {
     if (isClient) {
-      return ['overview', 'tasks', 'finances', 'assets', 'documents'].includes(tab.id);
+      return ['overview', 'tasks', 'assets'].includes(tab.id);
     }
     return true;
   });
@@ -259,7 +259,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
           <div className="flex flex-col h-full">
             <div className="flex justify-between items-center px-6 py-4 border-b border-border">
               <h2 className="text-xl font-bold text-foreground">Project Tasks</h2>
-              {isAdminOrPJM && (
+              {true && (
                 <button
                   onClick={() => setIsTaskFormModalOpen(true)}
                   className="px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-colors flex items-center gap-2"
