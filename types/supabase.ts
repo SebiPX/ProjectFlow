@@ -230,6 +230,15 @@ export interface Task {
   materials?: string[]; // Dynamic list of materials
   custom_dates?: { name: string; date: string }[]; // Dynamic list of dates
   depends_on_task_ids?: string[]; // Array of task IDs this task is blocked by
+  
+  // Airtable Replacement Fields for Asset Generation
+  brand?: string | null;
+  show?: string | null;
+  formats?: string[];
+  legal_line?: string | null;
+  freigabelink?: string | null;
+  rights_expiration_date?: string | null;
+  status_influencerclips?: boolean;
 
   // Enriched data
   assignee?: Profile; // Legacy single assignee
