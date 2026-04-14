@@ -227,11 +227,23 @@ export const TaskEditModal: React.FC<TaskEditModalProps> = ({ isOpen, onClose, t
                  classNamePrefix="react-select"
                  placeholder="Select or type new Brand..."
                  styles={{
-                   control: (base) => ({ ...base, backgroundColor: 'rgba(255, 255, 255, 0.05)', borderColor: 'rgba(255, 255, 255, 0.1)'}),
-                   menu: (base) => ({ ...base, backgroundColor: '#1E1E1E', color: 'white' }),
-                   option: (base, state) => ({ ...base, backgroundColor: state.isFocused ? '#3B82F6' : 'transparent' }),
-                   singleValue: (base) => ({ ...base, color: 'white' }),
-                   input: (base) => ({ ...base, color: 'white' }),
+                   control: (base) => ({
+                     ...base,
+                     backgroundColor: 'hsl(var(--muted))',
+                     borderColor: 'hsl(var(--input))',
+                   }),
+                   menu: (base) => ({
+                     ...base,
+                     backgroundColor: 'hsl(var(--card))',
+                     border: '1px solid hsl(var(--border))',
+                   }),
+                   option: (base, state) => ({
+                     ...base,
+                     backgroundColor: state.isFocused ? 'hsl(var(--primary) / 0.1)' : 'transparent',
+                     color: 'hsl(var(--foreground))',
+                   }),
+                   singleValue: (base) => ({ ...base, color: 'hsl(var(--foreground))' }),
+                   input: (base) => ({ ...base, color: 'hsl(var(--foreground))' }),
                  }}
                />
              </div>
@@ -246,11 +258,23 @@ export const TaskEditModal: React.FC<TaskEditModalProps> = ({ isOpen, onClose, t
                  classNamePrefix="react-select"
                  placeholder="Select or type new Show..."
                  styles={{
-                   control: (base) => ({ ...base, backgroundColor: 'rgba(255, 255, 255, 0.05)', borderColor: 'rgba(255, 255, 255, 0.1)'}),
-                   menu: (base) => ({ ...base, backgroundColor: '#1E1E1E', color: 'white' }),
-                   option: (base, state) => ({ ...base, backgroundColor: state.isFocused ? '#3B82F6' : 'transparent' }),
-                   singleValue: (base) => ({ ...base, color: 'white' }),
-                   input: (base) => ({ ...base, color: 'white' }),
+                   control: (base) => ({
+                     ...base,
+                     backgroundColor: 'hsl(var(--muted))',
+                     borderColor: 'hsl(var(--input))',
+                   }),
+                   menu: (base) => ({
+                     ...base,
+                     backgroundColor: 'hsl(var(--card))',
+                     border: '1px solid hsl(var(--border))',
+                   }),
+                   option: (base, state) => ({
+                     ...base,
+                     backgroundColor: state.isFocused ? 'hsl(var(--primary) / 0.1)' : 'transparent',
+                     color: 'hsl(var(--foreground))',
+                   }),
+                   singleValue: (base) => ({ ...base, color: 'hsl(var(--foreground))' }),
+                   input: (base) => ({ ...base, color: 'hsl(var(--foreground))' }),
                  }}
                />
              </div>
@@ -304,12 +328,33 @@ export const TaskEditModal: React.FC<TaskEditModalProps> = ({ isOpen, onClose, t
                  classNamePrefix="react-select"
                  placeholder="e.g. 16:9, 9:16..."
                  styles={{
-                   control: (base) => ({ ...base, backgroundColor: 'rgba(255, 255, 255, 0.05)', borderColor: 'rgba(255, 255, 255, 0.1)'}),
-                   menu: (base) => ({ ...base, backgroundColor: '#1E1E1E', color: 'white' }),
-                   option: (base, state) => ({ ...base, backgroundColor: state.isFocused ? '#3B82F6' : 'transparent' }),
-                   multiValue: (base) => ({ ...base, backgroundColor: 'rgba(59, 130, 246, 0.2)' }),
-                   multiValueLabel: (base) => ({ ...base, color: 'white' }),
-                   input: (base) => ({ ...base, color: 'white' }),
+                   control: (base) => ({
+                     ...base,
+                     backgroundColor: 'hsl(var(--muted))',
+                     borderColor: 'hsl(var(--input))',
+                   }),
+                   menu: (base) => ({
+                     ...base,
+                     backgroundColor: 'hsl(var(--card))',
+                     border: '1px solid hsl(var(--border))',
+                   }),
+                   option: (base, state) => ({
+                     ...base,
+                     backgroundColor: state.isFocused ? 'hsl(var(--primary) / 0.1)' : 'transparent',
+                     color: 'hsl(var(--foreground))',
+                   }),
+                   multiValue: (base) => ({
+                     ...base,
+                     backgroundColor: 'hsl(var(--primary) / 0.2)',
+                     borderRadius: '4px',
+                   }),
+                   multiValueLabel: (base) => ({ ...base, color: 'hsl(var(--primary))' }),
+                   multiValueRemove: (base) => ({
+                     ...base,
+                     color: 'hsl(var(--primary))',
+                     ':hover': { backgroundColor: 'hsl(var(--primary))', color: 'white' },
+                  }),
+                   input: (base) => ({ ...base, color: 'hsl(var(--foreground))' }),
                  }}
                />
              </div>
