@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { X, Save, Link as LinkIcon, Folder, Calendar } from 'lucide-react';
+import { X, Save, Link as LinkIcon, Calendar, CheckSquare, Plus, Trash2 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { createCase, updateCase } from '../services/api/cases';
-import { getProjects } from '../services/api/projects';
 import { getProfiles } from '../services/api/profiles';
+import { getAssetsByProject } from '../services/api/assets';
 import { toast } from 'react-toastify';
 import type { Case } from '../types/supabase';
 
@@ -11,6 +11,7 @@ interface CaseFormModalProps {
   isOpen: boolean;
   onClose: () => void;
   editingCase: Case | null;
+  projectId?: string;
 }
 
 const STATUS_OPTIONS = [
@@ -21,16 +22,14 @@ const STATUS_OPTIONS = [
   'Geposted',
 ];
 
-export const CaseFormModal: React.FC<CaseFormModalProps> = ({ isOpen, onClose, editingCase }) => {
+export const CaseFormModal: React.FC<CaseFormModalProps> = ({ isOpen, onClose, editingCase, projectId }) => {
   const queryClient = useQueryClient();
 
   const [formData, setFormData] = useState<Partial<Case>>({
     title: '',
-    project_id: null,
+    project_id: projectId || null,
     notes: '',
     category: 'Cases',
-    material_status: '',
-    material_link: '',
     date_posting: '',
     status_instagram: 'Nicht auf dieser Plattform',
     status_facebook: 'Nicht auf dieser Plattform',
@@ -38,16 +37,21 @@ export const CaseFormModal: React.FC<CaseFormModalProps> = ({ isOpen, onClose, e
     status_website: 'Nicht auf dieser Plattform',
     status_youtube: 'Nicht auf dieser Plattform',
     status_tiktok: 'Nicht auf dieser Plattform',
+    asset_ids: [],
+    external_links: [],
   });
 
-  const { data: projects } = useQuery({
-    queryKey: ['projects'],
-    queryFn: getProjects,
-  });
+  const activeProjectId = editingCase?.project_id || projectId;
 
   const { data: profiles } = useQuery({
     queryKey: ['profiles'],
     queryFn: getProfiles,
+  });
+
+  const { data: projectAssets } = useQuery({
+    queryKey: ['assets', activeProjectId],
+    queryFn: () => getAssetsByProject(activeProjectId!),
+    enabled: !!activeProjectId,
   });
 
   useEffect(() => {
@@ -55,11 +59,13 @@ export const CaseFormModal: React.FC<CaseFormModalProps> = ({ isOpen, onClose, e
       setFormData({
         ...editingCase,
         date_posting: editingCase.date_posting ? (editingCase.date_posting as string).split('T')[0] : '', // extract YYYY-MM-DD
+        asset_ids: editingCase.asset_ids || [],
+        external_links: editingCase.external_links || [],
       });
     } else {
       setFormData({
         title: '',
-        project_id: null,
+        project_id: projectId || null,
         category: 'Cases',
         status_instagram: 'Nicht auf dieser Plattform',
         status_facebook: 'Nicht auf dieser Plattform',
@@ -67,9 +73,11 @@ export const CaseFormModal: React.FC<CaseFormModalProps> = ({ isOpen, onClose, e
         status_website: 'Nicht auf dieser Plattform',
         status_youtube: 'Nicht auf dieser Plattform',
         status_tiktok: 'Nicht auf dieser Plattform',
+        asset_ids: [],
+        external_links: [],
       });
     }
-  }, [editingCase, isOpen]);
+  }, [editingCase, isOpen, projectId]);
 
   const saveMutation = useMutation({
     mutationFn: (data: Partial<Case>) => {
@@ -94,6 +102,34 @@ export const CaseFormModal: React.FC<CaseFormModalProps> = ({ isOpen, onClose, e
       return;
     }
     saveMutation.mutate(formData);
+  };
+
+  const toggleAsset = (assetId: string) => {
+    const current = formData.asset_ids || [];
+    if (current.includes(assetId)) {
+      setFormData({ ...formData, asset_ids: current.filter(id => id !== assetId) });
+    } else {
+      setFormData({ ...formData, asset_ids: [...current, assetId] });
+    }
+  };
+
+  const handleExternalLinkChange = (index: number, val: string) => {
+    const links = [...(formData.external_links || [])];
+    links[index] = val;
+    setFormData({ ...formData, external_links: links });
+  };
+
+  const addExternalLink = () => {
+    setFormData(prev => ({
+      ...prev,
+      external_links: [...(prev.external_links || []), '']
+    }));
+  };
+
+  const removeExternalLink = (index: number) => {
+    const links = [...(formData.external_links || [])];
+    links.splice(index, 1);
+    setFormData({ ...formData, external_links: links });
   };
 
   if (!isOpen) return null;
@@ -131,33 +167,6 @@ export const CaseFormModal: React.FC<CaseFormModalProps> = ({ isOpen, onClose, e
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center">
-                  <Folder size={14} className="mr-1" /> Bound to Project
-                </label>
-                <select
-                  value={formData.project_id || ''}
-                  onChange={e => {
-                    const pid = e.target.value || null;
-                    const proj = projects?.find(p => p.id === pid);
-                    setFormData(prev => ({
-                      ...prev,
-                      project_id: pid,
-                      // Auto-fill title if empty
-                      title: (!prev.title && proj) ? proj.title : prev.title
-                    }));
-                  }}
-                  className="w-full px-4 py-2 bg-gray-50 dark:bg-[#2A2D35] border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white"
-                >
-                  <option value="">-- No Project (Standalone) --</option>
-                  {projects?.map(p => (
-                    <option key={p.id} value={p.id}>{p.project_number} - {p.title}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-3 gap-6">
-              <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Category
                 </label>
@@ -172,7 +181,9 @@ export const CaseFormModal: React.FC<CaseFormModalProps> = ({ isOpen, onClose, e
                   <option>Employer Branding</option>
                 </select>
               </div>
+            </div>
 
+            <div className="grid grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center">
                   <Calendar size={14} className="mr-1" /> Posting Date
@@ -202,17 +213,75 @@ export const CaseFormModal: React.FC<CaseFormModalProps> = ({ isOpen, onClose, e
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center">
-                <LinkIcon size={14} className="mr-1" /> Material Link (SharePoint / R2)
-              </label>
-              <input
-                type="url"
-                value={formData.material_link || ''}
-                onChange={e => setFormData({ ...formData, material_link: e.target.value })}
-                placeholder="https://pixelschickeriacom.sharepoint.com/..."
-                className="w-full px-4 py-2 bg-gray-50 dark:bg-[#2A2D35] border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white"
-              />
+            {/* Assets Selection */}
+            {activeProjectId && (
+              <div className="bg-gray-50 dark:bg-[#2A2D35] p-5 rounded-xl border border-gray-100 dark:border-gray-800">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center">
+                  <CheckSquare size={16} className="mr-2" />
+                  Select Project Assets
+                </h3>
+                {(!projectAssets || projectAssets.length === 0) ? (
+                  <p className="text-xs text-gray-500">No assets have been uploaded to this project yet.</p>
+                ) : (
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3 max-h-48 overflow-y-auto pr-2">
+                    {projectAssets.map(asset => (
+                      <label key={asset.id} className="flex items-start space-x-2 p-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-[#1A1D24] cursor-pointer hover:border-blue-500 transition-colors">
+                        <input
+                          type="checkbox"
+                          className="mt-1"
+                          checked={(formData.asset_ids || []).includes(asset.id)}
+                          onChange={() => toggleAsset(asset.id)}
+                        />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{asset.name}</p>
+                          <p className="text-xs text-gray-500">{asset.status}</p>
+                        </div>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* External Links */}
+            <div className="bg-gray-50 dark:bg-[#2A2D35] p-5 rounded-xl border border-gray-100 dark:border-gray-800">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white flex items-center">
+                  <LinkIcon size={16} className="mr-2" /> External Material Links (Figma, Sharepoint, etc.)
+                </h3>
+                <button
+                  type="button"
+                  onClick={addExternalLink}
+                  className="flex items-center text-xs px-3 py-1 bg-white dark:bg-[#1A1D24] border border-gray-200 dark:border-gray-700 rounded shadow-sm hover:bg-gray-50 dark:hover:bg-gray-800"
+                >
+                  <Plus size={14} className="mr-1" /> Add Link
+                </button>
+              </div>
+
+              {(formData.external_links || []).length === 0 ? (
+                <p className="text-xs text-gray-500 italic">No external links added yet.</p>
+              ) : (
+                <div className="space-y-3">
+                  {(formData.external_links || []).map((link, idx) => (
+                    <div key={idx} className="flex items-center space-x-2">
+                      <input
+                        type="url"
+                        value={link}
+                        onChange={e => handleExternalLinkChange(idx, e.target.value)}
+                        placeholder="https://..."
+                        className="flex-1 px-3 py-2 text-sm bg-white dark:bg-[#1A1D24] border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeExternalLink(idx)}
+                        className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Platform Status Matrix */}

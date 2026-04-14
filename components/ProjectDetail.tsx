@@ -32,13 +32,14 @@ import { generateInvoicePDF } from '../services/pdfGenerator';
 import { getFinancialDocuments, deleteFinancialDocument } from '../services/api/financialDocuments';
 import { FinancialDocument, FinancialItem, DocType, DocStatus } from '../types/supabase';
 import { DocumentList } from './documents/DocumentList';
+import { CasesList } from './CasesList';
 
 interface ProjectDetailProps {
   project: Project;
   defaultTab?: string;
 }
 
-type ProjectTab = 'overview' | 'tasks' | 'finances' | 'assets' | 'team' | 'services' | 'documents';
+type ProjectTab = 'overview' | 'tasks' | 'finances' | 'assets' | 'team' | 'services' | 'documents' | 'cases';
 
 const tabs: { id: ProjectTab; label: string }[] = [
   { id: 'overview', label: 'Overview' },
@@ -48,6 +49,7 @@ const tabs: { id: ProjectTab; label: string }[] = [
   { id: 'team', label: 'Team' },
   { id: 'services', label: 'Services' },
   { id: 'documents', label: 'Documents' },
+  { id: 'cases', label: 'Cases' },
 ];
 
 export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialProject, defaultTab }) => {
@@ -652,6 +654,12 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
         return (
           <div className="space-y-4">
             <ProjectServiceBreakdown projectId={project.id} />
+          </div>
+        );
+      case 'cases':
+        return (
+          <div className="h-full bg-background/50">
+            <CasesList projectId={project.id} />
           </div>
         );
       case 'documents': {

@@ -6,15 +6,21 @@ import { CaseFormModal } from './CaseFormModal';
 import { toast } from 'react-toastify';
 import type { Case } from '../types/supabase';
 
-export const CasesList: React.FC = () => {
+interface CasesListProps {
+  projectId?: string;
+}
+
+export const CasesList: React.FC<CasesListProps> = ({ projectId }) => {
   const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCase, setEditingCase] = useState<Case | null>(null);
 
-  const { data: cases = [], isLoading } = useQuery({
+  const { data: allCases = [], isLoading } = useQuery({
     queryKey: ['cases'],
     queryFn: getCases,
   });
+
+  const cases = projectId ? allCases.filter(c => c.project_id === projectId) : allCases;
 
   const deleteMutation = useMutation({
     mutationFn: deleteCase,
@@ -49,24 +55,28 @@ export const CasesList: React.FC = () => {
     return <span className="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded-full">{status}</span>;
   };
 
-  if (isLoading) return <div>Loading cases...</div>;
+  if (isLoading) return <div className="p-6 text-muted-foreground">Loading cases...</div>;
 
   return (
-    <div className="space-y-6">
+    <div className={projectId ? "space-y-6" : "space-y-6 p-6"}>
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400">
-            Cases & Portfolio
+            {projectId ? 'Project Cases' : 'Cases & Portfolio'}
           </h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-1">Manage project cases across platforms</p>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">
+            {projectId ? 'Manage cases for this project' : 'Agency wide portfolio cases overview'}
+          </p>
         </div>
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all font-medium"
-        >
-          <Plus size={18} className="mr-2" />
-          Add Case
-        </button>
+        {projectId ? (
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all font-medium"
+          >
+            <Plus size={18} className="mr-2" />
+            Add Case
+          </button>
+        ) : null}
       </div>
 
       <div className="bg-white dark:bg-[#1A1D24] rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden">
@@ -122,10 +132,18 @@ export const CasesList: React.FC = () => {
 
                     <td className="p-4">
                       <div className="flex items-center justify-end space-x-2">
-                        {c.material_link && (
-                          <a href={c.material_link} target="_blank" rel="noopener noreferrer" className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg" title="View Material">
-                            <ExternalLink size={16} />
-                          </a>
+                        {c.external_links && c.external_links.length > 0 && (
+                          <div className="flex -space-x-1 mr-1" title={`${c.external_links.length} external links`}>
+                             <a href={c.external_links[0]} target="_blank" rel="noopener noreferrer" className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg">
+                               <ExternalLink size={16} />
+                             </a>
+                             {c.external_links.length > 1 && <span className="text-[10px] bg-blue-100 text-blue-800 rounded-full h-4 w-4 flex items-center justify-center font-bold">+{c.external_links.length - 1}</span>}
+                          </div>
+                        )}
+                        {c.asset_ids && c.asset_ids.length > 0 && (
+                          <span className="text-[10px] px-2 py-1 bg-indigo-100 text-indigo-800 rounded-full font-semibold" title={`${c.asset_ids.length} attached assets`}>
+                            {c.asset_ids.length} Assets
+                          </span>
                         )}
                         <button
                           onClick={() => handleEdit(c)}
@@ -154,6 +172,7 @@ export const CasesList: React.FC = () => {
           isOpen={isModalOpen}
           onClose={handleCloseModal}
           editingCase={editingCase}
+          projectId={projectId}
         />
       )}
     </div>

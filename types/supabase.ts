@@ -207,6 +207,8 @@ export interface Case {
   category?: string | null;
   material_status?: string | null;
   material_link?: string | null;
+  asset_ids?: string[];
+  external_links?: string[];
   editor_id?: string | null; // UUID
   website_editor_id?: string | null; // UUID
   date_posting?: string | null; // DATE
