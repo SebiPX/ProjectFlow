@@ -170,20 +170,22 @@ export const Navigation: React.FC<NavigationProps> = ({ currentView, onNavigate,
             </button>
 
             {/* External Links */}
-            <div className="hidden md:flex items-center pl-4 border-l border-border h-8">
-              <a
-                href={import.meta.env.VITE_PX_STUDIO_URL || "https://px-studio.labs-schickeria.com/"}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1.5 text-xs font-bold text-muted-foreground hover:text-primary transition-colors"
-              >
-                <div className="w-5 h-5 rounded flex items-center justify-center bg-primary/10 text-primary">
-                  <span className="material-icons-round text-[14px]">auto_awesome</span>
-                </div>
-                PX-Studio
-                <span className="material-icons-round text-[12px] opacity-50 ml-0.5">open_in_new</span>
-              </a>
-            </div>
+            {!isClient && (
+              <div className="hidden md:flex items-center pl-4 border-l border-border h-8">
+                <a
+                  href={import.meta.env.VITE_PX_STUDIO_URL || "https://px-studio.labs-schickeria.com/"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 text-xs font-bold text-muted-foreground hover:text-primary transition-colors"
+                >
+                  <div className="w-5 h-5 rounded flex items-center justify-center bg-primary/10 text-primary">
+                    <span className="material-icons-round text-[14px]">auto_awesome</span>
+                  </div>
+                  PX-Studio
+                  <span className="material-icons-round text-[12px] opacity-50 ml-0.5">open_in_new</span>
+                </a>
+              </div>
+            )}
           </div>
 
           {/* Desktop Categories */}
