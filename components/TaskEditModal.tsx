@@ -28,7 +28,6 @@ export const TaskEditModal: React.FC<TaskEditModalProps> = ({ isOpen, onClose, t
     review_date: task.review_date ? new Date(task.review_date).toISOString().split('T')[0] : '',
     revision_date: task.revision_date ? new Date(task.revision_date).toISOString().split('T')[0] : '',
     due_date: task.due_date ? new Date(task.due_date).toISOString().split('T')[0] : '',
-    planned_minutes: task.planned_minutes?.toString() || '',
     is_visible_to_client: task.is_visible_to_client ?? true,
   });
 
@@ -44,7 +43,6 @@ export const TaskEditModal: React.FC<TaskEditModalProps> = ({ isOpen, onClose, t
       review_date: task.review_date ? new Date(task.review_date).toISOString().split('T')[0] : '',
       revision_date: task.revision_date ? new Date(task.revision_date).toISOString().split('T')[0] : '',
       due_date: task.due_date ? new Date(task.due_date).toISOString().split('T')[0] : '',
-      planned_minutes: task.planned_minutes?.toString() || '',
       is_visible_to_client: task.is_visible_to_client ?? true,
     });
   }, [task]);
@@ -126,7 +124,7 @@ export const TaskEditModal: React.FC<TaskEditModalProps> = ({ isOpen, onClose, t
       review_date: formData.review_date || null,
       revision_date: formData.revision_date || null,
       due_date: formData.due_date || null,
-      planned_minutes: formData.planned_minutes ? parseInt(formData.planned_minutes) : undefined,
+      planned_minutes: estimatedHours ? Math.round(parseFloat(estimatedHours) * 60) : undefined,
       is_visible_to_client: formData.is_visible_to_client,
       // Service tracking fields (optional)
       project_service_id: projectServiceId || null,
@@ -311,26 +309,7 @@ export const TaskEditModal: React.FC<TaskEditModalProps> = ({ isOpen, onClose, t
                 className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
-          </div>
-
-          {/* Planned Minutes */}
-          <div>
-            <label htmlFor="planned_minutes" className="block text-sm font-medium text-muted-foreground mb-2">
-              Planned Time (minutes)
-            </label>
-            <input
-              type="number"
-              id="planned_minutes"
-              min="0"
-              step="15"
-              value={formData.planned_minutes}
-              onChange={(e) => setFormData({ ...formData, planned_minutes: e.target.value })}
-              className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-              placeholder="0"
-            />
-            <p className="text-xs text-muted-foreground mt-1">
-              Estimated time in minutes (e.g., 60 for 1 hour, 120 for 2 hours)
-            </p>
+            </div>
           </div>
 
           {/* Service-Based Estimation (Optional) */}
@@ -383,7 +362,7 @@ export const TaskEditModal: React.FC<TaskEditModalProps> = ({ isOpen, onClose, t
                   type="number"
                   id="estimated_hours"
                   min="0"
-                  step="0.5"
+                  step="0.25"
                   value={estimatedHours}
                   onChange={(e) => setEstimatedHours(e.target.value)}
                   disabled={!projectServiceId || updateMutation.isPending}
