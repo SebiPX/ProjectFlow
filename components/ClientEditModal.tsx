@@ -11,6 +11,7 @@ import {
 import type { Client, ClientContact } from '../types/supabase';
 import { Icon } from './ui/Icon';
 import { createClientLogin } from '../services/api/clients';
+import CreatableSelect from 'react-select/creatable';
 
 interface ClientEditModalProps {
   isOpen: boolean;
@@ -41,6 +42,7 @@ export const ClientEditModal: React.FC<ClientEditModalProps> = ({ isOpen, onClos
     vat_id: client.vat_id || '',
     payment_terms_days: client.payment_terms_days?.toString() || '30',
     website: client.website || '',
+    brands: client.brands || [],
   });
 
   const [contacts, setContacts] = useState<ContactFormData[]>([]);
@@ -70,6 +72,7 @@ export const ClientEditModal: React.FC<ClientEditModalProps> = ({ isOpen, onClos
       vat_id: client.vat_id || '',
       payment_terms_days: client.payment_terms_days?.toString() || '30',
       website: client.website || '',
+      brands: client.brands || [],
     });
   }, [client]);
 
@@ -172,6 +175,7 @@ export const ClientEditModal: React.FC<ClientEditModalProps> = ({ isOpen, onClos
         vat_id: formData.vat_id.trim() || null,
         payment_terms_days: formData.payment_terms_days ? parseInt(formData.payment_terms_days) : 30,
         website: formData.website.trim() || null,
+        brands: formData.brands,
       });
 
       // Upload new logo if selected
@@ -493,6 +497,67 @@ export const ClientEditModal: React.FC<ClientEditModalProps> = ({ isOpen, onClos
               onChange={(e) => setFormData({ ...formData, website: e.target.value })}
               className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="https://example.com"
+            />
+          </div>
+
+          {/* Brands */}
+          <div>
+            <label className="block text-sm font-medium text-muted-foreground mb-2">
+              Client Brands (Tags / Shows)
+            </label>
+            <CreatableSelect
+              isMulti
+              placeholder="Add brands e.g. DMAX, TLC, Warner..."
+              value={formData.brands.map(b => ({ value: b, label: b }))}
+              onChange={(selected) => setFormData({ ...formData, brands: selected ? selected.map(s => s.value) : [] })}
+              className="w-full text-sm"
+              classNamePrefix="react-select"
+              styles={{
+                control: (base) => ({
+                  ...base,
+                  backgroundColor: 'hsl(var(--muted))',
+                  borderColor: 'hsl(var(--input))',
+                  color: 'hsl(var(--foreground))',
+                  borderRadius: '0.5rem',
+                  minHeight: '42px',
+                }),
+                menu: (base) => ({
+                  ...base,
+                  backgroundColor: 'hsl(var(--muted))',
+                  border: '1px solid hsl(var(--input))',
+                }),
+                option: (base, state) => ({
+                  ...base,
+                  backgroundColor: state.isFocused ? 'hsl(var(--primary) / 0.1)' : 'transparent',
+                  color: 'hsl(var(--foreground))',
+                  cursor: 'pointer',
+                  '&:active': {
+                    backgroundColor: 'hsl(var(--primary) / 0.2)',
+                  },
+                }),
+                multiValue: (base) => ({
+                  ...base,
+                  backgroundColor: 'hsl(var(--primary) / 0.2)',
+                  borderRadius: '4px',
+                }),
+                multiValueLabel: (base) => ({
+                  ...base,
+                  color: 'hsl(var(--primary))',
+                  fontWeight: 500,
+                }),
+                multiValueRemove: (base) => ({
+                  ...base,
+                  color: 'hsl(var(--primary))',
+                  ':hover': {
+                    backgroundColor: 'hsl(var(--primary))',
+                    color: 'white',
+                  },
+                }),
+                input: (base) => ({
+                  ...base,
+                  color: 'hsl(var(--foreground))',
+                }),
+              }}
             />
           </div>
 

@@ -113,6 +113,7 @@ export interface Client {
   payment_terms_days?: number;
   website?: string | null;
   logo_url?: string | null; // Storage path for company logo
+  brands?: string[]; // Array of client-specific brands
   contacts?: ClientContact[]; // Enriched data
 }
 

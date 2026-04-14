@@ -135,8 +135,15 @@ export const TaskEditModal: React.FC<TaskEditModalProps> = ({ isOpen, onClose, t
     },
   });
 
-  const existingBrands = Array.from(new Set(projectTasks.map(t => t.brand).filter(Boolean))).map(b => ({ value: b, label: b }));
-  const existingShows = Array.from(new Set(projectTasks.map(t => t.show).filter(Boolean))).map(s => ({ value: s, label: s }));
+  // Extract unique brands from the selected project's client, fallback to existing tasks
+  const selectedProject = projects.find(p => p.id === formData.project_id);
+  const clientBrands = selectedProject?.client?.brands || [];
+  
+  // Combine client brands with any historical ones, removing duplicates
+  const allBrandsSet = new Set([...clientBrands, ...projectTasks.map(t => t.brand).filter(Boolean)]);
+  const existingBrands = Array.from(allBrandsSet).map(b => ({ value: b as string, label: b as string }));
+
+  const existingShows = Array.from(new Set(projectTasks.map(t => t.show).filter(Boolean))).map(s => ({ value: s as string, label: s as string }));
   const formatOptions = ['16:9', '9:16', '1:1', '4:5'].map(f => ({ value: f, label: f }));
 
   const handleSubmit = (e: React.FormEvent) => {
