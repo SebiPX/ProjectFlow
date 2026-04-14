@@ -197,6 +197,44 @@ export interface Project {
   project_members?: ProjectMember[]; // Enriched data - team members assigned to project
 }
 
+export interface Case {
+  id: string; // UUID
+  created_at?: string; // TIMESTAMPTZ
+  updated_at?: string; // TIMESTAMPTZ
+  project_id?: string | null; // UUID
+  title: string;
+  notes?: string | null;
+  category?: string | null;
+  material_status?: string | null;
+  material_link?: string | null;
+  editor_id?: string | null; // UUID
+  website_editor_id?: string | null; // UUID
+  date_posting?: string | null; // DATE
+  status_instagram?: string;
+  status_facebook?: string;
+  status_linkedin?: string;
+  status_website?: string;
+  status_youtube?: string;
+  status_tiktok?: string;
+  
+  // Enriched fields
+  project?: {
+    id: string;
+    title: string;
+    client_id: string;
+  };
+  editor?: {
+    id: string;
+    full_name: string;
+    avatar_url: string;
+  };
+  website_editor?: {
+    id: string;
+    full_name: string;
+    avatar_url: string;
+  };
+}
+
 export interface ProjectMember {
   project_id: string; // UUID
   profile_id: string; // UUID

@@ -29,8 +29,9 @@ import { InventarApp } from './components/InventarApp';
 import { ChatView } from './components/chat/ChatView';
 import { ContactsList } from './components/directory/ContactsList';
 import { LocationsList } from './components/directory/LocationsList';
+import { CasesList } from './components/CasesList';
 
-export type View = 'dashboard' | 'projects' | 'project-detail' | 'tasks' | 'planning' | 'assets' | 'clients' | 'employees' | 'service-catalog' | 'finances' | 'reports' | 'resources' | 'settings' | 'inventar' | 'verleih' | 'verleih-formular' | 'kalender' | 'logins' | 'handyvertraege' | 'kreditkarten' | 'firmendaten' | 'links' | 'chat' | 'directory-freelancers' | 'directory-locations';
+export type View = 'dashboard' | 'projects' | 'project-detail' | 'tasks' | 'planning' | 'assets' | 'clients' | 'employees' | 'service-catalog' | 'finances' | 'reports' | 'resources' | 'settings' | 'inventar' | 'verleih' | 'verleih-formular' | 'kalender' | 'logins' | 'handyvertraege' | 'kreditkarten' | 'firmendaten' | 'links' | 'chat' | 'directory-freelancers' | 'directory-locations' | 'cases';
 
 const MainApp: React.FC = () => {
   const [view, setView] = useState<View>('dashboard');
@@ -75,6 +76,8 @@ const MainApp: React.FC = () => {
       case 'assets':
         // Removing searchQuery to fix lint error if AssetList doesn't support it
         return <AssetList onSelectProject={handleSelectProject} />;
+      case 'cases':
+        return <CasesList />;
       case 'clients':
         return <ClientList searchQuery={searchQuery} />;
       case 'employees':
