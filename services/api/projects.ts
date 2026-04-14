@@ -83,3 +83,10 @@ export async function getProjectsFinancialOverview(): Promise<Record<string, { c
   return await fetchApi('/api/projects/financial-overview');
 }
 
+/**
+ * Get project services (from Moco)
+ */
+export async function getProjectServices(id: string): Promise<any[]> {
+  return await fetchApi(`/api/projects/${id}/services`);
+}
+

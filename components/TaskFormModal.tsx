@@ -2,11 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { createTask } from '../services/api/tasks';
-import { getProjects } from '../services/api/projects';
+import { getProjects, getProjectServices } from '../services/api/projects';
 import { getProfiles } from '../services/api/profiles';
-import { getServiceModules } from '../services/api/serviceModules';
-import { getSeniorityLevels } from '../services/api/seniorityLevels';
-import { getServicePricingRate } from '../services/api/taskVariance';
+import type { Task } from '../types/supabase';
 import type { Task } from '../types/supabase';
 import { Icon } from './ui/Icon';
 import { Avatar } from './ui/Avatar';
@@ -48,38 +46,26 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
   });
 
   // Service tracking state
-  const [serviceModuleId, setServiceModuleId] = useState('');
-  const [seniorityLevelId, setSeniorityLevelId] = useState('');
+  const [projectServiceId, setProjectServiceId] = useState('');
   const [estimatedHours, setEstimatedHours] = useState('');
   const [estimatedRate, setEstimatedRate] = useState('');
 
-  // Fetch service modules for dropdown
-  const { data: serviceModules = [] } = useQuery({
-    queryKey: ['service-modules'],
-    queryFn: getServiceModules,
-    enabled: isOpen,
+  // Fetch project services
+  const { data: projectServices = [] } = useQuery({
+    queryKey: ['project-services', formData.project_id],
+    queryFn: () => getProjectServices(formData.project_id),
+    enabled: isOpen && !!formData.project_id,
   });
 
-  // Fetch seniority levels for dropdown
-  const { data: seniorityLevels = [] } = useQuery({
-    queryKey: ['seniority-levels'],
-    queryFn: getSeniorityLevels,
-    enabled: isOpen,
-  });
-
-  // Fetch pricing rate for auto-fill
-  const { data: pricingRate } = useQuery({
-    queryKey: ['service-pricing-rate', serviceModuleId, seniorityLevelId],
-    queryFn: () => getServicePricingRate(serviceModuleId, seniorityLevelId),
-    enabled: !!serviceModuleId && !!seniorityLevelId,
-  });
-
-  // Auto-fill rate when pricing is loaded
+  // Auto-fill rate when service is selected
   useEffect(() => {
-    if (pricingRate && !estimatedRate) {
-      setEstimatedRate(pricingRate.toString());
+    if (projectServiceId) {
+      const selectedService = projectServices.find((s: any) => s.id === projectServiceId);
+      if (selectedService && selectedService.hourly_rate) {
+        setEstimatedRate(selectedService.hourly_rate.toString());
+      }
     }
-  }, [pricingRate]);
+  }, [projectServiceId, projectServices]);
 
   // Create task mutation
   const createMutation = useMutation({
@@ -111,8 +97,7 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
       is_visible_to_client: true,
     });
     // Reset service tracking state
-    setServiceModuleId('');
-    setSeniorityLevelId('');
+    setProjectServiceId('');
     setEstimatedHours('');
     setEstimatedRate('');
     onClose();
@@ -144,8 +129,7 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
       planned_minutes: formData.planned_minutes ? parseInt(formData.planned_minutes) : undefined,
       is_visible_to_client: formData.is_visible_to_client,
       // Service tracking fields (optional)
-      service_module_id: serviceModuleId || null,
-      seniority_level_id: seniorityLevelId || null,
+      project_service_id: projectServiceId || null,
       estimated_hours: estimatedHours ? parseFloat(estimatedHours) : null,
       estimated_rate: estimatedRate ? parseFloat(estimatedRate) : null,
     });
@@ -359,57 +343,33 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
               Link this task to a service from the catalog to enable Plan vs Actual tracking.
             </p>
 
-            {/* Service Module & Seniority Level */}
-            <div className="grid grid-cols-2 gap-4 mb-4">
+            {/* Service Module */}
+            <div className="grid grid-cols-1 gap-4 mb-4">
               <div>
-                <label htmlFor="service_module_id" className="block text-sm font-medium text-muted-foreground mb-2">
-                  Service Module
+                <label htmlFor="project_service_id" className="block text-sm font-medium text-muted-foreground mb-2">
+                  Budget / Moco Leistung
                 </label>
                 <select
-                  id="service_module_id"
-                  value={serviceModuleId}
+                  id="project_service_id"
+                  value={projectServiceId}
                   onChange={(e) => {
-                    setServiceModuleId(e.target.value);
-                    setSeniorityLevelId(''); // Reset level when module changes
-                    setEstimatedRate(''); // Reset rate
+                    setProjectServiceId(e.target.value);
                   }}
                   className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                  disabled={createMutation.isPending}
+                  disabled={createMutation.isPending || !formData.project_id}
                 >
                   <option value="">None</option>
-                  {serviceModules
-                    .filter((m) => m.is_active)
-                    .map((module) => (
+                  {projectServices
+                    .filter((m: any) => m.active)
+                    .map((module: any) => (
                       <option key={module.id} value={module.id}>
-                        {module.service_module} ({module.category})
+                        {module.name} (Budget: {module.budget ? module.budget + '€' : '-'})
                       </option>
                     ))}
                 </select>
-              </div>
-
-              <div>
-                <label htmlFor="seniority_level_id" className="block text-sm font-medium text-muted-foreground mb-2">
-                  Seniority Level
-                </label>
-                <select
-                  id="seniority_level_id"
-                  value={seniorityLevelId}
-                  onChange={(e) => {
-                    setSeniorityLevelId(e.target.value);
-                    setEstimatedRate(''); // Reset rate to trigger auto-fill
-                  }}
-                  disabled={!serviceModuleId || createMutation.isPending}
-                  className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <option value="">Select level</option>
-                  {seniorityLevels
-                    .filter((l) => l.is_active)
-                    .map((level) => (
-                      <option key={level.id} value={level.id}>
-                        {level.level_name}
-                      </option>
-                    ))}
-                </select>
+                {!formData.project_id && (
+                  <p className="text-xs text-muted-foreground mt-1">Please select a project first to see its services.</p>
+                )}
               </div>
             </div>
 
@@ -426,7 +386,7 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
                   step="0.5"
                   value={estimatedHours}
                   onChange={(e) => setEstimatedHours(e.target.value)}
-                  disabled={!serviceModuleId || createMutation.isPending}
+                  disabled={!projectServiceId || createMutation.isPending}
                   className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
                   placeholder="0"
                 />
@@ -436,9 +396,6 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
               <div>
                 <label htmlFor="estimated_rate" className="block text-sm font-medium text-muted-foreground mb-2 flex items-center gap-1">
                   Estimated Rate (€/h)
-                  {pricingRate && (
-                    <span className="text-green-500 text-xs">(Auto-filled)</span>
-                  )}
                 </label>
                 <input
                   type="number"
@@ -447,7 +404,7 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
                   step="0.01"
                   value={estimatedRate}
                   onChange={(e) => setEstimatedRate(e.target.value)}
-                  disabled={!serviceModuleId || createMutation.isPending}
+                  disabled={!projectServiceId || createMutation.isPending}
                   className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
                   placeholder="0.00"
                 />
