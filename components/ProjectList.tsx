@@ -1,24 +1,26 @@
 import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import type { Project } from '../types/supabase';
 import { ProjectStatus } from '../types/supabase';
-import { getProjects, getProjectsFinancialOverview } from '../services/api/projects';
+import { getProjects, getProjectsFinancialOverview, updateProject } from '../services/api/projects';
 import { toast } from 'react-toastify';
 import { useAuth } from '../lib/AuthContext';
 import { calculateProjectsMargins } from '../services/api/projectFinancials';
 import { ClientLogo } from './ui/ClientLogo';
-import { fetchApi } from '../services/api/client';
+import { Avatar } from './ui/Avatar';
+import { LayoutGrid, List, AppWindow, ArrowRight, Calendar as CalendarIcon } from 'lucide-react';
 
 interface ProjectListProps {
   onSelectProject: (project: Project) => void;
+  searchQuery?: string;
 }
 
-const statusColors: { [key in ProjectStatus]: string } = {
-  [ProjectStatus.Active]: 'bg-primary text-primary-foreground',
-  [ProjectStatus.Completed]: 'bg-green-500 text-white',
-  [ProjectStatus.Planned]: 'bg-orange-500 text-white',
-  [ProjectStatus.OnHold]: 'bg-yellow-500 text-white',
-  [ProjectStatus.Cancelled]: 'bg-red-500 text-white',
+const statusColors: { [key in string]: string } = {
+  [ProjectStatus.Active]: 'bg-primary text-primary-foreground border-primary/20',
+  [ProjectStatus.Completed]: 'bg-green-500 text-white border-green-500/20',
+  [ProjectStatus.Planned]: 'bg-orange-500 text-white border-orange-500/20',
+  [ProjectStatus.OnHold]: 'bg-yellow-500 text-white border-yellow-500/20',
+  [ProjectStatus.Cancelled]: 'bg-red-500 text-white border-red-500/20',
 };
 
 const ProjectCard: React.FC<{
@@ -31,7 +33,6 @@ const ProjectCard: React.FC<{
   const spent = financialData?.total || 0;
   const progress = budget > 0 ? Math.min((spent / budget) * 100, 100) : 0;
 
-  // Check if deadline is overdue
   const deadline = project.deadline ? new Date(project.deadline) : null;
   const isOverdue = deadline && deadline < new Date();
   const daysUntilDeadline = deadline
@@ -45,14 +46,12 @@ const ProjectCard: React.FC<{
     >
       <div>
         <div className="flex justify-between items-start">
-          <h3 className="text-lg font-bold text-foreground">{project.title}</h3>
-          <span
-            className={`px-2.5 py-1 text-xs font-semibold rounded-full ${statusColors[project.status || ProjectStatus.Planned]}`}
-          >
+          <h3 className="text-lg font-bold text-foreground line-clamp-1">{project.title}</h3>
+          <span className={`px-2.5 py-1 text-[10px] uppercase font-bold tracking-wider rounded-full ${statusColors[project.status || ProjectStatus.Planned]}`}>
             {project.status?.replace('_', ' ')}
           </span>
         </div>
-        <div className="flex items-center gap-2 mt-1">
+        <div className="flex items-center gap-2 mt-2">
           <ClientLogo
             logoPath={project.client?.logo_url}
             companyName={project.client?.company_name || 'Client'}
@@ -61,12 +60,9 @@ const ProjectCard: React.FC<{
           <p className="text-sm text-muted-foreground">{project.client?.company_name}</p>
         </div>
 
-        {/* Deadline */}
         {deadline && (
-          <div className={`flex items-center gap-1 mt-2 text-xs ${isOverdue ? 'text-red-400' : daysUntilDeadline && daysUntilDeadline <= 7 ? 'text-yellow-400' : 'text-muted-foreground'}`}>
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
+          <div className={`flex items-center gap-1 mt-3 text-xs ${isOverdue ? 'text-red-400 font-semibold' : daysUntilDeadline && daysUntilDeadline <= 7 ? 'text-yellow-500 font-semibold' : 'text-muted-foreground'}`}>
+            <CalendarIcon size={14} />
             <span>
               {isOverdue
                 ? `Overdue (${deadline.toLocaleDateString('de-DE')})`
@@ -83,38 +79,37 @@ const ProjectCard: React.FC<{
       </div>
 
       <div className="mt-6">
-        <div className="flex justify-between text-sm text-muted-foreground mb-1">
+        <div className="flex justify-between text-sm text-muted-foreground mb-1 font-medium">
           <span>Budget Usage</span>
-          <span className={progress > 100 ? 'text-destructive' : ''}>{Math.round(progress)}%</span>
+          <span className={progress > 100 ? 'text-destructive font-bold' : ''}>{Math.round(progress)}%</span>
         </div>
-        <div className="w-full bg-secondary rounded-full h-2">
+        <div className="w-full bg-secondary rounded-full h-2 overflow-hidden">
           <div
-            className={`h-2 rounded-full ${progress > 100 ? 'bg-destructive' : progress > 80 ? 'bg-orange-500' : 'bg-primary'} text-primary-foreground`}
+            className={`h-2 rounded-full transition-all duration-500 ${progress > 100 ? 'bg-destructive' : progress > 80 ? 'bg-orange-500' : 'bg-primary'} text-primary-foreground`}
             style={{ width: `${Math.min(progress, 100)}%` }}
           ></div>
         </div>
         <div className="flex justify-between text-xs text-muted-foreground mt-2">
-          <span className={spent > budget ? 'text-destructive' : ''}>
+          <span className={spent > budget ? 'text-destructive font-semibold' : ''}>
             €{spent.toLocaleString(undefined, { maximumFractionDigits: 0 })} spent
           </span>
           <span>€{budget.toLocaleString()} budget</span>
         </div>
 
-        {/* Margin Badge */}
         {marginData && marginData.marginPercentage !== 0 && (
-          <div className="mt-3 pt-3 border-t border-border">
+          <div className="mt-4 pt-3 border-t border-border">
             <div className="flex items-center justify-between">
-              <span className="text-xs text-muted-foreground">Margin</span>
+              <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Acc. Margin</span>
               <span
-                className={`text-sm font-semibold px-2 py-1 rounded ${marginData.status === 'excellent'
-                  ? 'bg-green-900 bg-opacity-30 text-green-400'
+                className={`text-xs font-bold px-2 py-1 rounded-md ${marginData.status === 'excellent'
+                  ? 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400'
                   : marginData.status === 'good'
-                    ? 'bg-blue-900 bg-opacity-30 text-primary'
+                    ? 'bg-blue-100 dark:bg-blue-900/30 text-primary dark:text-blue-400'
                     : marginData.status === 'acceptable'
-                      ? 'bg-yellow-900 bg-opacity-30 text-yellow-400'
+                      ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400'
                       : marginData.status === 'poor'
-                        ? 'bg-orange-900 bg-opacity-30 text-orange-400'
-                        : 'bg-red-900 bg-opacity-30 text-red-400'
+                        ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400'
+                        : 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400'
                   }`}
               >
                 {marginData.marginPercentage >= 0 ? '+' : ''}
@@ -128,37 +123,42 @@ const ProjectCard: React.FC<{
   );
 };
 
-export const ProjectList: React.FC<({ onSelectProject: (project: Project) => void; searchQuery?: string })> = ({ onSelectProject, searchQuery = '' }) => {
+export const ProjectList: React.FC<{ onSelectProject: (project: Project) => void; searchQuery?: string }> = ({ onSelectProject, searchQuery = '' }) => {
+  const queryClient = useQueryClient();
   const { user, profile } = useAuth();
-  const isAdminOrPJM = profile?.role === 'admin' || profile?.role === 'pjm';
   const [onlyMe, setOnlyMe] = useState(false);
   const [showArchived, setShowArchived] = useState(false);
+  const [viewMode, setViewMode] = useState<'grid' | 'table' | 'board'>('grid');
 
-  const { data: projects = [], isLoading, error, refetch: refetchProjects } = useQuery({
+  const { data: projects = [], isLoading, error } = useQuery({
     queryKey: ['projects'],
     queryFn: getProjects,
   });
 
-// Removed handleMocoSync
   const { data: financialOverview = {} } = useQuery({
     queryKey: ['projects-financial-overview'],
     queryFn: getProjectsFinancialOverview,
   });
 
-  // Fetch margin data for all projects
   const { data: marginsData = {} } = useQuery({
     queryKey: ['projects-margins', projects.map(p => p.id)],
     queryFn: () => calculateProjectsMargins(projects.map(p => p.id)),
     enabled: projects.length > 0,
   });
 
-  // Filter projects based on "Only Me" toggle AND Search Query
+  const updateMutation = useMutation({
+    mutationFn: ({ id, status }: { id: string; status: ProjectStatus }) => updateProject(id, { status }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
+      toast.success('Project status updated');
+    },
+    onError: () => toast.error('Failed to update project status')
+  });
+
   const filteredProjects = projects.filter(project => {
-    // 0. Archived Filter
     if (showArchived && !project.is_archived) return false;
     if (!showArchived && project.is_archived) return false;
 
-    // 1. Only Me Filter
     if (onlyMe) {
       const isTeamMember = project.project_members?.some(member => 
         member.profile_id === user?.id || 
@@ -169,7 +169,6 @@ export const ProjectList: React.FC<({ onSelectProject: (project: Project) => voi
       if (!isTeamMember) return false;
     }
 
-    // 2. Search Query Filter
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       const matchesTitle = project.title?.toLowerCase().includes(query);
@@ -181,10 +180,38 @@ export const ProjectList: React.FC<({ onSelectProject: (project: Project) => voi
     return true;
   });
 
+  const findPJM = (p: Project) => {
+    return p.project_members?.find(m => m.role && (m.role.toLowerCase().includes('pjm') || m.role.toLowerCase().includes('projektleitung')));
+  };
+
+  const handleDragStart = (e: React.DragEvent, projectId: string) => {
+    e.dataTransfer.setData('projectId', projectId);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleDrop = (e: React.DragEvent, newStatus: ProjectStatus) => {
+    e.preventDefault();
+    const projectId = e.dataTransfer.getData('projectId');
+    if (!projectId) return;
+
+    const project = projects.find(p => p.id === projectId);
+    if (project && project.status !== newStatus) {
+      updateMutation.mutate({ id: projectId, status: newStatus });
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-full">
-        <div className="text-foreground text-xl">Loading projects...</div>
+        <div className="text-muted-foreground text-xl flex items-center gap-2">
+          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
+          Loading projects...
+        </div>
       </div>
     );
   }
@@ -192,69 +219,294 @@ export const ProjectList: React.FC<({ onSelectProject: (project: Project) => voi
   if (error) {
     return (
       <div className="flex items-center justify-center h-full">
-        <div className="text-red-500 text-xl">Error loading projects. Please try again.</div>
+        <div className="text-destructive font-medium border border-destructive/20 bg-destructive/10 px-6 py-4 rounded-xl">
+          Error loading projects. Please check your connection.
+        </div>
       </div>
     );
   }
 
+  const renderBoardView = () => {
+    const columns = [
+      { id: ProjectStatus.Planned, title: 'Planned' },
+      { id: ProjectStatus.Active, title: 'Active' },
+      { id: ProjectStatus.OnHold, title: 'On Hold' },
+      { id: ProjectStatus.Completed, title: 'Completed' },
+    ];
+
+    return (
+      <div className="flex gap-6 overflow-x-auto pb-4 pt-2">
+        {columns.map(col => {
+          const colProjects = filteredProjects.filter(p => p.status === col.id);
+          const headerColors: Record<string, string> = {
+            [ProjectStatus.Planned]: 'text-orange-600 dark:text-orange-400 bg-orange-100 dark:bg-orange-900/30 border-orange-200 dark:border-orange-800/50',
+            [ProjectStatus.Active]: 'text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30 border-blue-200 dark:border-blue-800/50',
+            [ProjectStatus.OnHold]: 'text-yellow-600 dark:text-yellow-400 bg-yellow-100 dark:bg-yellow-900/30 border-yellow-200 dark:border-yellow-800/50',
+            [ProjectStatus.Completed]: 'text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/30 border-green-200 dark:border-green-800/50'
+          };
+          const style = headerColors[col.id];
+
+          return (
+            <div 
+              key={col.id} 
+              className={`min-w-[340px] max-w-[340px] rounded-2xl flex flex-col border border-border bg-card shadow-sm`}
+              onDragOver={handleDragOver}
+              onDrop={(e) => handleDrop(e, col.id)}
+            >
+              <div className={`p-4 border-b rounded-t-xl flex justify-between items-center ${style}`}>
+                <h3 className={`font-bold tracking-wide uppercase text-sm`}>{col.title}</h3>
+                <span className="text-xs bg-background/50 backdrop-blur-md px-2 py-1 rounded-full font-bold shadow-sm">{colProjects.length}</span>
+              </div>
+              
+              <div className="p-3 flex flex-col gap-3 overflow-y-auto max-h-[70vh] bg-muted/20 flex-1">
+                {colProjects.map(p => {
+                  const pjm = findPJM(p);
+                  const restMembers = p.project_members?.filter(m => m.user_id !== pjm?.user_id) || [];
+                  
+                  return (
+                    <div 
+                      key={p.id}
+                      draggable
+                      onDragStart={(e) => handleDragStart(e, p.id)}
+                      onClick={() => onSelectProject(p)}
+                      className="bg-card hover:border-primary border border-border rounded-xl p-4 shadow-sm cursor-grab active:cursor-grabbing transition-all hover:-translate-y-0.5"
+                    >
+                      <div className="flex justify-between items-start mb-2">
+                        <span className="text-[10px] text-muted-foreground font-mono bg-muted px-2 py-0.5 rounded-full">#{p.project_number}</span>
+                        {p.deadline && new Date(p.deadline) < new Date() && p.status !== ProjectStatus.Completed && (
+                           <span className="w-2 h-2 rounded-full bg-red-500 shadow-sm shadow-red-500/50 animate-pulse"></span>
+                        )}
+                      </div>
+                      <h4 className="font-bold text-foreground leading-tight hover:text-primary transition-colors text-base">{p.title}</h4>
+                      <p className="text-xs text-muted-foreground mb-4 mt-1 flex items-center gap-1">
+                        <ClientLogo logoPath={p.client?.logo_url} companyName={p.client?.company_name || ''} className="w-4 h-4 rounded-full" />
+                        {p.client?.company_name}
+                      </p>
+                      
+                      <div className="flex justify-between items-end mt-4 pt-4 border-t border-border/50">
+                        <div className="flex items-center">
+                          {pjm ? (
+                            <div className="relative group/avatar" title={`PJM: ${pjm.profile?.full_name}`}>
+                              <Avatar url={pjm.profile?.avatar_url || ''} alt={pjm.profile?.full_name || ''} size="sm" className="ring-2 ring-primary/50" />
+                              <span className="absolute -bottom-1 -right-1 bg-primary text-[8px] font-bold text-primary-foreground px-1 rounded">PJM</span>
+                            </div>
+                          ) : (
+                            <span className="text-[10px] text-muted-foreground italic">No PJM</span>
+                          )}
+                          {restMembers.length > 0 && (
+                            <div className="ml-2 flex -space-x-2">
+                              {restMembers.slice(0, 3).map(m => (
+                                <Avatar key={m.user_id} url={m.profile?.avatar_url || ''} alt={m.profile?.full_name || ''} size="xs" className="ring-2 ring-background grayscale hover:grayscale-0" />
+                              ))}
+                              {restMembers.length > 3 && (
+                                <div className="w-5 h-5 rounded-full bg-muted border-2 border-background flex items-center justify-center text-[8px] font-bold">
+                                  +{restMembers.length - 3}
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                        
+                        {p.deadline && (
+                          <div className={`text-[10px] flex items-center font-medium ${new Date(p.deadline) < new Date() && p.status !== 'completed' ? 'text-red-500 bg-red-500/10 px-2 py-1 rounded-md' : 'text-muted-foreground'}`}>
+                            <CalendarIcon size={10} className="mr-1" />
+                            {new Date(p.deadline).toLocaleDateString()}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+                {colProjects.length === 0 && (
+                  <div className="text-center py-8 text-sm text-muted-foreground border-2 border-dashed border-border rounded-xl">
+                    Drop projects here
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
+  const renderTableView = () => {
+    return (
+      <div className="bg-card border border-border shadow-sm rounded-xl overflow-hidden mt-2">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm text-left">
+            <thead className="text-[11px] uppercase tracking-wider bg-muted/50 text-muted-foreground border-b border-border">
+              <tr>
+                <th className="px-5 py-3 font-semibold">ID</th>
+                <th className="px-5 py-3 font-semibold">Project</th>
+                <th className="px-5 py-3 font-semibold">Client</th>
+                <th className="px-5 py-3 font-semibold">PJM / Lead</th>
+                <th className="px-5 py-3 font-semibold">Team</th>
+                <th className="px-5 py-3 font-semibold">Status</th>
+                <th className="px-5 py-3 font-semibold text-right">Deadline</th>
+                <th className="px-5 py-3 font-semibold text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border/50">
+              {filteredProjects.length === 0 ? (
+                <tr>
+                  <td colSpan={8} className="p-8 text-center text-muted-foreground">No projects found matching the criteria.</td>
+                </tr>
+              ) : (
+                filteredProjects.map(p => {
+                  const pjm = findPJM(p);
+                  
+                  return (
+                    <tr key={p.id} className="hover:bg-muted/30 transition-colors group">
+                      <td className="px-5 py-3 font-mono text-xs text-muted-foreground">#{p.project_number}</td>
+                      <td className="px-5 py-3 font-medium text-foreground">
+                        <button onClick={() => onSelectProject(p)} className="hover:text-primary transition-colors text-left flex flex-col">
+                          <span>{p.title}</span>
+                        </button>
+                      </td>
+                      <td className="px-5 py-3">
+                        <div className="flex items-center gap-2">
+                          <ClientLogo logoPath={p.client?.logo_url} companyName={p.client?.company_name || ''} className="w-5 h-5 rounded-full" />
+                          <span className="text-muted-foreground">{p.client?.company_name}</span>
+                        </div>
+                      </td>
+                      <td className="px-5 py-3">
+                        {pjm ? (
+                          <div className="flex items-center space-x-2" title={pjm.role || ''}>
+                             <Avatar url={pjm.profile?.avatar_url || ''} alt={pjm.profile?.full_name || ''} size="xs" />
+                             <span className="font-medium text-xs">{pjm.profile?.full_name}</span>
+                          </div>
+                        ) : (
+                          <span className="text-muted-foreground italic text-[10px]">Unassigned</span>
+                        )}
+                      </td>
+                      <td className="px-5 py-3">
+                        <div className="flex -space-x-2">
+                           {p.project_members?.filter(m => m.user_id !== pjm?.user_id).slice(0, 4).map(m => (
+                             <div key={m.user_id} title={m.profile?.full_name || ''}>
+                               <Avatar url={m.profile?.avatar_url || ''} alt={m.profile?.full_name || ''} size="xs" className="ring-2 ring-background w-6 h-6" />
+                             </div>
+                           ))}
+                           {p.project_members && p.project_members.length > (pjm ? 5 : 4) && (
+                              <div className="w-6 h-6 rounded-full bg-muted border-2 border-background flex items-center justify-center text-[8px] font-bold z-0">
+                                +{(p.project_members.length - (pjm ? 1 : 0)) - 4}
+                              </div>
+                           )}
+                        </div>
+                      </td>
+                      <td className="px-5 py-3">
+                        <span className={`px-2 py-1 text-[10px] uppercase font-bold tracking-wider rounded-md border ${statusColors[p.status || ProjectStatus.Planned]}`}>
+                          {p.status?.replace('_', ' ')}
+                        </span>
+                      </td>
+                      <td className="px-5 py-3 text-right text-muted-foreground text-xs font-medium">
+                        {p.deadline ? new Date(p.deadline).toLocaleDateString() : '-'}
+                      </td>
+                      <td className="px-5 py-3 text-right">
+                         <button onClick={() => onSelectProject(p)} className="p-1.5 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-md transition-colors opacity-0 group-hover:opacity-100">
+                            <ArrowRight size={16} />
+                         </button>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    );
+  };
+
   return (
-    <div className="p-8">
-      <div className="flex justify-between items-center mb-6">
+    <div className="p-4 sm:p-6 lg:p-8 h-full flex flex-col">
+      <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
         <div>
           <h1 className="text-3xl font-bold text-foreground">Projects</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            {filteredProjects.length} {filteredProjects.length === 1 ? 'project' : 'projects'}
+            {filteredProjects.length} active {filteredProjects.length === 1 ? 'project' : 'projects'}
             {onlyMe && ' • Only Me'}
           </p>
         </div>
-        <div className="flex gap-3">
+        
+        <div className="flex items-center gap-3 bg-muted/30 p-1.5 rounded-xl border border-border">
+          {/* View Toggles */}
+          <div className="flex items-center space-x-1 border-r border-border pr-3 mr-1">
+            <button 
+              onClick={() => setViewMode('grid')} 
+              className={`p-2 rounded-lg flex items-center transition-all ${viewMode === 'grid' ? 'bg-background shadow-sm text-primary ring-1 ring-border' : 'text-muted-foreground hover:text-foreground hover:bg-background/50'}`}
+              title="Grid View (Cards)"
+            >
+              <LayoutGrid size={16} />
+            </button>
+            <button 
+              onClick={() => setViewMode('table')} 
+              className={`p-2 rounded-lg flex items-center transition-all ${viewMode === 'table' ? 'bg-background shadow-sm text-primary ring-1 ring-border' : 'text-muted-foreground hover:text-foreground hover:bg-background/50'}`}
+              title="Table View (Airtable Style)"
+            >
+              <List size={16} />
+            </button>
+            <button 
+              onClick={() => setViewMode('board')} 
+              className={`p-2 rounded-lg flex items-center transition-all ${viewMode === 'board' ? 'bg-background shadow-sm text-primary ring-1 ring-border' : 'text-muted-foreground hover:text-foreground hover:bg-background/50'}`}
+              title="Board View (Kanban Style)"
+            >
+              <AppWindow size={16} />
+            </button>
+          </div>
+
           <button
             onClick={() => setOnlyMe(!onlyMe)}
-            className={`font-semibold py-2 px-4 rounded-lg flex items-center transition-colors ${onlyMe
-              ? 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm'
-              : 'bg-secondary hover:bg-secondary/80 text-secondary-foreground'
+            className={`font-semibold py-1.5 px-3 rounded-lg text-sm flex items-center transition-colors ${onlyMe
+              ? 'bg-primary text-primary-foreground shadow-sm hover:bg-primary/90'
+              : 'bg-background hover:bg-muted text-muted-foreground border border-border'
               }`}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
             Only Me
           </button>
           <button
             onClick={() => setShowArchived(!showArchived)}
-            className={`font-semibold py-2 px-4 rounded-lg flex items-center transition-colors ${showArchived
-              ? 'bg-accent hover:bg-accent/90 text-accent-foreground shadow-sm'
-              : 'bg-secondary hover:bg-secondary/80 text-secondary-foreground'
+            className={`font-semibold py-1.5 px-3 rounded-lg text-sm flex items-center transition-colors ${showArchived
+              ? 'bg-accent text-accent-foreground shadow-sm'
+              : 'bg-background hover:bg-muted text-muted-foreground border border-border'
               }`}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-            </svg>
-            Show Archive
+            Archive
           </button>
-// Buttons removed as they are now automated
         </div>
       </div>
-      {filteredProjects.length === 0 ? (
-        <div className="text-center text-muted-foreground mt-12">
-          <p className="text-xl">No projects found.</p>
-          <p className="mt-2 text-muted-foreground/80">
-            {onlyMe ? 'You are not assigned to any projects yet.' : 'Create your first project to get started!'}
-          </p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredProjects.map(project => (
-            <ProjectCard
-              key={project.id}
-              project={project}
-              onSelectProject={onSelectProject}
-              financialData={financialOverview[project.id]}
-              marginData={marginsData[project.id]}
-            />
-          ))}
-        </div>
-      )}
+
+      <div className="flex-1 min-h-0">
+        {filteredProjects.length === 0 ? (
+          <div className="text-center bg-card border border-border rounded-xl p-12 mt-4 shadow-sm">
+            <div className="w-16 h-16 bg-muted/50 rounded-full flex items-center justify-center mx-auto mb-4 border border-border/50">
+              <AppWindow className="w-8 h-8 text-muted-foreground" />
+            </div>
+            <p className="text-xl font-semibold text-foreground">No projects found.</p>
+            <p className="mt-2 text-sm text-muted-foreground max-w-sm mx-auto">
+              {onlyMe ? 'You are not directly assigned to any active operations yet.' : 'Try adjusting your search filters or start a new project.'}
+            </p>
+          </div>
+        ) : (
+          viewMode === 'grid' ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-8">
+              {filteredProjects.map(project => (
+                <ProjectCard
+                  key={project.id}
+                  project={project}
+                  onSelectProject={onSelectProject}
+                  financialData={financialOverview[project.id]}
+                  marginData={marginsData[project.id]}
+                />
+              ))}
+            </div>
+          ) : viewMode === 'table' ? (
+            renderTableView()
+          ) : (
+            renderBoardView()
+          )
+        )}
+      </div>
 
     </div>
   );
