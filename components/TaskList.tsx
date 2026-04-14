@@ -64,6 +64,8 @@ export const TaskList: React.FC<TaskListProps> = ({ onSelectProject, searchQuery
       const isUnassigned = (!task.assignee_ids || task.assignee_ids.length === 0) && !task.assignee_id && !task.assigned_to;
       const isAssignedToUser = (userId: string) => {
         if (task.assignee_ids?.includes(userId)) return true;
+        if (task.assignees?.some(a => a.id === userId)) return true;
+        if (task.assignee?.id === userId) return true;
         if (task.assignee_id === userId) return true;
         if (task.assigned_to === userId) return true;
         if (Array.isArray(task.assigned_to) && task.assigned_to.includes(userId)) return true;
