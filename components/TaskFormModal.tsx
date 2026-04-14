@@ -309,7 +309,6 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
                 className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
-            </div>
           </div>
 
           {/* Service-Based Estimation (Optional) */}
