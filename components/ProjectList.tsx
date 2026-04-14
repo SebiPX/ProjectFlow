@@ -160,7 +160,12 @@ export const ProjectList: React.FC<({ onSelectProject: (project: Project) => voi
 
     // 1. Only Me Filter
     if (onlyMe) {
-      const isTeamMember = project.project_members?.some(member => member.profile_id === user?.id);
+      const isTeamMember = project.project_members?.some(member => 
+        member.profile_id === user?.id || 
+        member.profile_id === profile?.id || 
+        member.user_id === user?.id || 
+        member.user_id === profile?.id
+      );
       if (!isTeamMember) return false;
     }
 
