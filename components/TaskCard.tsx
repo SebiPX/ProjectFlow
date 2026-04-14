@@ -28,11 +28,21 @@ export const TaskCard: React.FC<TaskCardProps> = ({
   onSelectProject
 }) => {
   const getUpcomingDateInfo = () => {
-    const dates = [
-      { label: 'Freigabe', date: task.review_date },
-      { label: 'Änderungen', date: task.revision_date },
-      { label: 'Final', date: task.due_date }
-    ].filter(d => d.date);
+    const dates: { label: string, date: string }[] = [];
+    if (task.start_date) dates.push({ label: 'Start', date: task.start_date });
+    if (task.due_date) dates.push({ label: 'Final', date: task.due_date });
+    
+    if (task.custom_dates && task.custom_dates.length > 0) {
+      task.custom_dates.forEach(cd => {
+        if (cd.date && cd.name.trim() !== '') {
+          dates.push({ label: cd.name, date: cd.date });
+        }
+      });
+    } else {
+      // fallback for legacy
+      if (task.review_date) dates.push({ label: 'Freigabe', date: task.review_date });
+      if (task.revision_date) dates.push({ label: 'Änderungen', date: task.revision_date });
+    }
 
     if (dates.length === 0) return { label: 'Kein Datum', date: null, isOverdue: false };
 
@@ -40,11 +50,11 @@ export const TaskCard: React.FC<TaskCardProps> = ({
     now.setHours(0, 0, 0, 0);
 
     // Sort chronologically
-    dates.sort((a, b) => new Date(a.date!).getTime() - new Date(b.date!).getTime());
+    dates.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
     // Find first date today or in future
     const upcoming = dates.find(d => {
-      const dTime = new Date(d.date!);
+      const dTime = new Date(d.date);
       dTime.setHours(0, 0, 0, 0);
       return dTime >= now;
     });
@@ -97,16 +107,25 @@ export const TaskCard: React.FC<TaskCardProps> = ({
           </div>
         )}
 
-        {/* Service Badge */}
-        {task.service_module && (
-          <div className="flex items-center gap-1 text-xs px-2 py-1 bg-primary/10 border border-primary/30 rounded text-primary inline-flex mb-3">
-            <Icon path="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" className="w-3 h-3" />
-            <span>{(task.service_module as any).service_module}</span>
-            {task.estimated_hours && (
-              <span className="text-muted-foreground">• {task.estimated_hours}h</span>
-            )}
-          </div>
-        )}
+        {/* Service Badge & Materials */}
+        <div className="flex flex-wrap gap-2 mb-3">
+          {task.service_module && (
+            <div className="flex items-center gap-1 text-xs px-2 py-1 bg-primary/10 border border-primary/30 rounded text-primary">
+              <Icon path="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" className="w-3 h-3" />
+              <span>{(task.service_module as any).service_module}</span>
+              {task.estimated_hours && (
+                <span className="text-muted-foreground">• {task.estimated_hours}h</span>
+              )}
+            </div>
+          )}
+          
+          {task.materials && task.materials.length > 0 && (
+            <div className="flex items-center gap-1 text-xs px-2 py-1 bg-amber-500/10 border border-amber-500/30 rounded text-amber-600">
+              <Icon path="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" className="w-3 h-3" />
+              <span>{task.materials.length} Material{task.materials.length !== 1 ? 's' : ''}</span>
+            </div>
+          )}
+        </div>
 
         {/* Description Preview */}
         {task.description && (

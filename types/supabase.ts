@@ -227,6 +227,8 @@ export interface Task {
   seniority_level_id?: string | null; // UUID - Seniority level for rate calculation
   estimated_hours?: number | null; // Planned effort in hours (for billing)
   estimated_rate?: number | null; // Estimated hourly rate in € (from service_pricing or custom)
+  materials?: string[]; // Dynamic list of materials
+  custom_dates?: { name: string; date: string }[]; // Dynamic list of dates
 
   // Enriched data
   assignee?: Profile; // Legacy single assignee

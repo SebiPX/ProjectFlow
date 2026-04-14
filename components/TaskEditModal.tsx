@@ -31,6 +31,9 @@ export const TaskEditModal: React.FC<TaskEditModalProps> = ({ isOpen, onClose, t
     is_visible_to_client: task.is_visible_to_client ?? true,
   });
 
+  const [materials, setMaterials] = useState<string[]>(task.materials || []);
+  const [customDates, setCustomDates] = useState<{name: string, date: string}[]>(task.custom_dates || []);
+
   // Update form data when task changes
   useEffect(() => {
     setFormData({
@@ -45,6 +48,8 @@ export const TaskEditModal: React.FC<TaskEditModalProps> = ({ isOpen, onClose, t
       due_date: task.due_date ? new Date(task.due_date).toISOString().split('T')[0] : '',
       is_visible_to_client: task.is_visible_to_client ?? true,
     });
+    setMaterials(task.materials || []);
+    setCustomDates(task.custom_dates || []);
   }, [task]);
 
   // Fetch projects for dropdown
@@ -121,9 +126,9 @@ export const TaskEditModal: React.FC<TaskEditModalProps> = ({ isOpen, onClose, t
       status: formData.status as any,
       assignee_ids: formData.assignee_ids,
       start_date: formData.start_date || null,
-      review_date: formData.review_date || null,
-      revision_date: formData.revision_date || null,
       due_date: formData.due_date || null,
+      custom_dates: customDates.filter(c => c.name.trim() && c.date),
+      materials: materials.filter(m => m.trim() !== ''),
       planned_minutes: estimatedHours ? Math.round(parseFloat(estimatedHours) * 60) : undefined,
       is_visible_to_client: formData.is_visible_to_client,
       // Service tracking fields (optional)
@@ -253,7 +258,7 @@ export const TaskEditModal: React.FC<TaskEditModalProps> = ({ isOpen, onClose, t
             </div>
           </div>
 
-          {/* Dates Row 1 */}
+          {/* Static Dates Row */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label htmlFor="start_date" className="block text-sm font-medium text-muted-foreground mb-2">
@@ -267,36 +272,6 @@ export const TaskEditModal: React.FC<TaskEditModalProps> = ({ isOpen, onClose, t
                 className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
-
-            <div>
-              <label htmlFor="review_date" className="block text-sm font-medium text-muted-foreground mb-2">
-                Date Freigabe
-              </label>
-              <input
-                type="date"
-                id="review_date"
-                value={formData.review_date}
-                onChange={(e) => setFormData({ ...formData, review_date: e.target.value })}
-                className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-            </div>
-          </div>
-
-          {/* Dates Row 2 */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="revision_date" className="block text-sm font-medium text-muted-foreground mb-2">
-                Date Änderungen
-              </label>
-              <input
-                type="date"
-                id="revision_date"
-                value={formData.revision_date}
-                onChange={(e) => setFormData({ ...formData, revision_date: e.target.value })}
-                className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-            </div>
-
             <div>
               <label htmlFor="due_date" className="block text-sm font-medium text-muted-foreground mb-2">
                 Date Final (Due)
@@ -308,6 +283,121 @@ export const TaskEditModal: React.FC<TaskEditModalProps> = ({ isOpen, onClose, t
                 onChange={(e) => setFormData({ ...formData, due_date: e.target.value })}
                 className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               />
+            </div>
+          </div>
+
+          {/* Custom Dates & Milestones */}
+          <div className="border-t border-border pt-4 mt-4">
+            <div className="flex justify-between items-center mb-3">
+              <div>
+                <h3 className="text-sm font-medium text-foreground">Custom Milestones & Dates</h3>
+                <p className="text-xs text-muted-foreground">Add specific deadlines or events for this task.</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setCustomDates([...customDates, { name: '', date: '' }])}
+                className="text-primary hover:text-primary/80 transition-colors flex items-center gap-1 text-sm font-medium"
+              >
+                <Icon path="M12 4v16m8-8H4" className="w-4 h-4" />
+                Add Date
+              </button>
+            </div>
+            
+            <div className="space-y-3">
+              {customDates.map((cd, idx) => (
+                <div key={idx} className="flex items-center gap-3 bg-background p-2 rounded-lg border border-border">
+                  <div className="flex-1">
+                    <input
+                      type="text"
+                      value={cd.name}
+                      onChange={(e) => {
+                        const newDates = [...customDates];
+                        newDates[idx].name = e.target.value;
+                        setCustomDates(newDates);
+                      }}
+                      placeholder="e.g. Interner Review"
+                      className="w-full px-3 py-1.5 bg-muted border border-input rounded text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <input
+                      type="datetime-local"
+                      value={cd.date}
+                      onChange={(e) => {
+                        const newDates = [...customDates];
+                        newDates[idx].date = e.target.value;
+                        setCustomDates(newDates);
+                      }}
+                      className="w-full px-3 py-1.5 bg-muted border border-input rounded text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const newDates = customDates.filter((_, i) => i !== idx);
+                      setCustomDates(newDates);
+                    }}
+                    className="p-1.5 text-destructive hover:bg-destructive/10 rounded transition-colors"
+                  >
+                    <Icon path="M6 18L18 6M6 6l12 12" className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+              {customDates.length === 0 && (
+                <div className="text-sm text-muted-foreground italic text-center py-2 bg-muted/30 rounded-lg">No custom dates added</div>
+              )}
+            </div>
+          </div>
+
+          {/* Materials Section */}
+          <div className="border-t border-border pt-4 mt-4">
+            <div className="flex justify-between items-center mb-3">
+              <div>
+                <h3 className="text-sm font-medium text-foreground">Materials / Equipment</h3>
+                <p className="text-xs text-muted-foreground">List external materials or items required.</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setMaterials([...materials, ''])}
+                className="text-primary hover:text-primary/80 transition-colors flex items-center gap-1 text-sm font-medium"
+              >
+                <Icon path="M12 4v16m8-8H4" className="w-4 h-4" />
+                Add Material
+              </button>
+            </div>
+            
+            <div className="space-y-2">
+              {materials.map((mat, idx) => (
+                <div key={idx} className="flex items-center gap-2">
+                  <div className="flex-1 relative">
+                    <Icon path="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="text"
+                      value={mat}
+                      onChange={(e) => {
+                        const newMats = [...materials];
+                        newMats[idx] = e.target.value;
+                        setMaterials(newMats);
+                      }}
+                      placeholder="Item name / link"
+                      className="w-full pl-9 pr-4 py-2 bg-muted border border-input rounded text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const newMats = materials.filter((_, i) => i !== idx);
+                      setMaterials(newMats);
+                    }}
+                    className="p-2 text-destructive hover:bg-destructive/10 rounded transition-colors"
+                  >
+                    <Icon path="M6 18L18 6M6 6l12 12" className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+              {materials.length === 0 && (
+                <div className="text-sm text-muted-foreground italic text-center py-2 bg-muted/30 rounded-lg">No materials added</div>
+              )}
             </div>
           </div>
 
