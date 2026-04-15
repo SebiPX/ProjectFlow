@@ -34,6 +34,8 @@ export const EmployeeTasksModal: React.FC<EmployeeTasksModalProps> = ({ isOpen, 
 
   // Filter tasks for this employee
   const employeeTasks = tasks.filter(task => {
+    if (task.status === 'done') return false;
+    
     if (task.assignee_ids?.includes(employee.id)) return true;
     if (task.assignees?.some(a => a.id === employee.id)) return true;
     if (task.assignee?.id === employee.id) return true;
