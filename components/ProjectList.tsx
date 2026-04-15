@@ -363,7 +363,6 @@ export const ProjectList: React.FC<{ onSelectProject: (project: Project) => void
               <tr>
                 <th className="px-5 py-3 font-semibold">ID</th>
                 <th className="px-5 py-3 font-semibold">Project</th>
-                <th className="px-5 py-3 font-semibold">Client</th>
                 <th className="px-5 py-3 font-semibold">PJM / Lead</th>
                 <th className="px-5 py-3 font-semibold">Team</th>
                 <th className="px-5 py-3 font-semibold">Status</th>
@@ -372,66 +371,81 @@ export const ProjectList: React.FC<{ onSelectProject: (project: Project) => void
               </tr>
             </thead>
             <tbody className="divide-y divide-border/50">
-              {sortedProjectsFlat.length === 0 ? (
+              {sortedClients.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="p-8 text-center text-muted-foreground">No projects found matching the criteria.</td>
+                  <td colSpan={7} className="p-8 text-center text-muted-foreground">No projects found matching the criteria.</td>
                 </tr>
               ) : (
-                sortedProjectsFlat.map(p => {
-                  const pjm = findPJM(p);
+                sortedClients.map(clientName => {
+                  const clientProjects = groupedProjects[clientName];
+                  const firstProject = clientProjects[0];
                   
                   return (
-                    <tr key={p.id} className="hover:bg-muted/30 transition-colors group">
-                      <td className="px-5 py-3 font-mono text-xs text-muted-foreground">#{p.project_number}</td>
-                      <td className="px-5 py-3 font-medium text-foreground">
-                        <button onClick={() => onSelectProject(p)} className="hover:text-primary transition-colors text-left flex flex-col">
-                          <span>{p.title}</span>
-                        </button>
-                      </td>
-                      <td className="px-5 py-3">
-                        <div className="flex items-center gap-2">
-                          <ClientLogo logoPath={p.client?.logo_url} companyName={p.client?.company_name || ''} className="w-5 h-5 rounded-full" />
-                          <span className="text-muted-foreground">{p.client?.company_name}</span>
-                        </div>
-                      </td>
-                      <td className="px-5 py-3">
-                        {pjm ? (
-                          <div className="flex items-center space-x-2" title={pjm.role || ''}>
-                             <Avatar url={pjm.profile?.avatar_url || ''} alt={pjm.profile?.full_name || ''} size="xs" />
-                             <span className="font-medium text-xs">{pjm.profile?.full_name}</span>
+                    <React.Fragment key={clientName}>
+                      {/* Client Group Header */}
+                      <tr className="bg-muted/20 border-y border-border">
+                        <td colSpan={7} className="px-5 py-3 font-bold text-foreground">
+                          <div className="flex items-center gap-2">
+                            {firstProject?.client?.logo_url && clientName !== 'Ohne Kunden' && (
+                              <ClientLogo logoPath={firstProject.client.logo_url} companyName={clientName} className="w-5 h-5 rounded-full" />
+                            )}
+                            <span className="text-sm">{clientName}</span>
+                            <span className="text-[10px] font-semibold bg-background border border-border text-muted-foreground px-2 rounded-full ml-1">{clientProjects.length}</span>
                           </div>
-                        ) : (
-                          <span className="text-muted-foreground italic text-[10px]">Unassigned</span>
-                        )}
-                      </td>
-                      <td className="px-5 py-3">
-                        <div className="flex -space-x-2">
-                           {p.project_members?.filter(m => m.user_id !== pjm?.user_id).slice(0, 4).map(m => (
-                             <div key={m.user_id} title={m.profile?.full_name || ''}>
-                               <Avatar url={m.profile?.avatar_url || ''} alt={m.profile?.full_name || ''} size="xs" className="ring-2 ring-background w-6 h-6" />
-                             </div>
-                           ))}
-                           {p.project_members && p.project_members.length > (pjm ? 5 : 4) && (
-                              <div className="w-6 h-6 rounded-full bg-muted border-2 border-background flex items-center justify-center text-[8px] font-bold z-0">
-                                +{(p.project_members.length - (pjm ? 1 : 0)) - 4}
+                        </td>
+                      </tr>
+                      {/* Projects for this Client */}
+                      {clientProjects.map(p => {
+                        const pjm = findPJM(p);
+                        return (
+                          <tr key={p.id} className="hover:bg-muted/30 transition-colors group">
+                            <td className="px-5 py-3 font-mono text-xs text-muted-foreground">#{p.project_number}</td>
+                            <td className="px-5 py-3 font-medium text-foreground">
+                              <button onClick={() => onSelectProject(p)} className="hover:text-primary transition-colors text-left flex flex-col">
+                                <span>{p.title}</span>
+                              </button>
+                            </td>
+                            <td className="px-5 py-3">
+                              {pjm ? (
+                                <div className="flex items-center space-x-2" title={pjm.role || ''}>
+                                   <Avatar url={pjm.profile?.avatar_url || ''} alt={pjm.profile?.full_name || ''} size="xs" />
+                                   <span className="font-medium text-xs">{pjm.profile?.full_name}</span>
+                                </div>
+                              ) : (
+                                <span className="text-muted-foreground italic text-[10px]">Unassigned</span>
+                              )}
+                            </td>
+                            <td className="px-5 py-3">
+                              <div className="flex -space-x-2">
+                                 {p.project_members?.filter(m => m.user_id !== pjm?.user_id).slice(0, 4).map(m => (
+                                   <div key={m.user_id} title={m.profile?.full_name || ''}>
+                                     <Avatar url={m.profile?.avatar_url || ''} alt={m.profile?.full_name || ''} size="xs" className="ring-2 ring-background w-6 h-6" />
+                                   </div>
+                                 ))}
+                                 {p.project_members && p.project_members.length > (pjm ? 5 : 4) && (
+                                    <div className="w-6 h-6 rounded-full bg-muted border-2 border-background flex items-center justify-center text-[8px] font-bold z-0">
+                                      +{(p.project_members.length - (pjm ? 1 : 0)) - 4}
+                                    </div>
+                                 )}
                               </div>
-                           )}
-                        </div>
-                      </td>
-                      <td className="px-5 py-3">
-                        <span className={`px-2 py-1 text-[10px] uppercase font-bold tracking-wider rounded-md border ${statusColors[p.status || ProjectStatus.Planned]}`}>
-                          {p.status?.replace('_', ' ')}
-                        </span>
-                      </td>
-                      <td className="px-5 py-3 text-right text-muted-foreground text-xs font-medium">
-                        {p.deadline ? new Date(p.deadline).toLocaleDateString() : '-'}
-                      </td>
-                      <td className="px-5 py-3 text-right">
-                         <button onClick={() => onSelectProject(p)} className="p-1.5 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-md transition-colors opacity-0 group-hover:opacity-100">
-                            <ArrowRight size={16} />
-                         </button>
-                      </td>
-                    </tr>
+                            </td>
+                            <td className="px-5 py-3">
+                              <span className={`px-2 py-1 text-[10px] uppercase font-bold tracking-wider rounded-md border ${statusColors[p.status || ProjectStatus.Planned]}`}>
+                                {p.status?.replace('_', ' ')}
+                              </span>
+                            </td>
+                            <td className="px-5 py-3 text-right text-muted-foreground text-xs font-medium">
+                              {p.deadline ? new Date(p.deadline).toLocaleDateString() : '-'}
+                            </td>
+                            <td className="px-5 py-3 text-right">
+                               <button onClick={() => onSelectProject(p)} className="p-1.5 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-md transition-colors opacity-0 group-hover:opacity-100">
+                                  <ArrowRight size={16} />
+                               </button>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </React.Fragment>
                   );
                 })
               )}
