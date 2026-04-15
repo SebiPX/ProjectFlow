@@ -26,9 +26,10 @@ const statusColors: { [key in string]: string } = {
 const ProjectCard: React.FC<{
   project: Project;
   onSelectProject: (project: Project) => void;
+  onStatusChange?: (status: ProjectStatus) => void;
   financialData?: { costs: number; billableValue: number; total: number };
   marginData?: { profit: number; marginPercentage: number; status: string };
-}> = ({ project, onSelectProject, financialData, marginData }) => {
+}> = ({ project, onSelectProject, onStatusChange, financialData, marginData }) => {
   const budget = project.budget_total || 0;
   const spent = financialData?.total || 0;
   const progress = budget > 0 ? Math.min((spent / budget) * 100, 100) : 0;
@@ -46,10 +47,20 @@ const ProjectCard: React.FC<{
     >
       <div>
         <div className="flex justify-between items-start">
-          <h3 className="text-lg font-bold text-foreground line-clamp-1">{project.title}</h3>
-          <span className={`px-2.5 py-1 text-[10px] uppercase font-bold tracking-wider rounded-full ${statusColors[project.status || ProjectStatus.Planned]}`}>
-            {project.status?.replace('_', ' ')}
-          </span>
+          <h3 className="text-lg font-bold text-foreground line-clamp-1 pr-2">{project.title}</h3>
+          <select
+            value={project.status || ProjectStatus.Planned}
+            onChange={(e) => onStatusChange && onStatusChange(e.target.value as ProjectStatus)}
+            onClick={(e) => e.stopPropagation()}
+            className={`px-2.5 py-1 text-[10px] uppercase font-bold tracking-wider rounded-full appearance-none outline-none cursor-pointer hover:opacity-80 transition-opacity ${statusColors[project.status || ProjectStatus.Planned]} border-none`}
+            style={{ WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none', textAlign: 'center' }}
+          >
+            <option value={ProjectStatus.Planned} className="bg-background text-foreground text-sm py-1">Planned</option>
+            <option value={ProjectStatus.Active} className="bg-background text-foreground text-sm py-1">Active</option>
+            <option value={ProjectStatus.OnHold} className="bg-background text-foreground text-sm py-1">On Hold</option>
+            <option value={ProjectStatus.Completed} className="bg-background text-foreground text-sm py-1">Completed</option>
+            <option value={ProjectStatus.Cancelled} className="bg-background text-foreground text-sm py-1">Cancelled</option>
+          </select>
         </div>
         <div className="flex items-center gap-2 mt-2">
           <ClientLogo
@@ -430,9 +441,19 @@ export const ProjectList: React.FC<{ onSelectProject: (project: Project) => void
                               </div>
                             </td>
                             <td className="px-5 py-3">
-                              <span className={`px-2 py-1 text-[10px] uppercase font-bold tracking-wider rounded-md border ${statusColors[p.status || ProjectStatus.Planned]}`}>
-                                {p.status?.replace('_', ' ')}
-                              </span>
+                              <select
+                                value={p.status || ProjectStatus.Planned}
+                                onChange={(e) => updateMutation.mutate({ id: p.id, status: e.target.value as ProjectStatus })}
+                                onClick={(e) => e.stopPropagation()}
+                                className={`px-2 py-1 text-[10px] uppercase font-bold tracking-wider rounded-md border appearance-none outline-none cursor-pointer hover:opacity-80 transition-opacity ${statusColors[p.status || ProjectStatus.Planned]}`}
+                                style={{ WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none', textAlign: 'center' }}
+                              >
+                                <option value={ProjectStatus.Planned} className="bg-background text-foreground text-sm py-1">Planned</option>
+                                <option value={ProjectStatus.Active} className="bg-background text-foreground text-sm py-1">Active</option>
+                                <option value={ProjectStatus.OnHold} className="bg-background text-foreground text-sm py-1">On Hold</option>
+                                <option value={ProjectStatus.Completed} className="bg-background text-foreground text-sm py-1">Completed</option>
+                                <option value={ProjectStatus.Cancelled} className="bg-background text-foreground text-sm py-1">Cancelled</option>
+                              </select>
                             </td>
                             <td className="px-5 py-3 text-right text-muted-foreground text-xs font-medium">
                               {p.deadline ? new Date(p.deadline).toLocaleDateString() : '-'}
@@ -558,6 +579,7 @@ export const ProjectList: React.FC<{ onSelectProject: (project: Project) => void
                         key={project.id}
                         project={project}
                         onSelectProject={onSelectProject}
+                        onStatusChange={(status) => updateMutation.mutate({ id: project.id, status })}
                         financialData={financialOverview[project.id]}
                         marginData={marginsData[project.id]}
                       />
