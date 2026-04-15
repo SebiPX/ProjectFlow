@@ -457,6 +457,13 @@ Don't try to create RLS policies for admin access to all profiles - use service 
 - ✅ **Category Naming**: Renamed the generic "Home" sidebar category string cleanly to "PX Desk" to enforce ecosystem nomenclature globally.
 - ✅ **Ecosystem Linking**: Implemented a responsive direct external linking button in the top header bridging users instantly back and forth between "PX-Studio" and "PX-Flow".
 
+### Completed in v2.6.0 ✅ (April 2026) - UI/UX REFINEMENTS
+
+- ✅ **Team Grid Clarity**: Removed sensitive financial statistics (Weekly Hours, Billable Rate, Internal Cost) from the public Team view component for better privacy.
+- ✅ **Quick Tasks View**: Clicking any team member card now instantly opens a detailed Modal indicating all their active assigned tasks.
+- ✅ **Project Listing Structure**: Advanced the main Projects component to exclusively categorize and sort alphabetically grouped by "Client Name", reducing visual clutter.
+- ✅ **Completed Projects Archival Strategy**: Completed projects are now intentionally hidden by default to keep the Active workspace clean. Introduced a discrete 'Completed' toggle filter to explicitly invoke these projects optionally.
+
 1. **Integrations & Export (Phase 2)**
    - [x] Automation email notifications (Edge Functions)
    - [ ] API for external tool integration

@@ -36,7 +36,8 @@ This app aims to increase efficiency, improve transparency for internal teams an
 **✅ Project Management**
 
 - Create, view, edit, and delete projects (Admin & PJM only)
-- **Project Archiving:** Soft-delete active projects and hide them via "Show Archive" toggle
+- **Project Structure**: Grouped and sorted alphabetically by Client in grid and table views
+- **Project Archiving & Completed Options**: Hide "Completed" projects by default to keep the workspace clean, and toggle visibility for both "Completed" and "Archived" projects via dedicated buttons
 - Link projects to clients
 - Project categories and status tracking
 - **Real-time budget tracking** with financial calculations
@@ -104,16 +105,17 @@ This app aims to increase efficiency, improve transparency for internal teams an
 - Full CRUD operations with React Query
 - Integration with time tracking for accurate billing
 
-**✅ Employee Management (Admin-Only)**
+**✅ Employee Management**
 
-- **Team member management** restricted to admin users
-- Beautiful card-based grid layout
+- **Team member management** restricted to admin users (for editing profiles/roles)
+- Beautiful card-based grid layout visible to everyone
+- **Quick Tasks View**: Clicking any user card instantly displays a modal with their active assigned tasks
 - **Employee profiles** with:
   - Avatar and full name display
   - Role badges (Admin, Employee, Freelancer)
-  - Weekly contracted hours (40h default, customizable)
-  - Billable hourly rate (used for project billing calculations)
-  - Internal cost per hour (for profit margin analysis)
+- **Admin-only Edit Modal & Stats** for updating and viewing:
+  - Weekly contracted hours, Billable rates, and Internal costs
+  - Contact information (name, email) & Role assignment
 - **Edit modal** for updating:
   - Contact information (name, email)
   - Role assignment
