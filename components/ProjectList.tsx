@@ -157,11 +157,16 @@ export const ProjectList: React.FC<{ onSelectProject: (project: Project) => void
   });
 
   const filteredProjects = projects.filter(project => {
-    if (showCompleted && project.status !== ProjectStatus.Completed) return false;
-    if (!showCompleted && project.status === ProjectStatus.Completed) return false;
-    
-    if (showArchived && !project.is_archived) return false;
-    if (!showArchived && project.is_archived) return false;
+    if (showArchived) {
+      if (!project.is_archived) return false;
+    } else if (showCompleted) {
+      if (project.status !== ProjectStatus.Completed) return false;
+      if (project.is_archived) return false;
+    } else {
+      // Default active view
+      if (project.is_archived) return false;
+      if (project.status === ProjectStatus.Completed) return false;
+    }
 
     if (onlyMe) {
       const isTeamMember = project.project_members?.some(member => 
