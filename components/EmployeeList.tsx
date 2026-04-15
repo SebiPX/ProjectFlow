@@ -4,6 +4,7 @@ import { useAuth } from '../lib/AuthContext';
 import { useQuery } from '@tanstack/react-query';
 import { getInternalProfiles, getTeamDirectory } from '../services/api/profiles';
 import { EmployeeEditModal } from './EmployeeEditModal';
+import { EmployeeTasksModal } from './EmployeeTasksModal';
 import type { Profile } from '../types/supabase';
 import { Card } from './ui/Card';
 import { Icon } from './ui/Icon';
@@ -15,6 +16,7 @@ interface EmployeeListProps {
 
 export const EmployeeList: React.FC<EmployeeListProps> = ({ searchQuery = '' }) => {
   const [editingEmployee, setEditingEmployee] = useState<Profile | null>(null);
+  const [selectedEmployeeForTasks, setSelectedEmployeeForTasks] = useState<Profile | null>(null);
   const [showOnlineOnly, setShowOnlineOnly] = useState(false);
   const { onlineUsers } = usePresence();
   const { profile } = useAuth();
@@ -95,8 +97,8 @@ export const EmployeeList: React.FC<EmployeeListProps> = ({ searchQuery = '' }) 
           {filteredEmployees.map((employee) => (
             <Card
               key={employee.id}
-              className={`p-6 transition-all duration-200 ${isAdmin ? 'hover:border-primary cursor-pointer' : ''}`}
-              onClick={() => isAdmin && setEditingEmployee(employee)}
+              className="p-6 transition-all duration-200 hover:border-primary cursor-pointer shadow-sm hover:shadow-md bg-card"
+              onClick={() => setSelectedEmployeeForTasks(employee)}
             >
               <div className="flex flex-col items-center text-center">
                 {/* Avatar */}
@@ -129,29 +131,7 @@ export const EmployeeList: React.FC<EmployeeListProps> = ({ searchQuery = '' }) 
                   {employee.role?.toUpperCase() || 'GUEST'}
                 </span>
 
-                {/* Stats - ONLY VISIBLE TO ADMINS */}
-                {isAdmin && (
-                  <div className="w-full space-y-2 border-t border-border pt-4">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Weekly Hours:</span>
-                      <span className="text-foreground font-semibold">
-                        {employee.weekly_hours || 40}h
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Billable Rate:</span>
-                      <span className="text-foreground font-semibold">
-                        €{employee.billable_hourly_rate || 0}/h
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Internal Cost:</span>
-                      <span className="text-foreground font-semibold">
-                        €{employee.internal_cost_per_hour || 0}/h
-                      </span>
-                    </div>
-                  </div>
-                )}
+
 
                 {/* Edit Button - ONLY VISIBLE TO ADMINS */}
                 {isAdmin && (
@@ -160,7 +140,7 @@ export const EmployeeList: React.FC<EmployeeListProps> = ({ searchQuery = '' }) 
                       e.stopPropagation();
                       setEditingEmployee(employee);
                     }}
-                    className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2 bg-muted hover:bg-muted/80 text-foreground rounded-lg transition-colors"
+                    className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2 bg-muted hover:bg-muted/80 text-foreground rounded-lg transition-colors border border-border"
                   >
                     <Icon path="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" className="w-4 h-4" />
                     Edit Details
@@ -177,6 +157,14 @@ export const EmployeeList: React.FC<EmployeeListProps> = ({ searchQuery = '' }) 
           isOpen={!!editingEmployee}
           onClose={() => setEditingEmployee(null)}
           employee={editingEmployee}
+        />
+      )}
+
+      {selectedEmployeeForTasks && (
+        <EmployeeTasksModal
+          isOpen={!!selectedEmployeeForTasks}
+          onClose={() => setSelectedEmployeeForTasks(null)}
+          employee={selectedEmployeeForTasks}
         />
       )}
     </div>
