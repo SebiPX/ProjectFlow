@@ -128,6 +128,7 @@ export const ProjectList: React.FC<{ onSelectProject: (project: Project) => void
   const { user, profile } = useAuth();
   const [onlyMe, setOnlyMe] = useState(false);
   const [showArchived, setShowArchived] = useState(false);
+  const [showCompleted, setShowCompleted] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'table' | 'board'>('grid');
 
   const { data: projects = [], isLoading, error } = useQuery({
@@ -156,7 +157,9 @@ export const ProjectList: React.FC<{ onSelectProject: (project: Project) => void
   });
 
   const filteredProjects = projects.filter(project => {
-    if (project.status === ProjectStatus.Completed) return false;
+    if (showCompleted && project.status !== ProjectStatus.Completed) return false;
+    if (!showCompleted && project.status === ProjectStatus.Completed) return false;
+    
     if (showArchived && !project.is_archived) return false;
     if (!showArchived && project.is_archived) return false;
 
@@ -247,6 +250,7 @@ export const ProjectList: React.FC<{ onSelectProject: (project: Project) => void
       { id: ProjectStatus.Planned, title: 'Planned' },
       { id: ProjectStatus.Active, title: 'Active' },
       { id: ProjectStatus.OnHold, title: 'On Hold' },
+      ...(showCompleted ? [{ id: ProjectStatus.Completed, title: 'Completed' }] : []),
     ];
 
     return (
@@ -480,7 +484,22 @@ export const ProjectList: React.FC<{ onSelectProject: (project: Project) => void
             Only Me
           </button>
           <button
-            onClick={() => setShowArchived(!showArchived)}
+            onClick={() => {
+              setShowCompleted(!showCompleted);
+              if (!showCompleted) setShowArchived(false);
+            }}
+            className={`font-semibold py-1.5 px-3 rounded-lg text-sm flex items-center transition-colors ${showCompleted
+              ? 'bg-green-600 text-white shadow-sm'
+              : 'bg-background hover:bg-muted text-muted-foreground border border-border'
+              }`}
+          >
+            Completed
+          </button>
+          <button
+            onClick={() => {
+              setShowArchived(!showArchived);
+              if (!showArchived) setShowCompleted(false);
+            }}
             className={`font-semibold py-1.5 px-3 rounded-lg text-sm flex items-center transition-colors ${showArchived
               ? 'bg-accent text-accent-foreground shadow-sm'
               : 'bg-background hover:bg-muted text-muted-foreground border border-border'
