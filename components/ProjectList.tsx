@@ -156,6 +156,7 @@ export const ProjectList: React.FC<{ onSelectProject: (project: Project) => void
   });
 
   const filteredProjects = projects.filter(project => {
+    if (project.status === ProjectStatus.Completed) return false;
     if (showArchived && !project.is_archived) return false;
     if (!showArchived && project.is_archived) return false;
 
@@ -179,6 +180,21 @@ export const ProjectList: React.FC<{ onSelectProject: (project: Project) => void
 
     return true;
   });
+
+  const groupedProjects = filteredProjects.reduce((acc, project) => {
+    const clientName = project.client?.company_name || 'Ohne Kunden';
+    if (!acc[clientName]) acc[clientName] = [];
+    acc[clientName].push(project);
+    return acc;
+  }, {} as Record<string, Project[]>);
+
+  const sortedClients = Object.keys(groupedProjects).sort((a, b) => {
+    if (a === 'Ohne Kunden') return 1;
+    if (b === 'Ohne Kunden') return -1;
+    return a.localeCompare(b);
+  });
+
+  const sortedProjectsFlat = sortedClients.flatMap(client => groupedProjects[client]);
 
   const findPJM = (p: Project) => {
     return p.project_members?.find(m => m.role && (m.role.toLowerCase().includes('pjm') || m.role.toLowerCase().includes('projektleitung')));
@@ -231,7 +247,6 @@ export const ProjectList: React.FC<{ onSelectProject: (project: Project) => void
       { id: ProjectStatus.Planned, title: 'Planned' },
       { id: ProjectStatus.Active, title: 'Active' },
       { id: ProjectStatus.OnHold, title: 'On Hold' },
-      { id: ProjectStatus.Completed, title: 'Completed' },
     ];
 
     return (
@@ -348,12 +363,12 @@ export const ProjectList: React.FC<{ onSelectProject: (project: Project) => void
               </tr>
             </thead>
             <tbody className="divide-y divide-border/50">
-              {filteredProjects.length === 0 ? (
+              {sortedProjectsFlat.length === 0 ? (
                 <tr>
                   <td colSpan={8} className="p-8 text-center text-muted-foreground">No projects found matching the criteria.</td>
                 </tr>
               ) : (
-                filteredProjects.map(p => {
+                sortedProjectsFlat.map(p => {
                   const pjm = findPJM(p);
                   
                   return (
@@ -489,15 +504,28 @@ export const ProjectList: React.FC<{ onSelectProject: (project: Project) => void
           </div>
         ) : (
           viewMode === 'grid' ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-8">
-              {filteredProjects.map(project => (
-                <ProjectCard
-                  key={project.id}
-                  project={project}
-                  onSelectProject={onSelectProject}
-                  financialData={financialOverview[project.id]}
-                  marginData={marginsData[project.id]}
-                />
+            <div className="flex flex-col gap-8 pb-8">
+              {sortedClients.map(clientName => (
+                <div key={clientName}>
+                  <div className="flex items-center gap-3 mb-4">
+                     {groupedProjects[clientName][0]?.client?.logo_url && clientName !== 'Ohne Kunden' && (
+                        <ClientLogo logoPath={groupedProjects[clientName][0].client?.logo_url} companyName={clientName} className="w-6 h-6 rounded-full" />
+                     )}
+                     <h2 className="text-xl font-bold text-foreground">{clientName}</h2>
+                     <span className="text-xs font-semibold bg-muted text-muted-foreground px-2 py-0.5 rounded-full">{groupedProjects[clientName].length}</span>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {groupedProjects[clientName].map(project => (
+                      <ProjectCard
+                        key={project.id}
+                        project={project}
+                        onSelectProject={onSelectProject}
+                        financialData={financialOverview[project.id]}
+                        marginData={marginsData[project.id]}
+                      />
+                    ))}
+                  </div>
+                </div>
               ))}
             </div>
           ) : viewMode === 'table' ? (
