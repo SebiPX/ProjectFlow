@@ -58,33 +58,41 @@ const SortableAssetItem = ({ asset, ...props }: { asset: Asset } & any) => {
     );
 };
 
+const statusStyles = {
+    [AssetStatus.Upload]: 'bg-secondary',
+    [AssetStatus.InternalReview]: 'bg-accent',
+    [AssetStatus.ClientReview]: 'bg-primary',
+    [AssetStatus.ChangesRequested]: 'bg-yellow-500',
+    [AssetStatus.Approved]: 'bg-emerald-500',
+    [AssetStatus.Archived]: 'bg-muted',
+};
+
 const KanbanColumn = ({ id, title, assets, assetCardProps, isClient }: { id: AssetStatus, title: string, assets: Asset[], assetCardProps: any, isClient: boolean }) => {
     const { setNodeRef } = useDroppable({ id });
 
     return (
-        <div className="flex flex-col w-80 bg-background rounded-lg border border-border h-full flex-shrink-0">
-            <div className={`p-4 border-b border-border font-semibold text-primary-foreground flex justify-between items-center
-        ${id === AssetStatus.Approved ? 'bg-green-500/10 text-green-400' : ''}
-        ${id === AssetStatus.ClientReview ? 'bg-primary/10 text-primary' : ''}
-      `}>
-                {title}
-                <span className="bg-card text-muted-foreground text-xs py-0.5 px-2 rounded-full">
+        <div className="flex flex-col w-80 bg-muted/30 rounded-lg border border-border h-full flex-shrink-0">
+            <div className="flex items-center justify-between p-3 border-b-2 border-border mb-2">
+                <div className="flex items-center">
+                    <span className={`w-3 h-3 rounded-full mr-2 ${statusStyles[id] || 'bg-muted'}`}></span>
+                    <h3 className="font-semibold text-foreground">{title}</h3>
+                </div>
+                <span className="text-sm font-medium bg-muted text-muted-foreground rounded-full px-2 py-0.5">
                     {assets.length}
                 </span>
             </div>
-            <div ref={setNodeRef} className="flex-1 p-3 overflow-y-auto min-h-[150px]">
+            <div ref={setNodeRef} className="flex-1 p-3 overflow-y-auto min-h-[150px] kanban-column">
                 <SortableContext items={assets.map(a => a.id)} strategy={verticalListSortingStrategy}>
                     {assets.map((asset) => (
                         <SortableAssetItem
                             key={asset.id}
                             asset={asset}
-                            // Pass down props for AssetCard
                             {...assetCardProps}
                             onClick={() => assetCardProps.onPreview(asset)}
                         />
                     ))}
                     {assets.length === 0 && (
-                        <div className="h-full flex items-center justify-center text-gray-600 text-sm border-2 border-dashed border-border rounded-lg py-8">
+                        <div className="h-full flex items-center justify-center text-muted-foreground text-sm border-2 border-dashed border-border rounded-lg py-8">
                             Drop here
                         </div>
                     )}
