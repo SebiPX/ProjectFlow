@@ -178,7 +178,18 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProject }) => {
               </tr>
             </thead>
             <tbody>
-              {projects.filter(p => p.status === 'active').map(project => (
+              {projects
+                .filter(p => p.status === 'active')
+                .sort((a, b) => {
+                  const clientA = (a.client?.company_name || '').toLowerCase();
+                  const clientB = (b.client?.company_name || '').toLowerCase();
+                  if (clientA < clientB) return -1;
+                  if (clientA > clientB) return 1;
+                  const titleA = (a.title || '').toLowerCase();
+                  const titleB = (b.title || '').toLowerCase();
+                  return titleA.localeCompare(titleB);
+                })
+                .map(project => (
                 <tr key={project.id} className="bg-card border-b border-border hover:bg-muted/30">
                   <td className="px-6 py-4 font-medium text-foreground whitespace-nowrap">{project.title}</td>
                   <td className="px-6 py-4">{project.client?.company_name}</td>
