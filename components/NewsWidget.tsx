@@ -9,6 +9,7 @@ interface NewsItem {
   content: string;
   type: 'internal' | 'external';
   publish_date: string;
+  thumbnail?: string;
 }
 
 export const NewsWidget: React.FC = () => {
@@ -42,7 +43,7 @@ export const NewsWidget: React.FC = () => {
     if (loading) {
         return (
             <div className="bg-card/60 border border-border rounded-2xl p-5 flex items-center justify-center h-48">
-                <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                <div className="w-8 h-8 border-4 border-[#135bec] border-t-transparent rounded-full animate-spin"></div>
             </div>
         );
     }
@@ -51,7 +52,7 @@ export const NewsWidget: React.FC = () => {
         <div className="bg-card/60 border border-border rounded-2xl overflow-hidden flex flex-col max-h-[500px]">
             <div className="flex items-center justify-between px-5 py-4 border-b border-border bg-card/80">
                 <h2 className="font-semibold text-foreground flex items-center gap-2">
-                    <Newspaper size={18} className="text-primary" />
+                    <Newspaper size={18} className="text-[#135bec]" />
                     News of the Day
                 </h2>
             </div>
@@ -61,7 +62,12 @@ export const NewsWidget: React.FC = () => {
                     <div className="text-center text-muted-foreground text-sm py-4">Keine aktuellen Nachrichten vorhanden.</div>
                 ) : (
                     news.map(item => (
-                        <div key={item.id} className="bg-background/40 p-4 rounded-xl border border-border/50 hover:border-input transition-colors">
+                        <div key={item.id} className="bg-card/40 p-4 rounded-xl border border-border/50 hover:border-border/80 transition-colors">
+                            {item.thumbnail && (
+                                <div className="mb-4 rounded-lg overflow-hidden h-40 w-full bg-muted/20 relative">
+                                    <img src={item.thumbnail} alt={item.title} className="w-full h-full object-cover" loading="lazy" />
+                                </div>
+                            )}
                             <div className="flex items-center gap-2 mb-2">
                                 {item.type === 'internal' ? (
                                     <MessageCircle size={16} className="text-green-400 shrink-0" />
