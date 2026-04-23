@@ -463,6 +463,7 @@ Don't try to create RLS policies for admin access to all profiles - use service 
 - ✅ **Quick Tasks View**: Clicking any team member card now instantly opens a detailed Modal indicating all their active assigned tasks.
 - ✅ **Project Listing Structure**: Advanced the main Projects component to exclusively categorize and sort alphabetically grouped by "Client Name", reducing visual clutter.
 - ✅ **Completed Projects Archival Strategy**: Completed projects are now intentionally hidden by default to keep the Active workspace clean. Introduced a discrete 'Completed' toggle filter to explicitly invoke these projects optionally.
+- ✅ **News Widget Integration**: Integrated the external `ai_news` PostgreSQL database directly into the Dashboard for side-by-side thumbnail rendering of curated tech news.
 
 1. **Integrations & Export (Phase 2)**
    - [x] Automation email notifications (Edge Functions)
