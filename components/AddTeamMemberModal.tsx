@@ -21,6 +21,7 @@ export const AddTeamMemberModal: React.FC<AddTeamMemberModalProps> = ({
   const queryClient = useQueryClient();
   const [selectedUserId, setSelectedUserId] = useState<string>('');
   const [role, setRole] = useState<string>('');
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [workloadMap, setWorkloadMap] = useState<Map<string, WorkloadData>>(new Map());
   const [assignmentCheck, setAssignmentCheck] = useState<{
@@ -46,6 +47,15 @@ export const AddTeamMemberModal: React.FC<AddTeamMemberModalProps> = ({
   // Filter out users who are already team members
   const currentMemberIds = new Set(currentMembers.map(m => m.user_id || m.profile_id));
   const availableUsers = allUsers.filter(user => !currentMemberIds.has(user.id));
+  
+  // Filter by search query
+  const filteredUsers = availableUsers.filter(user => {
+    if (!searchQuery) return true;
+    const query = searchQuery.toLowerCase();
+    const nameMatch = (user.full_name || user.email || '').toLowerCase().includes(query);
+    const roleMatch = (user.role || '').toLowerCase().includes(query);
+    return nameMatch || roleMatch;
+  });
 
   // Load workload data for all available users
   useEffect(() => {
@@ -104,6 +114,7 @@ export const AddTeamMemberModal: React.FC<AddTeamMemberModalProps> = ({
   const handleClose = () => {
     setSelectedUserId('');
     setRole('');
+    setSearchQuery('');
     setLoading(false);
     setAssignmentCheck(null);
     onClose();
@@ -154,11 +165,26 @@ export const AddTeamMemberModal: React.FC<AddTeamMemberModalProps> = ({
                 <label className="block text-sm font-medium text-muted-foreground mb-2">
                   Team Member <span className="text-red-500">*</span>
                 </label>
+                <div className="relative mb-3">
+                  <Icon path="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                  <input
+                    type="text"
+                    placeholder="Search by name, email or role..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full bg-muted border border-input text-foreground placeholder-gray-400 text-sm rounded-lg focus:ring-primary focus:border-primary pl-9 pr-4 py-2"
+                  />
+                </div>
                 <div className="space-y-2 max-h-64 overflow-y-auto pr-2" style={{
                   scrollbarWidth: 'thin',
                   scrollbarColor: '#4B5563 #1F2937'
                 }}>
-                  {availableUsers.map((user) => {
+                  {filteredUsers.length === 0 ? (
+                    <div className="text-center py-4 text-sm text-muted-foreground">
+                      No team members found matching "{searchQuery}"
+                    </div>
+                  ) : (
+                    filteredUsers.map((user) => {
                     const workload = workloadMap.get(user.id);
                     const utilization = workload?.utilization_percentage || 0;
                     const isSelected = selectedUserId === user.id;
@@ -204,7 +230,7 @@ export const AddTeamMemberModal: React.FC<AddTeamMemberModalProps> = ({
                         </div>
                       </div>
                     );
-                  })}
+                  }))}
                 </div>
                 <p className="mt-2 text-xs text-muted-foreground">
                   Utilization shown as percentage of weekly capacity
