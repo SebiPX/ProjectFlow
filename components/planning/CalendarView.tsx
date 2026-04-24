@@ -148,6 +148,9 @@ export const CalendarView: React.FC = () => {
                                             else if (isReview) prefix = '🎯 ';
                                             else if (isRevision) prefix = '✍️ ';
 
+                                            const timeStr = isDue && task.due_date ? 
+                                                new Date(task.due_date).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) + ' Uhr - ' : '';
+
                                             return (
                                                 <div
                                                     key={task.id}
@@ -159,7 +162,7 @@ export const CalendarView: React.FC = () => {
                                                     }}
                                                     title={task.title}
                                                 >
-                                                    {prefix}{task.title}
+                                                    {prefix}{timeStr}{task.title}
                                                 </div>
                                             );
                                         })}

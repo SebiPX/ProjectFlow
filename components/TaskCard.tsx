@@ -207,7 +207,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
             {upcomingInfo.date ? (
               <>
                 <span className="font-semibold text-foreground/80">{upcomingInfo.label}: </span>
-                {new Date(upcomingInfo.date).toLocaleDateString('de-DE')}
+                {new Date(upcomingInfo.date).toLocaleString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })} Uhr
                 {upcomingInfo.isOverdue && ' (Überfällig)'}
               </>
             ) : 'Kein Datum'}

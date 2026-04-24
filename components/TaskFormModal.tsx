@@ -27,7 +27,7 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
     review_date: '',
     revision_date: '',
     due_date: '',
-    is_visible_to_client: true,
+    is_visible_to_client: false,
     brand: '',
     show: '',
     legal_line: '',
@@ -109,7 +109,7 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
       review_date: '',
       revision_date: '',
       due_date: '',
-      is_visible_to_client: true,
+      is_visible_to_client: false,
       brand: '',
       show: '',
       legal_line: '',
@@ -158,8 +158,8 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
       project_id: formData.project_id,
       status: formData.status as any,
       assignee_ids: formData.assignee_ids,
-      start_date: formData.start_date || null,
-      due_date: formData.due_date || null,
+      start_date: formData.start_date ? new Date(formData.start_date).toISOString() : null,
+      due_date: formData.due_date ? new Date(formData.due_date).toISOString() : null,
       custom_dates: customDates.filter(c => c.name.trim() && c.date),
       materials: materials.filter(m => m.trim() !== ''),
       depends_on_task_ids: dependsOnTaskIds,
@@ -500,7 +500,7 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
                 Start Date
               </label>
               <input
-                type="date"
+                type="datetime-local"
                 id="start_date"
                 value={formData.start_date}
                 onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
@@ -512,7 +512,7 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
                 Date Final (Due)
               </label>
               <input
-                type="date"
+                type="datetime-local"
                 id="due_date"
                 value={formData.due_date}
                 onChange={(e) => setFormData({ ...formData, due_date: e.target.value })}

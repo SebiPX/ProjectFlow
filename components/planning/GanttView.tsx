@@ -128,16 +128,20 @@ export const GanttView: React.FC = () => {
                                 {group.project.title}
                             </div>
                             {/* Task Rows */}
-                            {group.tasks.map(task => (
+                            {group.tasks.map(task => {
+                                const timeStr = task.due_date ? 
+                                    new Date(task.due_date).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) + ' Uhr - ' : '';
+                                return (
                                 <div 
                                     key={task.id} 
                                     onClick={() => setEditingTask(task)}
                                     className="h-8 px-8 flex items-center text-sm text-muted-foreground border-b border-border/30 truncate hover:bg-muted/50 cursor-pointer transition-colors"
                                     title="Edit Task"
                                 >
-                                    {task.title}
+                                    <span className="font-semibold text-foreground mr-1">{timeStr}</span> {task.title}
                                 </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     ))}
                 </div>

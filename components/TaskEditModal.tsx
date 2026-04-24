@@ -16,6 +16,13 @@ interface TaskEditModalProps {
   onTimeTrack?: (task: Task) => void;
 }
 
+const formatDateTimeLocal = (dateString: string | null) => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  const offset = date.getTimezoneOffset() * 60000;
+  return new Date(date.getTime() - offset).toISOString().slice(0, 16);
+};
+
 export const TaskEditModal: React.FC<TaskEditModalProps> = ({ isOpen, onClose, task, onTimeTrack }) => {
   const queryClient = useQueryClient();
   const [formData, setFormData] = useState({
@@ -24,10 +31,10 @@ export const TaskEditModal: React.FC<TaskEditModalProps> = ({ isOpen, onClose, t
     project_id: task.project_id,
     status: task.status || 'todo',
     assignee_ids: task.assignee_ids || (task.assignee_id ? [task.assignee_id] : []),
-    start_date: task.start_date ? new Date(task.start_date).toISOString().split('T')[0] : '',
+    start_date: formatDateTimeLocal(task.start_date),
     review_date: task.review_date ? new Date(task.review_date).toISOString().split('T')[0] : '',
     revision_date: task.revision_date ? new Date(task.revision_date).toISOString().split('T')[0] : '',
-    due_date: task.due_date ? new Date(task.due_date).toISOString().split('T')[0] : '',
+    due_date: formatDateTimeLocal(task.due_date),
     is_visible_to_client: task.is_visible_to_client ?? true,
     brand: task.brand || '',
     show: task.show || '',
@@ -51,10 +58,10 @@ export const TaskEditModal: React.FC<TaskEditModalProps> = ({ isOpen, onClose, t
       project_id: task.project_id,
       status: task.status || 'todo',
       assignee_ids: task.assignee_ids || (task.assignee_id ? [task.assignee_id] : []),
-      start_date: task.start_date ? new Date(task.start_date).toISOString().split('T')[0] : '',
+      start_date: formatDateTimeLocal(task.start_date),
       review_date: task.review_date ? new Date(task.review_date).toISOString().split('T')[0] : '',
       revision_date: task.revision_date ? new Date(task.revision_date).toISOString().split('T')[0] : '',
-      due_date: task.due_date ? new Date(task.due_date).toISOString().split('T')[0] : '',
+      due_date: formatDateTimeLocal(task.due_date),
       is_visible_to_client: task.is_visible_to_client ?? true,
       brand: task.brand || '',
       show: task.show || '',
@@ -160,8 +167,8 @@ export const TaskEditModal: React.FC<TaskEditModalProps> = ({ isOpen, onClose, t
       project_id: formData.project_id,
       status: formData.status as any,
       assignee_ids: formData.assignee_ids,
-      start_date: formData.start_date || null,
-      due_date: formData.due_date || null,
+      start_date: formData.start_date ? new Date(formData.start_date).toISOString() : null,
+      due_date: formData.due_date ? new Date(formData.due_date).toISOString() : null,
       custom_dates: customDates.filter(c => c.name.trim() && c.date),
       materials: materials.filter(m => m.trim() !== ''),
       depends_on_task_ids: dependsOnTaskIds,
@@ -478,7 +485,7 @@ export const TaskEditModal: React.FC<TaskEditModalProps> = ({ isOpen, onClose, t
                 Start Date
               </label>
               <input
-                type="date"
+                type="datetime-local"
                 id="start_date"
                 value={formData.start_date}
                 onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
@@ -490,7 +497,7 @@ export const TaskEditModal: React.FC<TaskEditModalProps> = ({ isOpen, onClose, t
                 Date Final (Due)
               </label>
               <input
-                type="date"
+                type="datetime-local"
                 id="due_date"
                 value={formData.due_date}
                 onChange={(e) => setFormData({ ...formData, due_date: e.target.value })}
