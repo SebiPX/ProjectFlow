@@ -36,7 +36,10 @@ export const GanttView: React.FC = () => {
     // Group Tasks by Project
     const groupedTasks = useMemo(() => {
         // Sort projects alphabetically by Client name, then by Project title
-        const sortedProjects = [...projects].sort((a, b) => {
+        // Only include active projects
+        const sortedProjects = [...projects]
+            .filter(p => p.status === 'active')
+            .sort((a, b) => {
             const clientA = (a.client?.company_name || '').toLowerCase();
             const clientB = (b.client?.company_name || '').toLowerCase();
             

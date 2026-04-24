@@ -41,6 +41,9 @@ export const CalendarView: React.FC = () => {
     const totalSlots = daysInMonth + firstDay;
     const days = [];
 
+    const activeProjectIds = new Set(projects.filter(p => p.status === 'active').map(p => p.id));
+    const activeTasks = tasks.filter(t => activeProjectIds.has(t.project_id));
+
     // Empty slots for previous month
     for (let i = 0; i < firstDay; i++) {
         days.push(null);
@@ -102,7 +105,7 @@ export const CalendarView: React.FC = () => {
                                 return <div key={`empty-${index}`} className="bg-background/40 border-r border-b border-border" />;
                             }
 
-                            const dayTasks = tasks.filter(task => {
+                            const dayTasks = activeTasks.filter(task => {
                                 const dates = [
                                     task.start_date, 
                                     task.review_date, 
