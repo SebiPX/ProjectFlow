@@ -14,7 +14,7 @@ import { CostFormModal } from './CostFormModal';
 import { CostEditModal } from './CostEditModal';
 import { TaskFormModal } from './TaskFormModal';
 import { AssetKanbanBoard } from './AssetKanbanBoard';
-import { getTasksByProject } from '../services/api/tasks';
+import { getTasksByProject, updateTaskStatus } from '../services/api/tasks';
 import { getAssetsByProject, downloadAsset, deleteAsset, getAssetSignedUrl, updateAsset } from '../services/api/assets';
 import { getProjectMembers, removeProjectMember } from '../services/api/projectMembers';
 import { getCostsByProject, deleteCost, getCostDocumentSignedUrl } from '../services/api/costs';
@@ -148,6 +148,23 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
     updateAssetStatusMutation.mutate({ id: assetId, status: newStatus });
   };
 
+  // Task Status Update Mutation
+  const updateTaskStatusMutation = useMutation({
+    mutationFn: ({ id, status }: { id: string; status: any }) =>
+      updateTaskStatus(id, status),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks', project.id] });
+      toast.success('Task status updated');
+    },
+    onError: (error: any) => {
+      toast.error(`Failed to update task status: ${error.message}`);
+    }
+  });
+
+  const handleUpdateTaskStatus = (taskId: string, newStatus: any) => {
+    updateTaskStatusMutation.mutate({ id: taskId, status: newStatus });
+  };
+
   // Delete asset mutation
   const deleteAssetMutation = useMutation({
     mutationFn: deleteAsset,
@@ -272,7 +289,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
               )}
             </div>
             <div className="flex-grow overflow-hidden">
-              <KanbanBoard tasks={tasks} />
+              <KanbanBoard tasks={tasks} onStatusChange={handleUpdateTaskStatus} />
             </div>
           </div>
         );

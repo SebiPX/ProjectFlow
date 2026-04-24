@@ -1,5 +1,24 @@
-
 import React, { useState } from 'react';
+import {
+    DndContext,
+    closestCenter,
+    KeyboardSensor,
+    PointerSensor,
+    useSensor,
+    useSensors,
+    DragOverlay,
+    DragStartEvent,
+    DragEndEvent,
+    useDroppable,
+} from '@dnd-kit/core';
+import {
+    SortableContext,
+    sortableKeyboardCoordinates,
+    verticalListSortingStrategy,
+    useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+
 import type { Task, Project } from '../types/supabase';
 import { TaskStatus } from '../types/supabase';
 import { TaskCard } from './TaskCard';
@@ -11,6 +30,7 @@ interface KanbanBoardProps {
   projects?: Project[];
   currentProject?: Project;
   onSelectProject?: (project: Project) => void;
+  onStatusChange?: (taskId: string, newStatus: TaskStatus) => void;
 }
 
 const columns: { status: TaskStatus, title: string }[] = [
@@ -27,6 +47,35 @@ const statusStyles = {
   [TaskStatus.Done]: 'bg-emerald-500',
 };
 
+const SortableTaskItem = ({ task, project, onEditTask, onTimeTrack, onSelectProject }: any) => {
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+        isDragging,
+    } = useSortable({ id: task.id, data: { task } });
+
+    const style = {
+        transform: CSS.Translate.toString(transform),
+        transition,
+        opacity: isDragging ? 0.5 : 1,
+    };
+
+    return (
+        <div ref={setNodeRef} style={style} {...attributes} {...listeners} className="mb-3">
+            <TaskCard
+              task={task}
+              project={project}
+              onEdit={onEditTask}
+              onTimeTrack={onTimeTrack}
+              onSelectProject={onSelectProject}
+            />
+        </div>
+    );
+};
+
 const KanbanColumn: React.FC<{
   status: TaskStatus,
   title: string,
@@ -37,8 +86,10 @@ const KanbanColumn: React.FC<{
   onTimeTrack: (task: Task) => void,
   onSelectProject?: (project: Project) => void
 }> = ({ status, title, tasks, projects, currentProject, onEditTask, onTimeTrack, onSelectProject }) => {
+  const { setNodeRef } = useDroppable({ id: status });
+
   return (
-    <div className="w-80 bg-muted/30 rounded-lg flex flex-col flex-shrink-0 border border-border">
+    <div className="w-80 bg-muted/30 rounded-lg flex flex-col flex-shrink-0 border border-border h-full">
       <div className="flex items-center justify-between p-3 border-b-2 border-border mb-2">
         <div className="flex items-center">
           <span className={`w-3 h-3 rounded-full mr-2 ${statusStyles[status]}`}></span>
@@ -46,49 +97,111 @@ const KanbanColumn: React.FC<{
         </div>
         <span className="text-sm font-medium bg-muted text-muted-foreground rounded-full px-2 py-0.5">{tasks.length}</span>
       </div>
-      <div className="flex-1 overflow-y-auto p-3 space-y-3 kanban-column min-h-[100px]">
-        {tasks.map(task => {
-          const project = currentProject || projects?.find(p => p.id === task.project_id);
-          return (
-            <TaskCard
-              key={task.id}
-              task={task}
-              project={project}
-              onEdit={onEditTask}
-              onTimeTrack={onTimeTrack}
-              onSelectProject={onSelectProject}
-            />
-          );
-        })}
+      <div ref={setNodeRef} className="flex-1 overflow-y-auto p-3 kanban-column min-h-[150px]">
+        <SortableContext items={tasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
+          {tasks.map(task => {
+            const project = currentProject || projects?.find(p => p.id === task.project_id);
+            return (
+              <SortableTaskItem
+                key={task.id}
+                task={task}
+                project={project}
+                onEditTask={onEditTask}
+                onTimeTrack={onTimeTrack}
+                onSelectProject={onSelectProject}
+              />
+            );
+          })}
+          {tasks.length === 0 && (
+            <div className="h-full flex items-center justify-center text-muted-foreground text-sm border-2 border-dashed border-border rounded-lg py-8">
+              Drop here
+            </div>
+          )}
+        </SortableContext>
       </div>
     </div>
   );
 };
 
-export const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, projects, currentProject, onSelectProject }) => {
+export const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, projects, currentProject, onSelectProject, onStatusChange }) => {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [trackingTask, setTrackingTask] = useState<Task | null>(null);
 
-  // Filter tasks that actually have a valid status, or fallback to Todo if needed
-  // But usually we just filter by matching column status
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const [activeTask, setActiveTask] = useState<Task | null>(null);
+
+  const sensors = useSensors(
+      useSensor(PointerSensor, {
+          activationConstraint: {
+              distance: 8,
+          }
+      }),
+      useSensor(KeyboardSensor, {
+          coordinateGetter: sortableKeyboardCoordinates,
+      })
+  );
+
+  const handleDragStart = (event: DragStartEvent) => {
+      if (!onStatusChange) return; // If no handler, prevent dragging or just don't do anything
+      const { active } = event;
+      setActiveId(active.id as string);
+      setActiveTask(active.data.current?.task);
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+      const { active, over } = event;
+      setActiveId(null);
+      setActiveTask(null);
+
+      if (!over || !onStatusChange) return;
+
+      const draggedTask = active.data.current?.task as Task;
+      const overId = over.id as string;
+
+      const isStatusColumn = Object.values(TaskStatus).includes(overId as any);
+
+      if (draggedTask && isStatusColumn && draggedTask.status !== overId) {
+          onStatusChange(draggedTask.id, overId as TaskStatus);
+      }
+  };
 
   return (
     <>
-      <div className="flex h-full p-4 space-x-4 overflow-x-auto items-start">
-        {columns.map(col => (
-          <KanbanColumn
-            key={col.status}
-            status={col.status}
-            title={col.title}
-            tasks={tasks.filter(t => t.status === col.status)}
-            projects={projects}
-            currentProject={currentProject}
-            onEditTask={setEditingTask}
-            onTimeTrack={setTrackingTask}
-            onSelectProject={onSelectProject}
-          />
-        ))}
-      </div>
+      <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+      >
+        <div className="flex h-full p-4 space-x-4 overflow-x-auto items-start">
+          {columns.map(col => (
+            <KanbanColumn
+              key={col.status}
+              status={col.status}
+              title={col.title}
+              tasks={tasks.filter(t => t.status === col.status)}
+              projects={projects}
+              currentProject={currentProject}
+              onEditTask={setEditingTask}
+              onTimeTrack={setTrackingTask}
+              onSelectProject={onSelectProject}
+            />
+          ))}
+        </div>
+
+        <DragOverlay>
+            {activeTask ? (
+                <div className="cursor-grabbing rotate-2 scale-105 shadow-2xl">
+                  <TaskCard
+                      task={activeTask}
+                      project={currentProject || projects?.find(p => p.id === activeTask.project_id)}
+                      onEdit={() => {}}
+                      onTimeTrack={() => {}}
+                  />
+                </div>
+            ) : null}
+        </DragOverlay>
+      </DndContext>
 
       {editingTask && (
         <TaskEditModal

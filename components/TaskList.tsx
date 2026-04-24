@@ -1,9 +1,10 @@
 
 import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'react-toastify';
 import type { Project, Task } from '../types/supabase';
 import { TaskStatus } from '../types/supabase';
-import { getTasks } from '../services/api/tasks';
+import { getTasks, updateTaskStatus } from '../services/api/tasks';
 import { getProjects } from '../services/api/projects';
 import { useAuth } from '../lib/AuthContext';
 import { Card } from './ui/Card';
@@ -32,6 +33,7 @@ interface TaskSort {
 
 export const TaskList: React.FC<TaskListProps> = ({ onSelectProject, searchQuery = '' }) => {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [trackingTask, setTrackingTask] = useState<Task | null>(null);
@@ -57,6 +59,22 @@ export const TaskList: React.FC<TaskListProps> = ({ onSelectProject, searchQuery
     queryKey: ['projects'],
     queryFn: getProjects,
   });
+
+  const updateTaskStatusMutation = useMutation({
+    mutationFn: ({ id, status }: { id: string; status: any }) =>
+      updateTaskStatus(id, status),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      toast.success('Task status updated');
+    },
+    onError: (error: any) => {
+      toast.error(`Failed to update task status: ${error.message}`);
+    }
+  });
+
+  const handleUpdateTaskStatus = (taskId: string, newStatus: any) => {
+    updateTaskStatusMutation.mutate({ id: taskId, status: newStatus });
+  };
 
   // Filter Logic
   const filterTasks = (tasks: Task[]): Task[] => {
@@ -390,6 +408,7 @@ export const TaskList: React.FC<TaskListProps> = ({ onSelectProject, searchQuery
                 tasks={filteredAndSortedTasks}
                 projects={projects}
                 onSelectProject={onSelectProject}
+                onStatusChange={handleUpdateTaskStatus}
               />
             </div>
           )}
