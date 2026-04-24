@@ -90,6 +90,7 @@ export const Navigation: React.FC<NavigationProps> = ({ currentView, onNavigate,
     queryKey: ['notifications'],
     queryFn: getNotifications,
     enabled: !!profile,
+    refetchInterval: 30000,
   });
 
   const unreadCount = notifications?.filter(n => !n.is_read).length || 0;

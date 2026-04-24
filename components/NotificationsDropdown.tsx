@@ -19,6 +19,7 @@ export const NotificationsDropdown: React.FC<Props> = ({ onClose, onNavigate }) 
         queryKey: ['notifications'],
         queryFn: getNotifications,
         enabled: !!user,
+        refetchInterval: 30000,
     });
 
     // Real-time subscription handled globally in useRealtime hook
