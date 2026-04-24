@@ -35,8 +35,25 @@ export const GanttView: React.FC = () => {
 
     // Group Tasks by Project
     const groupedTasks = useMemo(() => {
+        // Sort projects alphabetically by Client name, then by Project title
+        const sortedProjects = [...projects].sort((a, b) => {
+            const clientA = (a.client?.company_name || '').toLowerCase();
+            const clientB = (b.client?.company_name || '').toLowerCase();
+            
+            if (clientA < clientB) return -1;
+            if (clientA > clientB) return 1;
+            
+            const titleA = (a.title || '').toLowerCase();
+            const titleB = (b.title || '').toLowerCase();
+            
+            if (titleA < titleB) return -1;
+            if (titleA > titleB) return 1;
+            
+            return 0;
+        });
+
         const grouped: Record<string, Task[]> = {};
-        projects.forEach(p => grouped[p.id] = []);
+        sortedProjects.forEach(p => grouped[p.id] = []);
 
         tasks.forEach(task => {
             if (grouped[task.project_id]) {
@@ -44,10 +61,10 @@ export const GanttView: React.FC = () => {
             }
         });
 
-        return projects.map(p => ({
+        return sortedProjects.map(p => ({
             project: p,
             tasks: grouped[p.id] || []
-        })).filter(g => g.tasks.length > 0); // Only show projects with tasks or always show? Let's show active.
+        })).filter(g => g.tasks.length > 0);
     }, [projects, tasks]);
 
     // Handle Scroll (Basic prev/next)
