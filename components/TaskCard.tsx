@@ -4,6 +4,7 @@ import { TaskStatus } from '../types/supabase';
 import { Icon } from './ui/Icon';
 import { Avatar } from './ui/Avatar';
 import { Card } from './ui/Card';
+import { useAuth } from '../lib/AuthContext';
 
 export const taskStatusStyles: { [key in TaskStatus]: string } = {
   [TaskStatus.Todo]: 'bg-secondary text-secondary-foreground',
@@ -18,6 +19,7 @@ interface TaskCardProps {
   onEdit: (task: Task) => void;
   onTimeTrack: (task: Task) => void;
   onSelectProject?: (project: Project) => void;
+  onDelete?: (task: Task) => void;
 }
 
 export const TaskCard: React.FC<TaskCardProps> = ({
@@ -25,8 +27,13 @@ export const TaskCard: React.FC<TaskCardProps> = ({
   project,
   onEdit,
   onTimeTrack,
-  onSelectProject
+  onSelectProject,
+  onDelete
 }) => {
+  const { profile } = useAuth();
+  const canEdit = profile?.role === 'admin' || profile?.role === 'pjm' || task.created_by === profile?.id;
+  const canDelete = canEdit;
+
   const getAllDates = () => {
     const dates: { label: string, date: string, isOverdue: boolean }[] = [];
     if (task.start_date) dates.push({ label: 'Start', date: task.start_date, isOverdue: false });
@@ -221,16 +228,32 @@ export const TaskCard: React.FC<TaskCardProps> = ({
           <Icon path="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" className="w-5 h-5" />
           <span className="text-sm font-medium">Track Time</span>
         </button>
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onEdit(task);
-          }}
-          className="p-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-lg transition-colors"
-          title="Edit task"
-        >
-          <Icon path="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" className="w-5 h-5" />
-        </button>
+        {canEdit && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onEdit(task);
+            }}
+            className="p-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-lg transition-colors"
+            title="Edit task"
+          >
+            <Icon path="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" className="w-5 h-5" />
+          </button>
+        )}
+        {canDelete && onDelete && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              if (window.confirm('Möchtest du diesen Task wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.')) {
+                onDelete(task);
+              }
+            }}
+            className="p-2 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
+            title="Delete task"
+          >
+            <Icon path="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" className="w-5 h-5" />
+          </button>
+        )}
       </div>
     </Card>
   );

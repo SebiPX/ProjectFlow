@@ -31,6 +31,7 @@ interface KanbanBoardProps {
   currentProject?: Project;
   onSelectProject?: (project: Project) => void;
   onStatusChange?: (taskId: string, newStatus: TaskStatus) => void;
+  onDeleteTask?: (task: Task) => void;
 }
 
 const columns: { status: TaskStatus, title: string }[] = [
@@ -47,7 +48,7 @@ const statusStyles = {
   [TaskStatus.Done]: 'bg-emerald-500',
 };
 
-const SortableTaskItem = ({ task, project, onEditTask, onTimeTrack, onSelectProject }: any) => {
+const SortableTaskItem = ({ task, project, onEditTask, onTimeTrack, onSelectProject, onDeleteTask }: any) => {
     const {
         attributes,
         listeners,
@@ -71,6 +72,7 @@ const SortableTaskItem = ({ task, project, onEditTask, onTimeTrack, onSelectProj
               onEdit={onEditTask}
               onTimeTrack={onTimeTrack}
               onSelectProject={onSelectProject}
+              onDelete={onDeleteTask}
             />
         </div>
     );
@@ -84,8 +86,9 @@ const KanbanColumn: React.FC<{
   currentProject?: Project,
   onEditTask: (task: Task) => void,
   onTimeTrack: (task: Task) => void,
-  onSelectProject?: (project: Project) => void
-}> = ({ status, title, tasks, projects, currentProject, onEditTask, onTimeTrack, onSelectProject }) => {
+  onSelectProject?: (project: Project) => void,
+  onDeleteTask?: (task: Task) => void
+}> = ({ status, title, tasks, projects, currentProject, onEditTask, onTimeTrack, onSelectProject, onDeleteTask }) => {
   const { setNodeRef } = useDroppable({ id: status });
 
   return (
@@ -109,6 +112,7 @@ const KanbanColumn: React.FC<{
                 onEditTask={onEditTask}
                 onTimeTrack={onTimeTrack}
                 onSelectProject={onSelectProject}
+                onDeleteTask={onDeleteTask}
               />
             );
           })}
@@ -123,7 +127,7 @@ const KanbanColumn: React.FC<{
   );
 };
 
-export const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, projects, currentProject, onSelectProject, onStatusChange }) => {
+export const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, projects, currentProject, onSelectProject, onStatusChange, onDeleteTask }) => {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [trackingTask, setTrackingTask] = useState<Task | null>(null);
 
@@ -185,6 +189,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, projects, curre
               onEditTask={setEditingTask}
               onTimeTrack={setTrackingTask}
               onSelectProject={onSelectProject}
+              onDeleteTask={onDeleteTask}
             />
           ))}
         </div>

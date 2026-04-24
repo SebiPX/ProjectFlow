@@ -398,6 +398,7 @@ export const TaskList: React.FC<TaskListProps> = ({ onSelectProject, searchQuery
                     onEdit={setEditingTask}
                     onTimeTrack={setTrackingTask}
                     onSelectProject={onSelectProject}
+                    onDelete={handleDeleteTask}
                   />
                 );
               })}
@@ -409,6 +410,7 @@ export const TaskList: React.FC<TaskListProps> = ({ onSelectProject, searchQuery
                 projects={projects}
                 onSelectProject={onSelectProject}
                 onStatusChange={handleUpdateTaskStatus}
+                onDeleteTask={handleDeleteTask}
               />
             </div>
           )}

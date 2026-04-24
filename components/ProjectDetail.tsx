@@ -14,7 +14,7 @@ import { CostFormModal } from './CostFormModal';
 import { CostEditModal } from './CostEditModal';
 import { TaskFormModal } from './TaskFormModal';
 import { AssetKanbanBoard } from './AssetKanbanBoard';
-import { getTasksByProject, updateTaskStatus } from '../services/api/tasks';
+import { getTasksByProject, updateTaskStatus, deleteTask } from '../services/api/tasks';
 import { getAssetsByProject, downloadAsset, deleteAsset, getAssetSignedUrl, updateAsset } from '../services/api/assets';
 import { getProjectMembers, removeProjectMember } from '../services/api/projectMembers';
 import { getCostsByProject, deleteCost, getCostDocumentSignedUrl } from '../services/api/costs';
@@ -165,6 +165,21 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
     updateTaskStatusMutation.mutate({ id: taskId, status: newStatus });
   };
 
+  const deleteTaskMutation = useMutation({
+    mutationFn: deleteTask,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks', project.id] });
+      toast.success('Task successfully deleted');
+    },
+    onError: (error: any) => {
+      toast.error(`Failed to delete task: ${error.message}`);
+    },
+  });
+
+  const handleDeleteTask = (task: Task) => {
+    deleteTaskMutation.mutate(task.id);
+  };
+
   // Delete asset mutation
   const deleteAssetMutation = useMutation({
     mutationFn: deleteAsset,
@@ -289,7 +304,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
               )}
             </div>
             <div className="flex-grow overflow-hidden">
-              <KanbanBoard tasks={tasks} onStatusChange={handleUpdateTaskStatus} />
+              <KanbanBoard tasks={tasks} onStatusChange={handleUpdateTaskStatus} onDeleteTask={handleDeleteTask} />
             </div>
           </div>
         );

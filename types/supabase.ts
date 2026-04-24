@@ -248,6 +248,7 @@ export interface ProjectMember {
 export interface Task {
   id: string; // UUID
   created_at?: string; // TIMESTAMPTZ
+  created_by?: string | null; // UUID
   project_id: string; // UUID
   title: string;
   description?: string | null;
