@@ -29,6 +29,9 @@ export const EmployeeList: React.FC<EmployeeListProps> = ({ searchQuery = '' }) 
   });
 
   const filteredEmployees = employees.filter(employee => {
+    // Filter out freelancers from the internal team view
+    if (employee.role === 'freelancer') return false;
+
     // 1. Search Filter
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
