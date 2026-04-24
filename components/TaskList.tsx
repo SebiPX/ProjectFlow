@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import type { Project, Task } from '../types/supabase';
 import { TaskStatus } from '../types/supabase';
-import { getTasks, updateTaskStatus } from '../services/api/tasks';
+import { getTasks, updateTaskStatus, deleteTask } from '../services/api/tasks';
 import { getProjects } from '../services/api/projects';
 import { useAuth } from '../lib/AuthContext';
 import { Card } from './ui/Card';
@@ -74,6 +74,21 @@ export const TaskList: React.FC<TaskListProps> = ({ onSelectProject, searchQuery
 
   const handleUpdateTaskStatus = (taskId: string, newStatus: any) => {
     updateTaskStatusMutation.mutate({ id: taskId, status: newStatus });
+  };
+
+  const deleteTaskMutation = useMutation({
+    mutationFn: deleteTask,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      toast.success('Task successfully deleted');
+    },
+    onError: (error: any) => {
+      toast.error(`Failed to delete task: ${error.message}`);
+    },
+  });
+
+  const handleDeleteTask = (task: Task) => {
+    deleteTaskMutation.mutate(task.id);
   };
 
   // Filter Logic
