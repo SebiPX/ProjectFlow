@@ -16,11 +16,13 @@ import { toast } from 'react-toastify';
 
 interface ShotlistEditorProps {
   documentId: string;
+  pjmEmail: string;
+  projectTitle?: string;
   onBack: () => void;
   isAdminOrPJM: boolean;
 }
 
-export const ShotlistEditor: React.FC<ShotlistEditorProps> = ({ documentId, onBack, isAdminOrPJM }) => {
+export const ShotlistEditor: React.FC<ShotlistEditorProps> = ({ documentId, pjmEmail, projectTitle, onBack, isAdminOrPJM }) => {
   const queryClient = useQueryClient();
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [titleInput, setTitleInput] = useState('');
@@ -149,9 +151,9 @@ export const ShotlistEditor: React.FC<ShotlistEditorProps> = ({ documentId, onBa
   }, 0);
 
   return (
-    <div className="flex flex-col h-full bg-background relative">
+    <div className="flex flex-col h-full bg-background relative print:bg-white print:text-black print:h-auto print:block">
       {/* Header */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-card">
+      <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-card print:hidden">
         <div className="flex items-center gap-4">
           <button onClick={onBack} className="p-2 -ml-2 text-muted-foreground hover:text-foreground rounded-lg hover:bg-muted transition-colors">
             <Icon path="M10 19l-7-7m0 0l7-7m-7 7h18" className="w-5 h-5" />
@@ -203,7 +205,28 @@ export const ShotlistEditor: React.FC<ShotlistEditorProps> = ({ documentId, onBa
       </div>
 
       {/* Grid */}
-      <div className="flex-1 overflow-auto p-6">
+      <div className="flex-1 overflow-auto p-6 print:p-0 print:overflow-visible print:h-auto print:block">
+        <div className="max-w-7xl mx-auto print:max-w-none">
+          {/* Brand Header for Print */}
+          <div className="hidden print:flex justify-between items-start border-b-2 border-primary pb-6 mb-8 mt-8">
+            <div>
+              <h1 className="text-4xl font-black tracking-tight text-black uppercase">
+                Shotliste
+              </h1>
+              <div className="mt-2 text-xl font-medium text-gray-800">
+                {projectTitle ? projectTitle : doc?.title}
+              </div>
+              <div className="mt-2 text-sm text-black flex items-center gap-2 font-bold uppercase text-gray-500">
+                Gesamtlänge: <span className="text-black font-normal">{formatSecondsToHMS(totalDurationSeconds)}</span>
+              </div>
+            </div>
+            <div className="text-right">
+              {/* Pixelschickeria Logo Header */}
+              <img src="/logos/px-black.png" alt="Pixelschickeria" className="h-10 ml-auto mb-2 opacity-90" />
+              <p className="text-xs font-medium text-black">Pixelschickeria GmbH</p>
+              <p className="text-xs text-gray-600">{pjmEmail}</p>
+            </div>
+          </div>
       <datalist id="camera-models">
         <option value="ARRI Alexa" />
         <option value="Sony FX9" />
@@ -212,9 +235,9 @@ export const ShotlistEditor: React.FC<ShotlistEditorProps> = ({ documentId, onBa
         <option value="Ursa Mini 4.6K G2" />
         <option value="Handy" />
       </datalist>
-        <div className="bg-card border border-border rounded-lg shadow-sm overflow-hidden">
+        <div className="bg-card border border-border rounded-lg shadow-sm overflow-hidden print:shadow-none print:border-none">
           <table className="w-full text-left text-sm whitespace-nowrap">
-            <thead className="bg-muted text-muted-foreground uppercase text-xs">
+            <thead className="bg-muted text-muted-foreground uppercase text-xs print:bg-gray-100 print:text-gray-800">
               <tr>
                 <th className="px-4 py-3 w-10"></th>
                 <th className="px-4 py-3 w-16">Szene</th>
@@ -243,7 +266,7 @@ export const ShotlistEditor: React.FC<ShotlistEditorProps> = ({ documentId, onBa
                       type="text" 
                       defaultValue={item.scene_number} 
                       onBlur={(e) => handleCellChange(item.id, 'scene_number', e.target.value)}
-                      className="w-full bg-transparent border-none focus:ring-1 focus:ring-primary rounded px-2 py-1"
+                      className="w-full bg-transparent border-none focus:ring-1 focus:ring-primary rounded px-2 py-1 print:p-0"
                       disabled={!isAdminOrPJM}
                     />
                   </td>
@@ -330,7 +353,7 @@ export const ShotlistEditor: React.FC<ShotlistEditorProps> = ({ documentId, onBa
                       type="text" 
                       defaultValue={item.cast_list} 
                       onBlur={(e) => handleCellChange(item.id, 'cast_list', e.target.value)}
-                      className="w-full bg-transparent border-none focus:ring-1 focus:ring-primary rounded px-2 py-1"
+                      className="w-full bg-transparent border-none focus:ring-1 focus:ring-primary rounded px-2 py-1 print:p-0"
                       disabled={!isAdminOrPJM}
                     />
                   </td>
@@ -387,6 +410,7 @@ export const ShotlistEditor: React.FC<ShotlistEditorProps> = ({ documentId, onBa
             </tbody>
           </table>
         </div>
+      </div>
       </div>
     </div>
   );

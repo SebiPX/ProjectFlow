@@ -66,7 +66,7 @@ export const DocumentList: React.FC<DocumentListProps> = ({ projectId, projectTi
 
   if (selectedDocument) {
     if (selectedDocument.type === 'shotlist') {
-      return <ShotlistEditor documentId={selectedDocument.id} onBack={() => setSelectedDocument(null)} isAdminOrPJM={isAdminOrPJM} />;
+      return <ShotlistEditor documentId={selectedDocument.id} pjmEmail={pjmEmail} projectTitle={projectTitle} onBack={() => setSelectedDocument(null)} isAdminOrPJM={isAdminOrPJM} />;
     } else {
       return <CallSheetEditor documentId={selectedDocument.id} pjmEmail={pjmEmail} projectTitle={projectTitle} onBack={() => setSelectedDocument(null)} isAdminOrPJM={isAdminOrPJM} />;
     }
