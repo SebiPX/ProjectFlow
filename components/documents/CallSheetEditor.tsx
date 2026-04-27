@@ -22,11 +22,12 @@ import { LocationAutocomplete } from './LocationAutocomplete';
 interface CallSheetEditorProps {
   documentId: string;
   pjmEmail: string;
+  projectTitle?: string;
   onBack: () => void;
   isAdminOrPJM: boolean;
 }
 
-export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pjmEmail, onBack, isAdminOrPJM }) => {
+export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pjmEmail, projectTitle, onBack, isAdminOrPJM }) => {
   const queryClient = useQueryClient();
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [titleInput, setTitleInput] = useState('');
@@ -293,7 +294,9 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                <h1 className="text-4xl font-black tracking-tight text-foreground uppercase print:text-black">
                  {doc.type === 'event_sheet' ? 'Eventdispo' : 'Drehdispo'}
                </h1>
-               <div className="mt-2 text-xl font-medium text-muted-foreground print:text-gray-800">{doc.title}</div>
+               <div className="mt-2 text-xl font-medium text-muted-foreground print:text-gray-800">
+                 {doc.type === 'event_sheet' && projectTitle ? projectTitle : doc.title}
+               </div>
                <div className="mt-2 text-sm text-foreground flex items-center gap-2">
                  <span className="font-bold uppercase text-muted-foreground">
                    {doc.type === 'event_sheet' ? 'Eventtag:' : 'Drehtag:'}
