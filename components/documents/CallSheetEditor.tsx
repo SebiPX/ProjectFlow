@@ -344,239 +344,6 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
              </div>
            </div>
 
-           {/* Grid Info */}
-           <div className="grid grid-cols-2 gap-8 mb-10">
-              <div className="space-y-4">
-                <div className="p-3 bg-muted/30 rounded-lg border border-border/50">
-                  <div className="mb-3">
-                    <label className="block text-xs font-bold text-muted-foreground uppercase mb-1 print:text-gray-500">Location</label>
-                    <input 
-                      type="text" 
-                      defaultValue={data.location_name || ''} 
-                      onBlur={(e) => handleDataChange('location_name', e.target.value)}
-                      placeholder="Studio 1..."
-                      className="w-full bg-transparent font-medium text-lg border-b border-border focus:border-primary focus:outline-none pb-1 print:border-none print:p-0"
-                      disabled={!isAdminOrPJM}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-muted-foreground uppercase mb-1 print:text-gray-500">Adresse</label>
-                    <LocationAutocomplete 
-                      value={data.location_address || ''} 
-                      onChange={(val) => handleDataChange('location_address', val)}
-                      onSelectCallback={(lat, lon, address) => {
-                        updateDataMutation.mutate({
-                          location_address: address,
-                          location_lat: lat,
-                          location_lng: lon
-                        });
-                      }}
-                      disabled={!isAdminOrPJM}
-                    />
-                  </div>
-                </div>
-
-                {/* Additional Locations */}
-                {(data.additional_locations || []).map((loc, idx) => (
-                  <div key={idx} className="p-3 bg-muted/30 rounded-lg border border-border/50 relative group">
-                    {isAdminOrPJM && (
-                      <button 
-                        onClick={() => {
-                          const newLocs = [...(data.additional_locations || [])];
-                          newLocs.splice(idx, 1);
-                          handleDataChange('additional_locations', newLocs);
-                        }}
-                        className="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity print:hidden shadow-sm"
-                      >
-                        <Icon path="M6 18L18 6M6 6l12 12" className="w-3 h-3" />
-                      </button>
-                    )}
-                    <div className="mb-3">
-                      <label className="block text-xs font-bold text-muted-foreground uppercase mb-1 print:text-gray-500">Location {idx + 2}</label>
-                      <input 
-                        type="text" 
-                        defaultValue={loc.name || ''} 
-                        onBlur={(e) => {
-                          const newLocs = [...(data.additional_locations || [])];
-                          newLocs[idx] = { ...newLocs[idx], name: e.target.value };
-                          handleDataChange('additional_locations', newLocs);
-                        }}
-                        placeholder={`Location ${idx + 2}...`}
-                        className="w-full bg-transparent font-medium text-lg border-b border-border focus:border-primary focus:outline-none pb-1 print:border-none print:p-0"
-                        disabled={!isAdminOrPJM}
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-bold text-muted-foreground uppercase mb-1 print:text-gray-500">Adresse</label>
-                      <LocationAutocomplete 
-                        value={loc.address || ''} 
-                        onChange={(val) => {
-                          const newLocs = [...(data.additional_locations || [])];
-                          newLocs[idx] = { ...newLocs[idx], address: val };
-                          handleDataChange('additional_locations', newLocs);
-                        }}
-                        onSelectCallback={(lat, lon, address) => {
-                          const newLocs = [...(data.additional_locations || [])];
-                          newLocs[idx] = { ...newLocs[idx], address, lat, lng: lon };
-                          handleDataChange('additional_locations', newLocs);
-                        }}
-                        disabled={!isAdminOrPJM}
-                      />
-                    </div>
-                  </div>
-                ))}
-                
-                {isAdminOrPJM && (
-                  <button 
-                    onClick={() => {
-                      const newLocs = [...(data.additional_locations || []), { name: '', address: '' }];
-                      handleDataChange('additional_locations', newLocs);
-                    }}
-                    className="text-primary text-sm font-medium hover:underline flex items-center gap-1 print:hidden w-full justify-center p-2 border border-dashed border-border rounded-lg"
-                  >
-                    + Weitere Location
-                  </button>
-                )}
-              </div>
-              <div className="space-y-4">
-                {/* Main Location Wetter/Hospital */}
-                <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="block text-xs font-bold text-muted-foreground uppercase flex items-center gap-1 print:text-gray-500">
-                      <Icon path="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" className="w-3 h-3" /> Wetter
-                    </label>
-                    {isAdminOrPJM && (
-                      <button 
-                        onClick={() => fetchWeather(data.location_lat as string, data.location_lng as string, data.shoot_date as string)}
-                        className={`text-[10px] font-bold bg-primary/10 text-primary hover:bg-primary/20 px-2 rounded print:hidden transition-colors ${
-                          (!data.location_lat || !data.shoot_date || isWeatherLoading) ? 'opacity-50 cursor-pointer' : ''
-                        }`}
-                        title="Benötigt Datum & Adresse (Autocomplete)"
-                      >
-                        {isWeatherLoading ? 'Lade...' : 'Auto-Fill'}
-                      </button>
-                    )}
-                  </div>
-                  <input 
-                    key={`weather-${data.weather_info}`} // Forces remount with new default value when updated
-                    type="text" 
-                    defaultValue={data.weather_info || ''} 
-                    onBlur={(e) => {
-                      if (e.target.value !== data.weather_info) {
-                        handleDataChange('weather_info', e.target.value);
-                      }
-                    }}
-                    placeholder={data.location_lat && data.shoot_date ? "Sonnig, 20°C" : "Sonnig, 20°C"}
-                    className="w-full bg-transparent text-sm border border-transparent hover:border-border focus:border-primary rounded p-1 focus:outline-none print:border-none print:p-0"
-                    disabled={!isAdminOrPJM}
-                  />
-                </div>
-                <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="block text-xs font-bold text-muted-foreground uppercase flex items-center gap-1 text-red-400 print:text-red-600">
-                      <Icon path="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" className="w-3 h-3" /> Nächstes Krankenhaus
-                    </label>
-                    {isAdminOrPJM && (
-                      <button 
-                        onClick={() => fetchHospital(data.location_lat as string, data.location_lng as string)}
-                        className={`text-[10px] font-bold bg-red-400/10 text-red-400 hover:bg-red-400/20 px-2 rounded print:hidden transition-colors ${
-                          (!data.location_lat || isHospitalLoading) ? 'opacity-50 cursor-pointer' : ''
-                        }`}
-                        title="Sucht das nächste Krankenhaus via Koordinaten"
-                      >
-                        {isHospitalLoading ? 'Suche...' : 'Auto-Fill'}
-                      </button>
-                    )}
-                  </div>
-                  <textarea 
-                    key={`hospital-${data.hospital_info}`}
-                    defaultValue={data.hospital_info || ''} 
-                    onBlur={(e) => {
-                      if (e.target.value !== data.hospital_info) {
-                        handleDataChange('hospital_info', e.target.value);
-                      }
-                    }}
-                    placeholder={data.location_lat ? "Auto-Fill klicken für Krankenhaus..." : "Krankenhaus X... (erst Adresse setzen)"}
-                    className="w-full bg-transparent text-sm border border-transparent hover:border-border focus:border-primary rounded resize-none p-1 focus:outline-none print:border-none print:p-0"
-                    rows={3}
-                    disabled={!isAdminOrPJM}
-                  />
-                </div>
-
-                {/* Additional Locations Wetter/Hospital */}
-                {data.additional_locations?.map((loc, idx) => (
-                  <div key={idx} className="space-y-4 pt-4 border-t border-border/50">
-                    <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <label className="block text-xs font-bold text-muted-foreground uppercase flex items-center gap-1 print:text-gray-500">
-                          <Icon path="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" className="w-3 h-3" /> Wetter {loc.name ? `(${loc.name})` : ''}
-                        </label>
-                        {isAdminOrPJM && (
-                          <button 
-                            onClick={() => fetchWeather(loc.lat as string, loc.lng as string, data.shoot_date as string, idx)}
-                            className={`text-[10px] font-bold bg-primary/10 text-primary hover:bg-primary/20 px-2 rounded print:hidden transition-colors ${
-                              (!loc.lat || !data.shoot_date || isWeatherLoading) ? 'opacity-50 cursor-pointer' : ''
-                            }`}
-                            title="Benötigt Datum & Adresse (Autocomplete)"
-                          >
-                            {isWeatherLoading ? 'Lade...' : 'Auto-Fill'}
-                          </button>
-                        )}
-                      </div>
-                      <input 
-                        key={`weather-${idx}-${loc.weather_info}`}
-                        type="text" 
-                        defaultValue={loc.weather_info || ''} 
-                        onBlur={(e) => {
-                          if (e.target.value !== loc.weather_info) {
-                            const newLocs = [...(data.additional_locations || [])];
-                            newLocs[idx] = { ...newLocs[idx], weather_info: e.target.value };
-                            handleDataChange('additional_locations', newLocs);
-                          }
-                        }}
-                        placeholder={loc.lat && data.shoot_date ? "Sonnig, 20°C" : "Sonnig, 20°C"}
-                        className="w-full bg-transparent text-sm border border-transparent hover:border-border focus:border-primary rounded p-1 focus:outline-none print:border-none print:p-0"
-                        disabled={!isAdminOrPJM}
-                      />
-                    </div>
-                    <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <label className="block text-xs font-bold text-muted-foreground uppercase flex items-center gap-1 text-red-400 print:text-red-600">
-                          <Icon path="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" className="w-3 h-3" /> Nächstes Krankenhaus {loc.name ? `(${loc.name})` : ''}
-                        </label>
-                        {isAdminOrPJM && (
-                          <button 
-                            onClick={() => fetchHospital(loc.lat as string, loc.lng as string, idx)}
-                            className={`text-[10px] font-bold bg-red-400/10 text-red-400 hover:bg-red-400/20 px-2 rounded print:hidden transition-colors ${
-                              (!loc.lat || isHospitalLoading) ? 'opacity-50 cursor-pointer' : ''
-                            }`}
-                            title="Sucht das nächste Krankenhaus via Koordinaten"
-                          >
-                            {isHospitalLoading ? 'Suche...' : 'Auto-Fill'}
-                          </button>
-                        )}
-                      </div>
-                      <textarea 
-                        key={`hospital-${idx}-${loc.hospital_info}`}
-                        defaultValue={loc.hospital_info || ''} 
-                        onBlur={(e) => {
-                          if (e.target.value !== loc.hospital_info) {
-                            const newLocs = [...(data.additional_locations || [])];
-                            newLocs[idx] = { ...newLocs[idx], hospital_info: e.target.value };
-                            handleDataChange('additional_locations', newLocs);
-                          }
-                        }}
-                        placeholder={loc.lat ? "Auto-Fill klicken für Krankenhaus..." : "Krankenhaus X... (erst Adresse setzen)"}
-                        className="w-full bg-transparent text-sm border border-transparent hover:border-border focus:border-primary rounded resize-none p-1 focus:outline-none print:border-none print:p-0"
-                        rows={3}
-                        disabled={!isAdminOrPJM}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-           </div>
-
            {/* Contacts Table */}
            <div className="mb-8 print:break-inside-avoid">
              <div className="flex justify-between items-end mb-4 border-b border-border pb-2">
@@ -881,6 +648,239 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                  )}
                </tbody>
              </table>
+           </div>
+
+           {/* Grid Info */}
+           <div className="grid grid-cols-2 gap-8 mb-10">
+              <div className="space-y-4">
+                <div className="p-3 bg-muted/30 rounded-lg border border-border/50">
+                  <div className="mb-3">
+                    <label className="block text-xs font-bold text-muted-foreground uppercase mb-1 print:text-gray-500">Location</label>
+                    <input 
+                      type="text" 
+                      defaultValue={data.location_name || ''} 
+                      onBlur={(e) => handleDataChange('location_name', e.target.value)}
+                      placeholder="Studio 1..."
+                      className="w-full bg-transparent font-medium text-lg border-b border-border focus:border-primary focus:outline-none pb-1 print:border-none print:p-0"
+                      disabled={!isAdminOrPJM}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-muted-foreground uppercase mb-1 print:text-gray-500">Adresse</label>
+                    <LocationAutocomplete 
+                      value={data.location_address || ''} 
+                      onChange={(val) => handleDataChange('location_address', val)}
+                      onSelectCallback={(lat, lon, address) => {
+                        updateDataMutation.mutate({
+                          location_address: address,
+                          location_lat: lat,
+                          location_lng: lon
+                        });
+                      }}
+                      disabled={!isAdminOrPJM}
+                    />
+                  </div>
+                </div>
+
+                {/* Additional Locations */}
+                {(data.additional_locations || []).map((loc, idx) => (
+                  <div key={idx} className="p-3 bg-muted/30 rounded-lg border border-border/50 relative group">
+                    {isAdminOrPJM && (
+                      <button 
+                        onClick={() => {
+                          const newLocs = [...(data.additional_locations || [])];
+                          newLocs.splice(idx, 1);
+                          handleDataChange('additional_locations', newLocs);
+                        }}
+                        className="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity print:hidden shadow-sm"
+                      >
+                        <Icon path="M6 18L18 6M6 6l12 12" className="w-3 h-3" />
+                      </button>
+                    )}
+                    <div className="mb-3">
+                      <label className="block text-xs font-bold text-muted-foreground uppercase mb-1 print:text-gray-500">Location {idx + 2}</label>
+                      <input 
+                        type="text" 
+                        defaultValue={loc.name || ''} 
+                        onBlur={(e) => {
+                          const newLocs = [...(data.additional_locations || [])];
+                          newLocs[idx] = { ...newLocs[idx], name: e.target.value };
+                          handleDataChange('additional_locations', newLocs);
+                        }}
+                        placeholder={`Location ${idx + 2}...`}
+                        className="w-full bg-transparent font-medium text-lg border-b border-border focus:border-primary focus:outline-none pb-1 print:border-none print:p-0"
+                        disabled={!isAdminOrPJM}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-muted-foreground uppercase mb-1 print:text-gray-500">Adresse</label>
+                      <LocationAutocomplete 
+                        value={loc.address || ''} 
+                        onChange={(val) => {
+                          const newLocs = [...(data.additional_locations || [])];
+                          newLocs[idx] = { ...newLocs[idx], address: val };
+                          handleDataChange('additional_locations', newLocs);
+                        }}
+                        onSelectCallback={(lat, lon, address) => {
+                          const newLocs = [...(data.additional_locations || [])];
+                          newLocs[idx] = { ...newLocs[idx], address, lat, lng: lon };
+                          handleDataChange('additional_locations', newLocs);
+                        }}
+                        disabled={!isAdminOrPJM}
+                      />
+                    </div>
+                  </div>
+                ))}
+                
+                {isAdminOrPJM && (
+                  <button 
+                    onClick={() => {
+                      const newLocs = [...(data.additional_locations || []), { name: '', address: '' }];
+                      handleDataChange('additional_locations', newLocs);
+                    }}
+                    className="text-primary text-sm font-medium hover:underline flex items-center gap-1 print:hidden w-full justify-center p-2 border border-dashed border-border rounded-lg"
+                  >
+                    + Weitere Location
+                  </button>
+                )}
+              </div>
+              <div className="space-y-4">
+                {/* Main Location Wetter/Hospital */}
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-bold text-muted-foreground uppercase flex items-center gap-1 print:text-gray-500">
+                      <Icon path="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" className="w-3 h-3" /> Wetter
+                    </label>
+                    {isAdminOrPJM && (
+                      <button 
+                        onClick={() => fetchWeather(data.location_lat as string, data.location_lng as string, data.shoot_date as string)}
+                        className={`text-[10px] font-bold bg-primary/10 text-primary hover:bg-primary/20 px-2 rounded print:hidden transition-colors ${
+                          (!data.location_lat || !data.shoot_date || isWeatherLoading) ? 'opacity-50 cursor-pointer' : ''
+                        }`}
+                        title="Benötigt Datum & Adresse (Autocomplete)"
+                      >
+                        {isWeatherLoading ? 'Lade...' : 'Auto-Fill'}
+                      </button>
+                    )}
+                  </div>
+                  <input 
+                    key={`weather-${data.weather_info}`} // Forces remount with new default value when updated
+                    type="text" 
+                    defaultValue={data.weather_info || ''} 
+                    onBlur={(e) => {
+                      if (e.target.value !== data.weather_info) {
+                        handleDataChange('weather_info', e.target.value);
+                      }
+                    }}
+                    placeholder={data.location_lat && data.shoot_date ? "Sonnig, 20°C" : "Sonnig, 20°C"}
+                    className="w-full bg-transparent text-sm border border-transparent hover:border-border focus:border-primary rounded p-1 focus:outline-none print:border-none print:p-0"
+                    disabled={!isAdminOrPJM}
+                  />
+                </div>
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-bold text-muted-foreground uppercase flex items-center gap-1 text-red-400 print:text-red-600">
+                      <Icon path="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" className="w-3 h-3" /> Nächstes Krankenhaus
+                    </label>
+                    {isAdminOrPJM && (
+                      <button 
+                        onClick={() => fetchHospital(data.location_lat as string, data.location_lng as string)}
+                        className={`text-[10px] font-bold bg-red-400/10 text-red-400 hover:bg-red-400/20 px-2 rounded print:hidden transition-colors ${
+                          (!data.location_lat || isHospitalLoading) ? 'opacity-50 cursor-pointer' : ''
+                        }`}
+                        title="Sucht das nächste Krankenhaus via Koordinaten"
+                      >
+                        {isHospitalLoading ? 'Suche...' : 'Auto-Fill'}
+                      </button>
+                    )}
+                  </div>
+                  <textarea 
+                    key={`hospital-${data.hospital_info}`}
+                    defaultValue={data.hospital_info || ''} 
+                    onBlur={(e) => {
+                      if (e.target.value !== data.hospital_info) {
+                        handleDataChange('hospital_info', e.target.value);
+                      }
+                    }}
+                    placeholder={data.location_lat ? "Auto-Fill klicken für Krankenhaus..." : "Krankenhaus X... (erst Adresse setzen)"}
+                    className="w-full bg-transparent text-sm border border-transparent hover:border-border focus:border-primary rounded resize-none p-1 focus:outline-none print:border-none print:p-0"
+                    rows={3}
+                    disabled={!isAdminOrPJM}
+                  />
+                </div>
+
+                {/* Additional Locations Wetter/Hospital */}
+                {data.additional_locations?.map((loc, idx) => (
+                  <div key={idx} className="space-y-4 pt-4 border-t border-border/50">
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="block text-xs font-bold text-muted-foreground uppercase flex items-center gap-1 print:text-gray-500">
+                          <Icon path="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" className="w-3 h-3" /> Wetter {loc.name ? `(${loc.name})` : ''}
+                        </label>
+                        {isAdminOrPJM && (
+                          <button 
+                            onClick={() => fetchWeather(loc.lat as string, loc.lng as string, data.shoot_date as string, idx)}
+                            className={`text-[10px] font-bold bg-primary/10 text-primary hover:bg-primary/20 px-2 rounded print:hidden transition-colors ${
+                              (!loc.lat || !data.shoot_date || isWeatherLoading) ? 'opacity-50 cursor-pointer' : ''
+                            }`}
+                            title="Benötigt Datum & Adresse (Autocomplete)"
+                          >
+                            {isWeatherLoading ? 'Lade...' : 'Auto-Fill'}
+                          </button>
+                        )}
+                      </div>
+                      <input 
+                        key={`weather-${idx}-${loc.weather_info}`}
+                        type="text" 
+                        defaultValue={loc.weather_info || ''} 
+                        onBlur={(e) => {
+                          if (e.target.value !== loc.weather_info) {
+                            const newLocs = [...(data.additional_locations || [])];
+                            newLocs[idx] = { ...newLocs[idx], weather_info: e.target.value };
+                            handleDataChange('additional_locations', newLocs);
+                          }
+                        }}
+                        placeholder={loc.lat && data.shoot_date ? "Sonnig, 20°C" : "Sonnig, 20°C"}
+                        className="w-full bg-transparent text-sm border border-transparent hover:border-border focus:border-primary rounded p-1 focus:outline-none print:border-none print:p-0"
+                        disabled={!isAdminOrPJM}
+                      />
+                    </div>
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="block text-xs font-bold text-muted-foreground uppercase flex items-center gap-1 text-red-400 print:text-red-600">
+                          <Icon path="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" className="w-3 h-3" /> Nächstes Krankenhaus {loc.name ? `(${loc.name})` : ''}
+                        </label>
+                        {isAdminOrPJM && (
+                          <button 
+                            onClick={() => fetchHospital(loc.lat as string, loc.lng as string, idx)}
+                            className={`text-[10px] font-bold bg-red-400/10 text-red-400 hover:bg-red-400/20 px-2 rounded print:hidden transition-colors ${
+                              (!loc.lat || isHospitalLoading) ? 'opacity-50 cursor-pointer' : ''
+                            }`}
+                            title="Sucht das nächste Krankenhaus via Koordinaten"
+                          >
+                            {isHospitalLoading ? 'Suche...' : 'Auto-Fill'}
+                          </button>
+                        )}
+                      </div>
+                      <textarea 
+                        key={`hospital-${idx}-${loc.hospital_info}`}
+                        defaultValue={loc.hospital_info || ''} 
+                        onBlur={(e) => {
+                          if (e.target.value !== loc.hospital_info) {
+                            const newLocs = [...(data.additional_locations || [])];
+                            newLocs[idx] = { ...newLocs[idx], hospital_info: e.target.value };
+                            handleDataChange('additional_locations', newLocs);
+                          }
+                        }}
+                        placeholder={loc.lat ? "Auto-Fill klicken für Krankenhaus..." : "Krankenhaus X... (erst Adresse setzen)"}
+                        className="w-full bg-transparent text-sm border border-transparent hover:border-border focus:border-primary rounded resize-none p-1 focus:outline-none print:border-none print:p-0"
+                        rows={3}
+                        disabled={!isAdminOrPJM}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
            </div>
 
            {/* Anfahrt & Parken */}
