@@ -50,12 +50,15 @@ export const DocumentList: React.FC<DocumentListProps> = ({ projectId, projectTi
     }
   });
 
-  const handleCreate = (type: 'shotlist' | 'call_sheet') => {
+  const handleCreate = (type: 'shotlist' | 'call_sheet' | 'event_sheet') => {
     setIsCreating(true);
-    let title = type === 'shotlist' ? 'New Shotlist' : 'New Drehdispo';
+    let title = type === 'shotlist' ? 'New Shotlist' : type === 'event_sheet' ? 'New Event Dispo' : 'New Drehdispo';
     if (type === 'call_sheet') {
       const existingDispos = documents.filter((d: AgencyDocument) => d.type === 'call_sheet').length;
       title = `${projectTitle} - Dispo v${existingDispos + 1}`;
+    } else if (type === 'event_sheet') {
+      const existingEvents = documents.filter((d: AgencyDocument) => d.type === 'event_sheet').length;
+      title = `${projectTitle} - Event Dispo v${existingEvents + 1}`;
     }
     createMutation.mutate({ title, type });
   };
