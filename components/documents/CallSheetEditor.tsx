@@ -872,9 +872,9 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                         {allLocations.length > 1 && (
                           <h3 className="font-bold text-foreground mb-2 print:text-black">{loc.name}</h3>
                         )}
-                        <div className="w-full h-96 bg-muted rounded border border-border overflow-hidden print:h-[350px] grayscale relative">
+                        <div className="w-full h-96 bg-muted rounded border border-border overflow-hidden print:h-[350px] grayscale relative print:overflow-hidden">
                           <iframe 
-                            className="absolute top-[calc(-60px)] left-[calc(-20px)] w-[calc(100%+40px)] h-[calc(100%+80px)]"
+                            className="absolute print:relative top-[calc(-60px)] print:top-0 left-[calc(-20px)] print:left-0 w-[calc(100%+40px)] print:w-full h-[calc(100%+80px)] print:h-full"
                             frameBorder="0" style={{border:0}} 
                             loading="eager"
                             src={`https://www.google.com/maps?q=${encodeURIComponent(loc.address)}&z=16&output=embed`} 
