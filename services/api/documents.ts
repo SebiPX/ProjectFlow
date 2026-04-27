@@ -4,7 +4,7 @@ export interface AgencyDocument {
   id: string;
   project_id: string;
   title: string;
-  type: 'shotlist' | 'call_sheet';
+  type: 'shotlist' | 'call_sheet' | 'event_sheet';
   created_at: string;
   updated_at: string;
   created_by?: string;
@@ -26,6 +26,13 @@ export interface ShotlistItem {
   image_url: string;
 }
 
+export interface CallSheetLocation {
+  name: string;
+  address: string;
+  lat?: string;
+  lng?: string;
+}
+
 export interface CallSheetData {
   document_id: string;
   shoot_date?: string;
@@ -37,6 +44,7 @@ export interface CallSheetData {
   hospital_info: string;
   general_notes: string;
   directions_notes?: string;
+  additional_locations?: CallSheetLocation[];
 }
 
 export interface CallSheetSchedule {

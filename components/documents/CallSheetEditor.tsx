@@ -290,10 +290,14 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
            {/* Brand Header */}
            <div className="flex justify-between items-start border-b-2 border-primary pb-6 mb-8">
              <div>
-               <h1 className="text-4xl font-black tracking-tight text-foreground uppercase print:text-black">Drehdispo</h1>
+               <h1 className="text-4xl font-black tracking-tight text-foreground uppercase print:text-black">
+                 {doc.type === 'event_sheet' ? 'Eventdispo' : 'Drehdispo'}
+               </h1>
                <div className="mt-2 text-xl font-medium text-muted-foreground print:text-gray-800">{doc.title}</div>
                <div className="mt-2 text-sm text-foreground flex items-center gap-2">
-                 <span className="font-bold uppercase text-muted-foreground">Drehtag:</span>
+                 <span className="font-bold uppercase text-muted-foreground">
+                   {doc.type === 'event_sheet' ? 'Eventtag:' : 'Drehtag:'}
+                 </span>
                  <input 
                     type="date"
                     value={data.shoot_date || ''}
@@ -315,32 +319,96 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
            {/* Grid Info */}
            <div className="grid grid-cols-2 gap-8 mb-10">
               <div className="space-y-4">
-                <div>
-                  <label className="block text-xs font-bold text-muted-foreground uppercase mb-1 print:text-gray-500">Location</label>
-                  <input 
-                    type="text" 
-                    defaultValue={data.location_name || ''} 
-                    onBlur={(e) => handleDataChange('location_name', e.target.value)}
-                    placeholder="Studio 1..."
-                    className="w-full bg-transparent font-medium text-lg border-b border-border focus:border-primary focus:outline-none pb-1 print:border-none print:p-0"
-                    disabled={!isAdminOrPJM}
-                  />
+                <div className="p-3 bg-muted/30 rounded-lg border border-border/50">
+                  <div className="mb-3">
+                    <label className="block text-xs font-bold text-muted-foreground uppercase mb-1 print:text-gray-500">Location</label>
+                    <input 
+                      type="text" 
+                      defaultValue={data.location_name || ''} 
+                      onBlur={(e) => handleDataChange('location_name', e.target.value)}
+                      placeholder="Studio 1..."
+                      className="w-full bg-transparent font-medium text-lg border-b border-border focus:border-primary focus:outline-none pb-1 print:border-none print:p-0"
+                      disabled={!isAdminOrPJM}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-muted-foreground uppercase mb-1 print:text-gray-500">Adresse</label>
+                    <LocationAutocomplete 
+                      value={data.location_address || ''} 
+                      onChange={(val) => handleDataChange('location_address', val)}
+                      onSelectCallback={(lat, lon, address) => {
+                        updateDataMutation.mutate({
+                          location_address: address,
+                          location_lat: lat,
+                          location_lng: lon
+                        });
+                      }}
+                      disabled={!isAdminOrPJM}
+                    />
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-xs font-bold text-muted-foreground uppercase mb-1 print:text-gray-500">Adresse</label>
-                  <LocationAutocomplete 
-                    value={data.location_address || ''} 
-                    onChange={(val) => handleDataChange('location_address', val)}
-                    onSelectCallback={(lat, lon, address) => {
-                      updateDataMutation.mutate({
-                        location_address: address,
-                        location_lat: lat,
-                        location_lng: lon
-                      });
+
+                {/* Additional Locations */}
+                {(data.additional_locations || []).map((loc, idx) => (
+                  <div key={idx} className="p-3 bg-muted/30 rounded-lg border border-border/50 relative group">
+                    {isAdminOrPJM && (
+                      <button 
+                        onClick={() => {
+                          const newLocs = [...(data.additional_locations || [])];
+                          newLocs.splice(idx, 1);
+                          handleDataChange('additional_locations', newLocs);
+                        }}
+                        className="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity print:hidden shadow-sm"
+                      >
+                        <Icon path="M6 18L18 6M6 6l12 12" className="w-3 h-3" />
+                      </button>
+                    )}
+                    <div className="mb-3">
+                      <label className="block text-xs font-bold text-muted-foreground uppercase mb-1 print:text-gray-500">Location {idx + 2}</label>
+                      <input 
+                        type="text" 
+                        defaultValue={loc.name || ''} 
+                        onBlur={(e) => {
+                          const newLocs = [...(data.additional_locations || [])];
+                          newLocs[idx] = { ...newLocs[idx], name: e.target.value };
+                          handleDataChange('additional_locations', newLocs);
+                        }}
+                        placeholder={`Location ${idx + 2}...`}
+                        className="w-full bg-transparent font-medium text-lg border-b border-border focus:border-primary focus:outline-none pb-1 print:border-none print:p-0"
+                        disabled={!isAdminOrPJM}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-muted-foreground uppercase mb-1 print:text-gray-500">Adresse</label>
+                      <LocationAutocomplete 
+                        value={loc.address || ''} 
+                        onChange={(val) => {
+                          const newLocs = [...(data.additional_locations || [])];
+                          newLocs[idx] = { ...newLocs[idx], address: val };
+                          handleDataChange('additional_locations', newLocs);
+                        }}
+                        onSelectCallback={(lat, lon, address) => {
+                          const newLocs = [...(data.additional_locations || [])];
+                          newLocs[idx] = { ...newLocs[idx], address, lat, lng: lon };
+                          handleDataChange('additional_locations', newLocs);
+                        }}
+                        disabled={!isAdminOrPJM}
+                      />
+                    </div>
+                  </div>
+                ))}
+                
+                {isAdminOrPJM && (
+                  <button 
+                    onClick={() => {
+                      const newLocs = [...(data.additional_locations || []), { name: '', address: '' }];
+                      handleDataChange('additional_locations', newLocs);
                     }}
-                    disabled={!isAdminOrPJM}
-                  />
-                </div>
+                    className="text-primary text-sm font-medium hover:underline flex items-center gap-1 print:hidden w-full justify-center p-2 border border-dashed border-border rounded-lg"
+                  >
+                    + Weitere Location
+                  </button>
+                )}
               </div>
               <div className="space-y-4">
                 <div>
@@ -486,7 +554,9 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                  <tr>
                    <td colSpan={7} className="pb-4">
                      <div className="flex justify-between items-end border-b border-border pb-2">
-                       <h2 className="text-xl font-bold text-foreground print:text-black uppercase">DREHPLAN</h2>
+                       <h2 className="text-xl font-bold text-foreground print:text-black uppercase">
+                         {doc.type === 'event_sheet' ? 'ABLAUFPLAN' : 'DREHPLAN'}
+                       </h2>
                        {isAdminOrPJM && (
                          <button onClick={() => {
                            let nextTime = '08:00';
@@ -617,22 +687,45 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
            </div>
 
            {/* Anfahrt & Parken */}
-           <div className="mb-12 print:break-inside-avoid">
-             <div className="flex justify-between items-end mb-4 border-b border-border pb-2">
+           <div className="mb-12">
+             <div className="flex justify-between items-end mb-4 border-b border-border pb-2 print:break-inside-avoid">
                <h2 className="text-xl font-bold text-foreground print:text-black">ANFAHRT & PARKEN</h2>
              </div>
-             {data.location_address ? (
-               <div className="w-full h-96 bg-muted rounded border border-border overflow-hidden print:h-[450px] grayscale relative">
-                 <iframe 
-                   className="absolute top-[calc(-60px)] left-[calc(-20px)] w-[calc(100%+40px)] h-[calc(100%+80px)]"
-                   frameBorder="0" style={{border:0}} 
-                   src={`https://www.google.com/maps?q=${encodeURIComponent(data.location_address)}&z=16&output=embed`} 
-                   allowFullScreen>
-                 </iframe>
-               </div>
-             ) : (
-               <p className="text-muted-foreground italic">Bitte Adresse oben eingeben, um die Karte zu laden.</p>
-             )}
+             {(() => {
+                const allLocations = [];
+                if (data.location_address) {
+                  allLocations.push({ name: data.location_name || 'Hauptlocation', address: data.location_address });
+                }
+                if (data.additional_locations) {
+                  data.additional_locations.forEach((loc, idx) => {
+                    if (loc.address) allLocations.push({ name: loc.name || `Location ${idx + 2}`, address: loc.address });
+                  });
+                }
+                
+                if (allLocations.length === 0) {
+                  return <p className="text-muted-foreground italic print:break-inside-avoid">Bitte Adresse oben eingeben, um die Karte zu laden.</p>;
+                }
+                
+                return (
+                  <div className="space-y-8">
+                    {allLocations.map((loc, idx) => (
+                      <div key={idx} className="print:break-inside-avoid">
+                        {allLocations.length > 1 && (
+                          <h3 className="font-bold text-foreground mb-2 print:text-black">{loc.name}</h3>
+                        )}
+                        <div className="w-full h-96 bg-muted rounded border border-border overflow-hidden print:h-[450px] grayscale relative">
+                          <iframe 
+                            className="absolute top-[calc(-60px)] left-[calc(-20px)] w-[calc(100%+40px)] h-[calc(100%+80px)]"
+                            frameBorder="0" style={{border:0}} 
+                            src={`https://www.google.com/maps?q=${encodeURIComponent(loc.address)}&z=16&output=embed`} 
+                            allowFullScreen>
+                          </iframe>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                );
+             })()}
            </div>
 
            {/* Hinweise */}
