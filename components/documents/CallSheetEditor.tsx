@@ -619,7 +619,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                <h2 className="text-xl font-bold text-foreground print:text-black">ANFAHRT & PARKEN</h2>
              </div>
              {data.location_address ? (
-               <div className="w-full h-64 bg-muted rounded border border-border overflow-hidden print:h-80 grayscale relative">
+               <div className="w-full h-96 bg-muted rounded border border-border overflow-hidden print:h-[450px] grayscale relative">
                  <iframe 
                    className="absolute top-[calc(-60px)] left-[calc(-20px)] w-[calc(100%+40px)] h-[calc(100%+80px)]"
                    frameBorder="0" style={{border:0}} 
