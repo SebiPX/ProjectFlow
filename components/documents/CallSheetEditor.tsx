@@ -469,7 +469,27 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
              <div className="flex justify-between items-end mb-4 border-b border-border pb-2">
                <h2 className="text-xl font-bold text-foreground print:text-black">Drehplan</h2>
                {isAdminOrPJM && (
-                 <button onClick={() => createScheduleMutation.mutate({ time_start: '08:00', scene_name: 'Neue Szene' })} className="text-primary text-sm font-medium hover:underline print:hidden">
+                 <button onClick={() => {
+                   let nextTime = '08:00';
+                   if (schedule.length > 0) {
+                     const lastItem = schedule[schedule.length - 1];
+                     if (lastItem.time_start) {
+                       const duration = lastItem.duration_minutes || 0;
+                       const parts = lastItem.time_start.split(':');
+                       if (parts.length === 2) {
+                         const hours = parseInt(parts[0], 10);
+                         const minutes = parseInt(parts[1], 10);
+                         if (!isNaN(hours) && !isNaN(minutes)) {
+                           const totalMinutes = hours * 60 + minutes + duration;
+                           const nextHours = Math.floor(totalMinutes / 60) % 24;
+                           const nextMins = totalMinutes % 60;
+                           nextTime = `${nextHours.toString().padStart(2, '0')}:${nextMins.toString().padStart(2, '0')}`;
+                         }
+                       }
+                     }
+                   }
+                   createScheduleMutation.mutate({ time_start: nextTime, scene_name: 'Neue Szene' });
+                 }} className="text-primary text-sm font-medium hover:underline print:hidden">
                    + Szene hinzufügen
                  </button>
                )}
