@@ -302,8 +302,8 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
              </div>
              <div className="text-right">
                {/* Pixelschickeria Logo Header */}
-               <img src="/Pixelschickeria_Logo.png" alt="Pixelschickeria" className="h-10 ml-auto mb-2 opacity-90 hidden dark:block print:hidden" />
-               <img src="/Pixelschickeria_Logo_Dark.png" alt="Pixelschickeria" className="h-10 ml-auto mb-2 opacity-90 dark:hidden print:block" />
+               <img src="/logos/px-alpha.png" alt="Pixelschickeria" className="h-10 ml-auto mb-2 opacity-90 hidden dark:block print:hidden" />
+               <img src="/logos/px-black.png" alt="Pixelschickeria" className="h-10 ml-auto mb-2 opacity-90 dark:hidden print:block" />
                <p className="text-xs font-medium text-foreground print:text-black">Pixelschickeria GmbH</p>
                <p className="text-xs text-muted-foreground print:text-gray-600">{pjmEmail}</p>
              </div>
