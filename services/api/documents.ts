@@ -36,6 +36,7 @@ export interface CallSheetData {
   weather_info: string;
   hospital_info: string;
   general_notes: string;
+  directions_notes?: string;
 }
 
 export interface CallSheetSchedule {

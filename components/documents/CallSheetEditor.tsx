@@ -415,7 +415,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                  </button>
                )}
              </div>
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+             <div className="grid grid-cols-2 gap-x-8 gap-y-4">
                {contacts.map(contact => (
                  <div key={contact.id} className="flex items-start justify-between border-b border-border/50 pb-2 group">
                    <div className="w-full mr-2">
@@ -464,10 +464,22 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
              </div>
            </div>
 
+           {/* General Notes */}
+           <div className="mb-12 print:break-inside-avoid">
+             <h2 className="text-sm font-bold text-muted-foreground uppercase mb-2 print:text-gray-500">ALLGEMEINE NOTIZEN</h2>
+             <textarea 
+               defaultValue={data.general_notes || ''} 
+               onBlur={(e) => handleDataChange('general_notes', e.target.value)}
+               placeholder="Parkhinweise, Besonderheiten..."
+               className="w-full bg-transparent border border-transparent hover:border-border focus:border-primary rounded p-2 focus:outline-none min-h-[100px] print:border-none print:p-0"
+               disabled={!isAdminOrPJM}
+             />
+           </div>
+
            {/* Drehplan Table */}
-           <div className="mb-12">
+           <div className="mb-12 print:break-inside-auto">
              <div className="flex justify-between items-end mb-4 border-b border-border pb-2">
-               <h2 className="text-xl font-bold text-foreground print:text-black">Drehplan</h2>
+               <h2 className="text-xl font-bold text-foreground print:text-black uppercase">DREHPLAN</h2>
                {isAdminOrPJM && (
                  <button onClick={() => {
                    let nextTime = '08:00';
@@ -494,8 +506,8 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                  </button>
                )}
              </div>
-             <table className="w-full text-left text-sm">
-               <thead className="text-xs uppercase text-muted-foreground print:text-gray-500">
+             <table className="w-full text-left text-sm print:table">
+               <thead className="text-xs uppercase text-muted-foreground print:text-gray-500 print:table-header-group">
                  <tr>
                    <th className="py-2 w-12 text-center">Done</th>
                    <th className="py-2 w-20">Bild</th>
@@ -506,9 +518,9 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                    <th className="py-2 w-10 print:hidden"></th>
                  </tr>
                </thead>
-               <tbody className="divide-y divide-border/50">
+               <tbody className="divide-y divide-border/50 print:table-row-group">
                  {schedule.map(item => (
-                   <tr key={item.id} className="group">
+                   <tr key={item.id} className="group print:break-inside-avoid">
                      <td className="py-2 align-middle text-center">
                         <input 
                           type="checkbox"
@@ -597,13 +609,33 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
              </table>
            </div>
 
-           {/* General Notes */}
-           <div>
-             <h2 className="text-sm font-bold text-muted-foreground uppercase mb-2 print:text-gray-500">Allgemeine Notizen</h2>
+           {/* Anfahrt & Parken */}
+           <div className="mb-12 print:break-inside-avoid">
+             <div className="flex justify-between items-end mb-4 border-b border-border pb-2">
+               <h2 className="text-xl font-bold text-foreground print:text-black">ANFAHRT & PARKEN</h2>
+             </div>
+             {data.location_address ? (
+               <div className="w-full h-64 bg-muted rounded border border-border overflow-hidden print:h-80 grayscale">
+                 <iframe 
+                   width="100%" 
+                   height="100%" 
+                   frameBorder="0" style={{border:0}} 
+                   src={`https://www.google.com/maps?q=${encodeURIComponent(data.location_address)}&output=embed`} 
+                   allowFullScreen>
+                 </iframe>
+               </div>
+             ) : (
+               <p className="text-muted-foreground italic">Bitte Adresse oben eingeben, um die Karte zu laden.</p>
+             )}
+           </div>
+
+           {/* Hinweise */}
+           <div className="print:break-inside-avoid">
+             <h2 className="text-sm font-bold text-muted-foreground uppercase mb-2 print:text-gray-500">HINWEISE</h2>
              <textarea 
-               defaultValue={data.general_notes || ''} 
-               onBlur={(e) => handleDataChange('general_notes', e.target.value)}
-               placeholder="Parkhinweise, Besonderheiten..."
+               defaultValue={data.directions_notes || ''} 
+               onBlur={(e) => handleDataChange('directions_notes', e.target.value)}
+               placeholder="Hinweise zur Anfahrt, Parkmöglichkeiten..."
                className="w-full bg-transparent border border-transparent hover:border-border focus:border-primary rounded p-2 focus:outline-none min-h-[100px] print:border-none print:p-0"
                disabled={!isAdminOrPJM}
              />
