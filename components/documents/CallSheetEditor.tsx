@@ -578,7 +578,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
            </div>
 
            {/* Contacts Table */}
-           <div className="mb-8">
+           <div className="mb-8 print:break-inside-avoid">
              <div className="flex justify-between items-end mb-4 border-b border-border pb-2">
                <h2 className="text-xl font-bold text-foreground print:text-black">Kontakte / Crew</h2>
                {isAdminOrPJM && (
@@ -589,7 +589,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
              </div>
              <div className="grid grid-cols-2 gap-x-8 gap-y-4">
                {contacts.map(contact => (
-                 <div key={contact.id} className="flex items-start justify-between border-b border-border/50 pb-2 group">
+                 <div key={contact.id} className="flex items-start justify-between border-b border-border/50 pb-2 group print:break-inside-avoid">
                    <div className="w-full mr-2">
                      <div className="flex gap-2 mb-1">
                        <input 
