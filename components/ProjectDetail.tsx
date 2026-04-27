@@ -715,8 +715,8 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
   };
 
   return (
-    <div className="h-full flex flex-col">
-      <div className="p-8 border-b border-border">
+    <div className="h-full flex flex-col print:h-auto print:block">
+      <div className="p-8 border-b border-border print:hidden">
         <div className="flex justify-between items-center">
           <div>
             <p className="text-sm text-muted-foreground">Project #{project.project_number}</p>
@@ -736,7 +736,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
           </div>
         </div>
       </div>
-      <div className="border-b border-border">
+      <div className="border-b border-border print:hidden">
         <nav className="flex space-x-8 px-8" aria-label="Tabs">
           {visibleTabs.map((tab) => (
             <button
@@ -752,7 +752,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
           ))}
         </nav>
       </div>
-      <div className="flex-grow overflow-y-auto">
+      <div className="flex-grow overflow-y-auto print:overflow-visible print:h-auto print:block">
         {renderContent(activeTab)}
       </div>
 

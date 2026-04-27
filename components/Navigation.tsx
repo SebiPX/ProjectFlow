@@ -144,7 +144,7 @@ export const Navigation: React.FC<NavigationProps> = ({ currentView, onNavigate,
   const allNavItems = visibleCategories.flatMap(cat => cat.items);
 
   return (
-    <div className="flex-shrink-0 flex flex-col z-50">
+    <div className="flex-shrink-0 flex flex-col z-50 print:hidden">
       {/* Top Bar: Logo, Categories & Actions */}
       <nav className="bg-background border-b border-border">
         <div className="max-w-[1920px] mx-auto px-4 md:px-6 h-16 flex items-center justify-between">

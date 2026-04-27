@@ -240,7 +240,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
   const contacts: CallSheetContact[] = doc.contacts || [];
 
   return (
-    <div className="flex flex-col h-full bg-background relative print:bg-white print:text-black">
+    <div className="flex flex-col h-full bg-background relative print:bg-white print:text-black print:h-auto print:block">
       {/* Header bar - Hidden in Print */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-card print:hidden">
         <div className="flex items-center gap-4">
@@ -281,7 +281,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
       </div>
 
       {/* Printable Area */}
-      <div className="flex-1 overflow-auto p-8 print:p-0">
+      <div className="flex-1 overflow-auto p-8 print:p-0 print:overflow-visible print:h-auto print:block">
         <div className="max-w-4xl mx-auto bg-card border border-border rounded-xl shadow-sm p-10 print:shadow-none print:border-none print:w-full print:max-w-none print:p-0">
            
            {/* Brand Header */}
