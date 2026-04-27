@@ -118,7 +118,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
 
   const [isWeatherLoading, setIsWeatherLoading] = useState(false);
 
-  const fetchWeather = async (lat: string, lng: string, date: string) => {
+  const fetchWeather = async (lat: string, lng: string, date: string, idx?: number) => {
     if (!lat || !lng || !date) {
       toast.error('Bitte erst eine Location (mit Autocomplete) auswählen und das Drehtag-Datum festlegen!');
       return;
@@ -149,7 +149,15 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
 
         const weatherDesc = getWmoCodeText(code);
         const forecastText = `${weatherDesc}, ${Math.round(tMin)}°C bis ${Math.round(tMax)}°C`;
-        handleDataChange('weather_info', forecastText);
+        
+        if (idx !== undefined) {
+          const newLocs = [...(data.additional_locations || [])];
+          newLocs[idx] = { ...newLocs[idx], weather_info: forecastText };
+          handleDataChange('additional_locations', newLocs);
+        } else {
+          handleDataChange('weather_info', forecastText);
+        }
+        
         toast.success('Wetter erfolgreich geladen!');
       } else {
         toast.info('Für dieses Datum (zu weit in der Zukunft?) sind keine Daten verfügbar.');
@@ -164,7 +172,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
 
   const [isHospitalLoading, setIsHospitalLoading] = useState(false);
 
-  const fetchHospital = async (lat: string, lng: string) => {
+  const fetchHospital = async (lat: string, lng: string, idx?: number) => {
     if (!lat || !lng) {
       toast.error('Bitte erst eine Location (mit Autocomplete) auswählen!');
       return;
@@ -175,14 +183,14 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
       const url = `https://nominatim.openstreetmap.org/search?amenity=hospital&format=json&addressdetails=1&viewbox=${parseFloat(lng)-boxSize},${parseFloat(lat)+boxSize},${parseFloat(lng)+boxSize},${parseFloat(lat)-boxSize}&bounded=1&limit=5`;
       
       const res = await fetch(url);
-      const data = await res.json();
+      const resData = await res.json();
       
-      if (data && data.length > 0) {
-        let closest = data[0];
+      if (resData && resData.length > 0) {
+        let closest = resData[0];
         let minD = Infinity;
         const R = 6371; // Erdradius km
         
-        data.forEach((el: any) => {
+        resData.forEach((el: any) => {
           const elLat = parseFloat(el.lat);
           const elLng = parseFloat(el.lon);
           if (!elLat || !elLng) return;
@@ -214,9 +222,16 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
         if (postcode || city) {
           lines.push(`${postcode} ${city}`.trim());
         }
-        const info = lines.filter(Boolean).join('\n');
+        const info = lines.filter(Boolean).join('\\n');
         
-        handleDataChange('hospital_info', info);
+        if (idx !== undefined) {
+          const newLocs = [...(data.additional_locations || [])];
+          newLocs[idx] = { ...newLocs[idx], hospital_info: info };
+          handleDataChange('additional_locations', newLocs);
+        } else {
+          handleDataChange('hospital_info', info);
+        }
+        
         toast.success('Nächstes Krankenhaus gefunden!');
       } else {
         toast.info('Kein Krankenhaus im direkten Umkreis gefunden.');
@@ -242,6 +257,16 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
   const data: Partial<CallSheetData> = doc.data || {};
   const schedule: CallSheetSchedule[] = doc.schedule || [];
   const contacts: CallSheetContact[] = doc.contacts || [];
+
+  const allLocations = [];
+  if (data.location_address || data.location_name) {
+    allLocations.push({ name: data.location_name || 'Hauptlocation', address: data.location_address || '' });
+  }
+  if (data.additional_locations) {
+    data.additional_locations.forEach((loc, idx) => {
+      if (loc.address || loc.name) allLocations.push({ name: loc.name || `Location ${idx + 2}`, address: loc.address || '' });
+    });
+  }
 
   return (
     <div className="flex flex-col h-full bg-background relative print:bg-white print:text-black print:h-auto print:block">
@@ -414,6 +439,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                 )}
               </div>
               <div className="space-y-4">
+                {/* Main Location Wetter/Hospital */}
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label className="block text-xs font-bold text-muted-foreground uppercase flex items-center gap-1 print:text-gray-500">
@@ -476,6 +502,78 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                     disabled={!isAdminOrPJM}
                   />
                 </div>
+
+                {/* Additional Locations Wetter/Hospital */}
+                {data.additional_locations?.map((loc, idx) => (
+                  <div key={idx} className="space-y-4 pt-4 border-t border-border/50">
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="block text-xs font-bold text-muted-foreground uppercase flex items-center gap-1 print:text-gray-500">
+                          <Icon path="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" className="w-3 h-3" /> Wetter {loc.name ? `(${loc.name})` : ''}
+                        </label>
+                        {isAdminOrPJM && (
+                          <button 
+                            onClick={() => fetchWeather(loc.lat as string, loc.lng as string, data.shoot_date as string, idx)}
+                            className={`text-[10px] font-bold bg-primary/10 text-primary hover:bg-primary/20 px-2 rounded print:hidden transition-colors ${
+                              (!loc.lat || !data.shoot_date || isWeatherLoading) ? 'opacity-50 cursor-pointer' : ''
+                            }`}
+                            title="Benötigt Datum & Adresse (Autocomplete)"
+                          >
+                            {isWeatherLoading ? 'Lade...' : 'Auto-Fill'}
+                          </button>
+                        )}
+                      </div>
+                      <input 
+                        key={`weather-${idx}-${loc.weather_info}`}
+                        type="text" 
+                        defaultValue={loc.weather_info || ''} 
+                        onBlur={(e) => {
+                          if (e.target.value !== loc.weather_info) {
+                            const newLocs = [...(data.additional_locations || [])];
+                            newLocs[idx] = { ...newLocs[idx], weather_info: e.target.value };
+                            handleDataChange('additional_locations', newLocs);
+                          }
+                        }}
+                        placeholder={loc.lat && data.shoot_date ? "Sonnig, 20°C" : "Sonnig, 20°C"}
+                        className="w-full bg-transparent text-sm border border-transparent hover:border-border focus:border-primary rounded p-1 focus:outline-none print:border-none print:p-0"
+                        disabled={!isAdminOrPJM}
+                      />
+                    </div>
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="block text-xs font-bold text-muted-foreground uppercase flex items-center gap-1 text-red-400 print:text-red-600">
+                          <Icon path="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" className="w-3 h-3" /> Nächstes Krankenhaus {loc.name ? `(${loc.name})` : ''}
+                        </label>
+                        {isAdminOrPJM && (
+                          <button 
+                            onClick={() => fetchHospital(loc.lat as string, loc.lng as string, idx)}
+                            className={`text-[10px] font-bold bg-red-400/10 text-red-400 hover:bg-red-400/20 px-2 rounded print:hidden transition-colors ${
+                              (!loc.lat || isHospitalLoading) ? 'opacity-50 cursor-pointer' : ''
+                            }`}
+                            title="Sucht das nächste Krankenhaus via Koordinaten"
+                          >
+                            {isHospitalLoading ? 'Suche...' : 'Auto-Fill'}
+                          </button>
+                        )}
+                      </div>
+                      <textarea 
+                        key={`hospital-${idx}-${loc.hospital_info}`}
+                        defaultValue={loc.hospital_info || ''} 
+                        onBlur={(e) => {
+                          if (e.target.value !== loc.hospital_info) {
+                            const newLocs = [...(data.additional_locations || [])];
+                            newLocs[idx] = { ...newLocs[idx], hospital_info: e.target.value };
+                            handleDataChange('additional_locations', newLocs);
+                          }
+                        }}
+                        placeholder={loc.lat ? "Auto-Fill klicken für Krankenhaus..." : "Krankenhaus X... (erst Adresse setzen)"}
+                        className="w-full bg-transparent text-sm border border-transparent hover:border-border focus:border-primary rounded resize-none p-1 focus:outline-none print:border-none print:p-0"
+                        rows={3}
+                        disabled={!isAdminOrPJM}
+                      />
+                    </div>
+                  </div>
+                ))}
               </div>
            </div>
 
@@ -555,7 +653,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
              <table className="w-full text-left text-sm print:table">
                <thead className="print:table-header-group">
                  <tr>
-                   <td colSpan={7} className="pb-4">
+                   <td colSpan={doc.type === 'event_sheet' ? 5 : 7} className="pb-4">
                      <div className="flex justify-between items-end border-b border-border pb-2">
                        <h2 className="text-xl font-bold text-foreground print:text-black uppercase">
                          {doc.type === 'event_sheet' ? 'ABLAUFPLAN' : 'DREHPLAN'}
@@ -580,109 +678,177 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                                }
                              }
                            }
-                           createScheduleMutation.mutate({ time_start: nextTime, scene_name: 'Neue Szene' });
+                           createScheduleMutation.mutate({ time_start: nextTime, scene_name: doc.type === 'event_sheet' ? 'Neuer Eintrag' : 'Neue Szene' });
                          }} className="text-primary text-sm font-medium hover:underline print:hidden">
-                           + Szene hinzufügen
+                           {doc.type === 'event_sheet' ? '+ Eintrag hinzufügen' : '+ Szene hinzufügen'}
                          </button>
                        )}
                      </div>
                    </td>
                  </tr>
-                 <tr className="text-xs uppercase text-muted-foreground print:text-gray-500">
-                   <th className="py-2 w-12 text-center">Done</th>
-                   <th className="py-2 w-20">Bild</th>
-                   <th className="py-2 w-20">Zeit</th>
-                   <th className="py-2">Szene</th>
-                   <th className="py-2 w-20">Nr.</th>
-                   <th className="py-2 w-24">Dauer (Min)</th>
-                   <th className="py-2 w-10 print:hidden"></th>
-                 </tr>
+                 {doc.type === 'event_sheet' ? (
+                    <tr className="text-xs uppercase text-muted-foreground print:text-gray-500">
+                      <th className="py-2 w-20">Zeit</th>
+                      <th className="py-2">Beschreibung</th>
+                      <th className="py-2 w-48">Location</th>
+                      <th className="py-2 w-24 text-center">Dauer (Min)</th>
+                      <th className="py-2 w-10 print:hidden"></th>
+                    </tr>
+                  ) : (
+                    <tr className="text-xs uppercase text-muted-foreground print:text-gray-500">
+                      <th className="py-2 w-12 text-center">Done</th>
+                      <th className="py-2 w-20">Bild</th>
+                      <th className="py-2 w-20">Zeit</th>
+                      <th className="py-2">Szene</th>
+                      <th className="py-2 w-20">Nr.</th>
+                      <th className="py-2 w-24 text-center">Dauer (Min)</th>
+                      <th className="py-2 w-10 print:hidden"></th>
+                    </tr>
+                  )}
                </thead>
                <tbody className="divide-y divide-border/50 print:table-row-group">
                  {schedule.map(item => (
                    <tr key={item.id} className="group print:break-inside-avoid">
-                     <td className="py-2 align-middle text-center">
-                        <input 
-                          type="checkbox"
-                          defaultChecked={item.is_done}
-                          onChange={(e) => updateScheduleMutation.mutate({ id: item.id, data: { is_done: e.target.checked } })}
-                          disabled={!isAdminOrPJM}
-                          className="w-4 h-4 accent-primary cursor-pointer"
-                        />
-                     </td>
-                     <td className="py-2 align-middle">
-                        <div className="relative group/img inline-block">
-                          {item.image_url ? (
-                            <img src={item.image_url} alt="Scene" className="w-12 h-12 object-cover rounded border border-border" />
-                          ) : (
-                            <div className="w-12 h-12 bg-muted rounded flex items-center justify-center text-[10px] text-muted-foreground border border-dashed border-border">Bild</div>
-                          )}
-                          {isAdminOrPJM && (
-                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover/img:opacity-100 flex items-center justify-center rounded transition-opacity">
-                              <button 
-                                onClick={() => {
-                                  const url = prompt('Bild URL eingeben:', item.image_url || '');
-                                  if (url !== null) updateScheduleMutation.mutate({ id: item.id, data: { image_url: url } });
-                                }}
-                                className="text-white text-[10px] bg-primary px-2 py-1 rounded"
-                              >
-                                Edit
+                     {doc.type === 'event_sheet' ? (
+                        <>
+                          <td className="py-2 align-middle font-mono">
+                            <input 
+                              type="text" 
+                              defaultValue={item.time_start || ''} 
+                              onBlur={(e) => updateScheduleMutation.mutate({ id: item.id, data: { time_start: e.target.value } })}
+                              className="w-16 bg-transparent border-none focus:ring-1 focus:ring-primary rounded p-1 print:p-0 font-bold"
+                              disabled={!isAdminOrPJM}
+                            />
+                          </td>
+                          <td className="py-2 align-middle">
+                            <input 
+                              type="text"
+                              defaultValue={item.scene_name || ''} 
+                              onBlur={(e) => updateScheduleMutation.mutate({ id: item.id, data: { scene_name: e.target.value } })}
+                              className="w-full bg-transparent border-none focus:ring-1 focus:ring-primary rounded p-1 print:p-0 font-medium"
+                              placeholder="Beschreibung..."
+                              disabled={!isAdminOrPJM}
+                            />
+                          </td>
+                          <td className="py-2 align-middle">
+                            <select
+                              value={item.description || ''}
+                              onChange={(e) => updateScheduleMutation.mutate({ id: item.id, data: { description: e.target.value } })}
+                              className="w-full bg-transparent border-none focus:ring-1 focus:ring-primary rounded p-1 print:p-0"
+                              disabled={!isAdminOrPJM}
+                            >
+                              <option value="">-- Keine --</option>
+                              {allLocations.map((loc, idx) => (
+                                <option key={idx} value={loc.name}>{loc.name}</option>
+                              ))}
+                            </select>
+                          </td>
+                          <td className="py-2 align-middle text-center">
+                            <input 
+                              type="number" 
+                              defaultValue={item.duration_minutes || ''} 
+                              onBlur={(e) => updateScheduleMutation.mutate({ id: item.id, data: { duration_minutes: parseInt(e.target.value) || 0 } })}
+                              className="w-16 bg-transparent border-none focus:ring-1 focus:ring-primary rounded text-muted-foreground p-1 print:p-0 text-center mx-auto block"
+                              placeholder="Min"
+                              disabled={!isAdminOrPJM}
+                            />
+                          </td>
+                          <td className="py-2 text-right align-middle print:hidden">
+                            {isAdminOrPJM && (
+                              <button onClick={() => deleteScheduleMutation.mutate(item.id)} className="text-red-400 opacity-0 group-hover:opacity-100 transition-opacity p-1">
+                                <Icon path="M6 18L18 6M6 6l12 12" className="w-4 h-4" />
                               </button>
-                            </div>
-                          )}
-                        </div>
-                     </td>
-                     <td className="py-2 align-middle font-mono">
-                       <input 
-                         type="text" 
-                         defaultValue={item.time_start || ''} 
-                         onBlur={(e) => updateScheduleMutation.mutate({ id: item.id, data: { time_start: e.target.value } })}
-                         className="w-16 bg-transparent border-none focus:ring-1 focus:ring-primary rounded p-1 print:p-0 font-bold"
-                         disabled={!isAdminOrPJM}
-                       />
-                     </td>
-                     <td className="py-2 align-middle">
-                       <input 
-                         type="text"
-                         defaultValue={item.scene_name || ''} 
-                         onBlur={(e) => updateScheduleMutation.mutate({ id: item.id, data: { scene_name: e.target.value } })}
-                         className="w-full bg-transparent border-none focus:ring-1 focus:ring-primary rounded p-1 print:p-0 font-medium"
-                         placeholder="Szenenname..."
-                         disabled={!isAdminOrPJM}
-                       />
-                     </td>
-                     <td className="py-2 align-middle">
-                       <input 
-                         type="text" 
-                         defaultValue={item.scene_number || ''} 
-                         onBlur={(e) => updateScheduleMutation.mutate({ id: item.id, data: { scene_number: e.target.value } })}
-                         className="w-16 bg-transparent border-none focus:ring-1 focus:ring-primary rounded text-muted-foreground p-1 print:p-0"
-                         placeholder="Nr..."
-                         disabled={!isAdminOrPJM}
-                       />
-                     </td>
-                     <td className="py-2 align-middle">
-                       <input 
-                         type="number" 
-                         defaultValue={item.duration_minutes || ''} 
-                         onBlur={(e) => updateScheduleMutation.mutate({ id: item.id, data: { duration_minutes: parseInt(e.target.value) || 0 } })}
-                         className="w-16 bg-transparent border-none focus:ring-1 focus:ring-primary rounded text-muted-foreground p-1 print:p-0 text-center"
-                         placeholder="Min"
-                         disabled={!isAdminOrPJM}
-                       />
-                     </td>
-                     <td className="py-2 text-right align-middle print:hidden">
-                       {isAdminOrPJM && (
-                         <button onClick={() => deleteScheduleMutation.mutate(item.id)} className="text-red-400 opacity-0 group-hover:opacity-100 transition-opacity p-1">
-                           <Icon path="M6 18L18 6M6 6l12 12" className="w-4 h-4" />
-                         </button>
-                       )}
-                     </td>
+                            )}
+                          </td>
+                        </>
+                      ) : (
+                        <>
+                          <td className="py-2 align-middle text-center">
+                             <input 
+                               type="checkbox"
+                               defaultChecked={item.is_done}
+                               onChange={(e) => updateScheduleMutation.mutate({ id: item.id, data: { is_done: e.target.checked } })}
+                               disabled={!isAdminOrPJM}
+                               className="w-4 h-4 accent-primary cursor-pointer"
+                             />
+                          </td>
+                          <td className="py-2 align-middle">
+                             <div className="relative group/img inline-block">
+                               {item.image_url ? (
+                                 <img src={item.image_url} alt="Scene" className="w-12 h-12 object-cover rounded border border-border" />
+                               ) : (
+                                 <div className="w-12 h-12 bg-muted rounded flex items-center justify-center text-[10px] text-muted-foreground border border-dashed border-border">Bild</div>
+                               )}
+                               {isAdminOrPJM && (
+                                 <div className="absolute inset-0 bg-black/50 opacity-0 group-hover/img:opacity-100 flex items-center justify-center rounded transition-opacity">
+                                   <button 
+                                     onClick={() => {
+                                       const url = prompt('Bild URL eingeben:', item.image_url || '');
+                                       if (url !== null) updateScheduleMutation.mutate({ id: item.id, data: { image_url: url } });
+                                     }}
+                                     className="text-white text-[10px] bg-primary px-2 py-1 rounded"
+                                   >
+                                     Edit
+                                   </button>
+                                 </div>
+                               )}
+                             </div>
+                          </td>
+                          <td className="py-2 align-middle font-mono">
+                            <input 
+                              type="text" 
+                              defaultValue={item.time_start || ''} 
+                              onBlur={(e) => updateScheduleMutation.mutate({ id: item.id, data: { time_start: e.target.value } })}
+                              className="w-16 bg-transparent border-none focus:ring-1 focus:ring-primary rounded p-1 print:p-0 font-bold"
+                              disabled={!isAdminOrPJM}
+                            />
+                          </td>
+                          <td className="py-2 align-middle">
+                            <input 
+                              type="text"
+                              defaultValue={item.scene_name || ''} 
+                              onBlur={(e) => updateScheduleMutation.mutate({ id: item.id, data: { scene_name: e.target.value } })}
+                              className="w-full bg-transparent border-none focus:ring-1 focus:ring-primary rounded p-1 print:p-0 font-medium"
+                              placeholder="Szenenname..."
+                              disabled={!isAdminOrPJM}
+                            />
+                          </td>
+                          <td className="py-2 align-middle">
+                            <input 
+                              type="text" 
+                              defaultValue={item.scene_number || ''} 
+                              onBlur={(e) => updateScheduleMutation.mutate({ id: item.id, data: { scene_number: e.target.value } })}
+                              className="w-16 bg-transparent border-none focus:ring-1 focus:ring-primary rounded text-muted-foreground p-1 print:p-0"
+                              placeholder="Nr..."
+                              disabled={!isAdminOrPJM}
+                            />
+                          </td>
+                          <td className="py-2 align-middle">
+                            <input 
+                              type="number" 
+                              defaultValue={item.duration_minutes || ''} 
+                              onBlur={(e) => updateScheduleMutation.mutate({ id: item.id, data: { duration_minutes: parseInt(e.target.value) || 0 } })}
+                              className="w-16 bg-transparent border-none focus:ring-1 focus:ring-primary rounded text-muted-foreground p-1 print:p-0 text-center"
+                              placeholder="Min"
+                              disabled={!isAdminOrPJM}
+                            />
+                          </td>
+                          <td className="py-2 text-right align-middle print:hidden">
+                            {isAdminOrPJM && (
+                              <button onClick={() => deleteScheduleMutation.mutate(item.id)} className="text-red-400 opacity-0 group-hover:opacity-100 transition-opacity p-1">
+                                <Icon path="M6 18L18 6M6 6l12 12" className="w-4 h-4" />
+                              </button>
+                            )}
+                          </td>
+                        </>
+                      )}
                    </tr>
                  ))}
                  {schedule.length === 0 && (
                    <tr>
-                     <td colSpan={7} className="py-4 text-muted-foreground italic text-center">Keine Szenen geplant.</td>
+                     <td colSpan={doc.type === 'event_sheet' ? 5 : 7} className="py-4 text-muted-foreground italic text-center">
+                        {doc.type === 'event_sheet' ? 'Keine Einträge geplant.' : 'Keine Szenen geplant.'}
+                      </td>
                    </tr>
                  )}
                </tbody>
@@ -695,23 +861,13 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                <h2 className="text-xl font-bold text-foreground print:text-black">ANFAHRT & PARKEN</h2>
              </div>
              {(() => {
-                const allLocations = [];
-                if (data.location_address) {
-                  allLocations.push({ name: data.location_name || 'Hauptlocation', address: data.location_address });
-                }
-                if (data.additional_locations) {
-                  data.additional_locations.forEach((loc, idx) => {
-                    if (loc.address) allLocations.push({ name: loc.name || `Location ${idx + 2}`, address: loc.address });
-                  });
-                }
-                
-                if (allLocations.length === 0) {
+                if (allLocations.filter(loc => loc.address).length === 0) {
                   return <p className="text-muted-foreground italic print:break-inside-avoid">Bitte Adresse oben eingeben, um die Karte zu laden.</p>;
                 }
                 
                 return (
                   <div className="space-y-8">
-                    {allLocations.map((loc, idx) => (
+                    {allLocations.filter(loc => loc.address).map((loc, idx) => (
                       <div key={idx} className="print:break-inside-avoid">
                         {allLocations.length > 1 && (
                           <h3 className="font-bold text-foreground mb-2 print:text-black">{loc.name}</h3>
