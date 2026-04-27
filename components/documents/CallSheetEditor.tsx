@@ -478,37 +478,41 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
 
            {/* Drehplan Table */}
            <div className="mb-12 print:break-inside-auto">
-             <div className="flex justify-between items-end mb-4 border-b border-border pb-2">
-               <h2 className="text-xl font-bold text-foreground print:text-black uppercase">DREHPLAN</h2>
-               {isAdminOrPJM && (
-                 <button onClick={() => {
-                   let nextTime = '08:00';
-                   if (schedule.length > 0) {
-                     const lastItem = schedule[schedule.length - 1];
-                     if (lastItem.time_start) {
-                       const duration = lastItem.duration_minutes || 0;
-                       const parts = lastItem.time_start.split(':');
-                       if (parts.length === 2) {
-                         const hours = parseInt(parts[0], 10);
-                         const minutes = parseInt(parts[1], 10);
-                         if (!isNaN(hours) && !isNaN(minutes)) {
-                           const totalMinutes = hours * 60 + minutes + duration;
-                           const nextHours = Math.floor(totalMinutes / 60) % 24;
-                           const nextMins = totalMinutes % 60;
-                           nextTime = `${nextHours.toString().padStart(2, '0')}:${nextMins.toString().padStart(2, '0')}`;
-                         }
-                       }
-                     }
-                   }
-                   createScheduleMutation.mutate({ time_start: nextTime, scene_name: 'Neue Szene' });
-                 }} className="text-primary text-sm font-medium hover:underline print:hidden">
-                   + Szene hinzufügen
-                 </button>
-               )}
-             </div>
              <table className="w-full text-left text-sm print:table">
-               <thead className="text-xs uppercase text-muted-foreground print:text-gray-500 print:table-header-group">
+               <thead className="print:table-header-group">
                  <tr>
+                   <td colSpan={7} className="pb-4">
+                     <div className="flex justify-between items-end border-b border-border pb-2">
+                       <h2 className="text-xl font-bold text-foreground print:text-black uppercase">DREHPLAN</h2>
+                       {isAdminOrPJM && (
+                         <button onClick={() => {
+                           let nextTime = '08:00';
+                           if (schedule.length > 0) {
+                             const lastItem = schedule[schedule.length - 1];
+                             if (lastItem.time_start) {
+                               const duration = lastItem.duration_minutes || 0;
+                               const parts = lastItem.time_start.split(':');
+                               if (parts.length === 2) {
+                                 const hours = parseInt(parts[0], 10);
+                                 const minutes = parseInt(parts[1], 10);
+                                 if (!isNaN(hours) && !isNaN(minutes)) {
+                                   const totalMinutes = hours * 60 + minutes + duration;
+                                   const nextHours = Math.floor(totalMinutes / 60) % 24;
+                                   const nextMins = totalMinutes % 60;
+                                   nextTime = `${nextHours.toString().padStart(2, '0')}:${nextMins.toString().padStart(2, '0')}`;
+                                 }
+                               }
+                             }
+                           }
+                           createScheduleMutation.mutate({ time_start: nextTime, scene_name: 'Neue Szene' });
+                         }} className="text-primary text-sm font-medium hover:underline print:hidden">
+                           + Szene hinzufügen
+                         </button>
+                       )}
+                     </div>
+                   </td>
+                 </tr>
+                 <tr className="text-xs uppercase text-muted-foreground print:text-gray-500">
                    <th className="py-2 w-12 text-center">Done</th>
                    <th className="py-2 w-20">Bild</th>
                    <th className="py-2 w-20">Zeit</th>
@@ -615,10 +619,9 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                <h2 className="text-xl font-bold text-foreground print:text-black">ANFAHRT & PARKEN</h2>
              </div>
              {data.location_address ? (
-               <div className="w-full h-64 bg-muted rounded border border-border overflow-hidden print:h-80 grayscale">
+               <div className="w-full h-64 bg-muted rounded border border-border overflow-hidden print:h-80 grayscale relative pointer-events-none">
                  <iframe 
-                   width="100%" 
-                   height="100%" 
+                   className="absolute top-[calc(-60px)] left-[calc(-20px)] w-[calc(100%+40px)] h-[calc(100%+80px)]"
                    frameBorder="0" style={{border:0}} 
                    src={`https://www.google.com/maps?q=${encodeURIComponent(data.location_address)}&output=embed`} 
                    allowFullScreen>
