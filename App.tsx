@@ -137,14 +137,14 @@ const MainApp: React.FC = () => {
 
   // Show main app if authenticated
   return (
-    <div className="flex flex-col h-screen bg-background text-foreground overflow-hidden font-sans antialiased">
+    <div className="flex flex-col h-screen print:h-auto print:block print:min-h-0 bg-background text-foreground overflow-hidden print:overflow-visible font-sans antialiased">
       <Navigation 
         currentView={view} 
         onNavigate={handleNavigate} 
         searchQuery={searchQuery}
         onSearch={setSearchQuery}
       />
-      <main className="flex-1 overflow-x-hidden overflow-y-auto bg-muted/40 border-t border-border">
+      <main className="flex-1 overflow-x-hidden overflow-y-auto print:overflow-visible print:block bg-muted/40 print:bg-white border-t border-border print:border-none">
         {renderContent()}
       </main>
     </div>

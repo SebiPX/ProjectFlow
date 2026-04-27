@@ -80,3 +80,17 @@
     -moz-osx-font-smoothing: grayscale;
   }
 }
+
+@media print {
+  html, body, #root {
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+    display: block !important;
+  }
+
+  /* Force all scrollable containers to expand */
+  * {
+    overflow: visible !important;
+  }
+}
