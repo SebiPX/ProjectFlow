@@ -229,7 +229,10 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
   };
 
   const printDocument = () => {
+    const originalTitle = document.title;
+    document.title = doc?.title || 'Drehdispo';
     window.print();
+    document.title = originalTitle;
   };
 
   if (isLoading) return <div className="p-6">Loading Call Sheet...</div>;
