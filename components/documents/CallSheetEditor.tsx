@@ -636,16 +636,31 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
              </div>
            </div>
 
-           {/* General Notes */}
-           <div className="mb-12 print:break-inside-avoid">
-             <h2 className="text-sm font-bold text-muted-foreground uppercase mb-2 print:text-gray-500">ALLGEMEINE NOTIZEN</h2>
-             <textarea 
-               defaultValue={data.general_notes || ''} 
-               onBlur={(e) => handleDataChange('general_notes', e.target.value)}
-               placeholder="Parkhinweise, Besonderheiten..."
-               className="w-full bg-transparent border border-transparent hover:border-border focus:border-primary rounded p-2 focus:outline-none min-h-[100px] print:border-none print:p-0"
-               disabled={!isAdminOrPJM}
-             />
+           {/* General Notes and Catering */}
+           <div className="grid grid-cols-2 gap-8 mb-12 print:break-inside-avoid">
+             <div>
+               <h2 className="text-sm font-bold text-muted-foreground uppercase mb-2 print:text-gray-500">ALLGEMEINE NOTIZEN</h2>
+               <textarea 
+                 defaultValue={data.general_notes || ''} 
+                 onBlur={(e) => handleDataChange('general_notes', e.target.value)}
+                 placeholder="Parkhinweise, Besonderheiten..."
+                 className="w-full bg-transparent border border-transparent hover:border-border focus:border-primary rounded p-2 focus:outline-none min-h-[100px] print:border-none print:p-0"
+                 disabled={!isAdminOrPJM}
+               />
+             </div>
+             <div>
+               <h2 className="text-sm font-bold text-muted-foreground uppercase mb-2 print:text-gray-500 flex items-center gap-1">
+                 <Icon path="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" className="w-4 h-4 text-primary print:hidden" />
+                 CATERING / MITTAGESSEN (ANZAHL PERSONEN)
+               </h2>
+               <textarea 
+                 defaultValue={data.catering_info || ''} 
+                 onBlur={(e) => handleDataChange('catering_info', e.target.value)}
+                 placeholder="z.B. 15 Personen (davon 2 Vegetarier)..."
+                 className="w-full bg-transparent border border-transparent hover:border-border focus:border-primary rounded p-2 focus:outline-none min-h-[100px] print:border-none print:p-0 font-medium"
+                 disabled={!isAdminOrPJM}
+               />
+             </div>
            </div>
 
            {/* Drehplan Table */}
@@ -653,7 +668,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
              <table className="w-full text-left text-sm print:table">
                <thead className="print:table-header-group">
                  <tr>
-                   <td colSpan={doc.type === 'event_sheet' ? 5 : 7} className="pb-4">
+                   <td colSpan={doc.type === 'event_sheet' ? 5 : 8} className="pb-4">
                      <div className="flex justify-between items-end border-b border-border pb-2">
                        <h2 className="text-xl font-bold text-foreground print:text-black uppercase">
                          {doc.type === 'event_sheet' ? 'ABLAUFPLAN' : 'DREHPLAN'}
@@ -804,6 +819,19 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                             />
                           </td>
                           <td className="py-2 align-middle">
+                            <select
+                              value={item.description || ''}
+                              onChange={(e) => updateScheduleMutation.mutate({ id: item.id, data: { description: e.target.value } })}
+                              className="w-full bg-transparent border-none focus:ring-1 focus:ring-primary rounded p-1 print:p-0"
+                              disabled={!isAdminOrPJM}
+                            >
+                              <option value="">-- Keine --</option>
+                              {allLocations.map((loc, idx) => (
+                                <option key={idx} value={loc.name}>{loc.name}</option>
+                              ))}
+                            </select>
+                          </td>
+                          <td className="py-2 align-middle">
                             <input 
                               type="text"
                               defaultValue={item.scene_name || ''} 
@@ -846,7 +874,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                  ))}
                  {schedule.length === 0 && (
                    <tr>
-                     <td colSpan={doc.type === 'event_sheet' ? 5 : 7} className="py-4 text-muted-foreground italic text-center">
+                     <td colSpan={doc.type === 'event_sheet' ? 5 : 8} className="py-4 text-muted-foreground italic text-center">
                         {doc.type === 'event_sheet' ? 'Keine Einträge geplant.' : 'Keine Szenen geplant.'}
                       </td>
                    </tr>
