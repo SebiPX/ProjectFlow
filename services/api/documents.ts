@@ -47,6 +47,7 @@ export interface CallSheetData {
   weather_info: string;
   hospital_info: string;
   general_notes: string;
+  catering_info?: string;
   directions_notes?: string;
   additional_locations?: CallSheetLocation[];
 }
