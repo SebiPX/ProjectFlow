@@ -18,6 +18,7 @@ export const DocumentList: React.FC<DocumentListProps> = ({ projectId, projectTi
   const queryClient = useQueryClient();
   const [isCreating, setIsCreating] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState<AgencyDocument | null>(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const { data: documents = [], isLoading } = useQuery({
     queryKey: ['documents', projectId],
@@ -79,23 +80,42 @@ export const DocumentList: React.FC<DocumentListProps> = ({ projectId, projectTi
           <p className="text-sm text-muted-foreground">Manage your Dispos, Shotlists, and more.</p>
         </div>
         {!isClient && (
-          <div className="flex gap-2">
+          <div className="relative">
             <button
-              onClick={() => handleCreate('call_sheet')}
-              disabled={isCreating}
-              className="px-4 py-2 bg-secondary hover:bg-secondary/90 text-secondary-foreground rounded-lg transition-colors flex items-center gap-2"
-            >
-              <Icon path="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" className="w-5 h-5" />
-              New Drehdispo
-            </button>
-            <button
-              onClick={() => handleCreate('shotlist')}
-              disabled={isCreating}
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               className="px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-colors flex items-center gap-2"
             >
-              <Icon path="M4 6h16M4 10h16M4 14h16M4 18h16" className="w-5 h-5" />
-              New Shotlist
+              <Icon path="M12 4v16m8-8H4" className="w-5 h-5" />
+              New Document
+              <Icon path={isDropdownOpen ? "M5 15l7-7 7 7" : "M19 9l-7 7-7-7"} className="w-4 h-4 ml-1" />
             </button>
+            
+            {isDropdownOpen && (
+              <div className="absolute right-0 mt-2 w-56 bg-card border border-border rounded-lg shadow-lg overflow-hidden z-50">
+                <button
+                  onClick={() => {
+                    setIsDropdownOpen(false);
+                    handleCreate('call_sheet');
+                  }}
+                  disabled={isCreating}
+                  className="w-full text-left px-4 py-3 hover:bg-muted transition-colors flex items-center gap-3 border-b border-border/50 text-sm font-medium text-foreground"
+                >
+                  <Icon path="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" className="w-4 h-4 text-primary" />
+                  Drehdispo
+                </button>
+                <button
+                  onClick={() => {
+                    setIsDropdownOpen(false);
+                    handleCreate('shotlist');
+                  }}
+                  disabled={isCreating}
+                  className="w-full text-left px-4 py-3 hover:bg-muted transition-colors flex items-center gap-3 text-sm font-medium text-foreground"
+                >
+                  <Icon path="M4 6h16M4 10h16M4 14h16M4 18h16" className="w-4 h-4 text-primary" />
+                  Shotlist
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>
