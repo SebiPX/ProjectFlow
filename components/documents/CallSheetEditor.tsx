@@ -405,72 +405,6 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
               </div>
            </div>
 
-           {/* Schedule Table */}
-           <div className="mb-12">
-             <div className="flex justify-between items-end mb-4 border-b border-border pb-2">
-               <h2 className="text-xl font-bold text-foreground print:text-black">Zeitplan</h2>
-               {isAdminOrPJM && (
-                 <button onClick={() => createScheduleMutation.mutate({ time_start: '08:00', description: 'Neuer Punkt' })} className="text-primary text-sm font-medium hover:underline print:hidden">
-                   + Termin hinzufügen
-                 </button>
-               )}
-             </div>
-             <table className="w-full text-left text-sm">
-               <thead className="text-xs uppercase text-muted-foreground print:text-gray-500">
-                 <tr>
-                   <th className="py-2 w-24">Zeit</th>
-                   <th className="py-2">Was passiert?</th>
-                   <th className="py-2 w-48">Wer?</th>
-                   <th className="py-2 w-10 print:hidden"></th>
-                 </tr>
-               </thead>
-               <tbody className="divide-y divide-border/50">
-                 {schedule.map(item => (
-                   <tr key={item.id} className="group">
-                     <td className="py-2 align-top font-mono">
-                       <input 
-                         type="text" 
-                         defaultValue={item.time_start || ''} 
-                         onBlur={(e) => updateScheduleMutation.mutate({ id: item.id, data: { time_start: e.target.value } })}
-                         className="w-16 bg-transparent border-none focus:ring-1 focus:ring-primary rounded p-1 print:p-0 font-bold"
-                         disabled={!isAdminOrPJM}
-                       />
-                     </td>
-                     <td className="py-2 align-top">
-                       <textarea 
-                         defaultValue={item.description || ''} 
-                         onBlur={(e) => updateScheduleMutation.mutate({ id: item.id, data: { description: e.target.value } })}
-                         className="w-full bg-transparent border-none focus:ring-1 focus:ring-primary rounded resize-none min-h-[40px] p-1 print:p-0"
-                         disabled={!isAdminOrPJM}
-                       />
-                     </td>
-                     <td className="py-2 align-top">
-                       <input 
-                         type="text" 
-                         defaultValue={item.persons || ''} 
-                         onBlur={(e) => updateScheduleMutation.mutate({ id: item.id, data: { persons: e.target.value } })}
-                         className="w-full bg-transparent border-none focus:ring-1 focus:ring-primary rounded font-medium text-muted-foreground p-1 print:p-0"
-                         disabled={!isAdminOrPJM}
-                       />
-                     </td>
-                     <td className="py-2 text-right align-top print:hidden">
-                       {isAdminOrPJM && (
-                         <button onClick={() => deleteScheduleMutation.mutate(item.id)} className="text-red-400 opacity-0 group-hover:opacity-100 transition-opacity p-1">
-                           <Icon path="M6 18L18 6M6 6l12 12" className="w-4 h-4" />
-                         </button>
-                       )}
-                     </td>
-                   </tr>
-                 ))}
-                 {schedule.length === 0 && (
-                   <tr>
-                     <td colSpan={4} className="py-4 text-muted-foreground italic">Keine Einträge.</td>
-                   </tr>
-                 )}
-               </tbody>
-             </table>
-           </div>
-
            {/* Contacts Table */}
            <div className="mb-8">
              <div className="flex justify-between items-end mb-4 border-b border-border pb-2">
@@ -528,6 +462,119 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                  </div>
                ))}
              </div>
+           </div>
+
+           {/* Drehplan Table */}
+           <div className="mb-12">
+             <div className="flex justify-between items-end mb-4 border-b border-border pb-2">
+               <h2 className="text-xl font-bold text-foreground print:text-black">Drehplan</h2>
+               {isAdminOrPJM && (
+                 <button onClick={() => createScheduleMutation.mutate({ time_start: '08:00', scene_name: 'Neue Szene' })} className="text-primary text-sm font-medium hover:underline print:hidden">
+                   + Szene hinzufügen
+                 </button>
+               )}
+             </div>
+             <table className="w-full text-left text-sm">
+               <thead className="text-xs uppercase text-muted-foreground print:text-gray-500">
+                 <tr>
+                   <th className="py-2 w-12 text-center">Done</th>
+                   <th className="py-2 w-20">Bild</th>
+                   <th className="py-2 w-20">Zeit</th>
+                   <th className="py-2">Szene</th>
+                   <th className="py-2 w-20">Nr.</th>
+                   <th className="py-2 w-24">Dauer (Min)</th>
+                   <th className="py-2 w-10 print:hidden"></th>
+                 </tr>
+               </thead>
+               <tbody className="divide-y divide-border/50">
+                 {schedule.map(item => (
+                   <tr key={item.id} className="group">
+                     <td className="py-2 align-middle text-center">
+                        <input 
+                          type="checkbox"
+                          defaultChecked={item.is_done}
+                          onChange={(e) => updateScheduleMutation.mutate({ id: item.id, data: { is_done: e.target.checked } })}
+                          disabled={!isAdminOrPJM}
+                          className="w-4 h-4 accent-primary cursor-pointer"
+                        />
+                     </td>
+                     <td className="py-2 align-middle">
+                        <div className="relative group/img inline-block">
+                          {item.image_url ? (
+                            <img src={item.image_url} alt="Scene" className="w-12 h-12 object-cover rounded border border-border" />
+                          ) : (
+                            <div className="w-12 h-12 bg-muted rounded flex items-center justify-center text-[10px] text-muted-foreground border border-dashed border-border">Bild</div>
+                          )}
+                          {isAdminOrPJM && (
+                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover/img:opacity-100 flex items-center justify-center rounded transition-opacity">
+                              <button 
+                                onClick={() => {
+                                  const url = prompt('Bild URL eingeben:', item.image_url || '');
+                                  if (url !== null) updateScheduleMutation.mutate({ id: item.id, data: { image_url: url } });
+                                }}
+                                className="text-white text-[10px] bg-primary px-2 py-1 rounded"
+                              >
+                                Edit
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                     </td>
+                     <td className="py-2 align-middle font-mono">
+                       <input 
+                         type="text" 
+                         defaultValue={item.time_start || ''} 
+                         onBlur={(e) => updateScheduleMutation.mutate({ id: item.id, data: { time_start: e.target.value } })}
+                         className="w-16 bg-transparent border-none focus:ring-1 focus:ring-primary rounded p-1 print:p-0 font-bold"
+                         disabled={!isAdminOrPJM}
+                       />
+                     </td>
+                     <td className="py-2 align-middle">
+                       <input 
+                         type="text"
+                         defaultValue={item.scene_name || ''} 
+                         onBlur={(e) => updateScheduleMutation.mutate({ id: item.id, data: { scene_name: e.target.value } })}
+                         className="w-full bg-transparent border-none focus:ring-1 focus:ring-primary rounded p-1 print:p-0 font-medium"
+                         placeholder="Szenenname..."
+                         disabled={!isAdminOrPJM}
+                       />
+                     </td>
+                     <td className="py-2 align-middle">
+                       <input 
+                         type="text" 
+                         defaultValue={item.scene_number || ''} 
+                         onBlur={(e) => updateScheduleMutation.mutate({ id: item.id, data: { scene_number: e.target.value } })}
+                         className="w-16 bg-transparent border-none focus:ring-1 focus:ring-primary rounded text-muted-foreground p-1 print:p-0"
+                         placeholder="Nr..."
+                         disabled={!isAdminOrPJM}
+                       />
+                     </td>
+                     <td className="py-2 align-middle">
+                       <input 
+                         type="number" 
+                         defaultValue={item.duration_minutes || ''} 
+                         onBlur={(e) => updateScheduleMutation.mutate({ id: item.id, data: { duration_minutes: parseInt(e.target.value) || 0 } })}
+                         className="w-16 bg-transparent border-none focus:ring-1 focus:ring-primary rounded text-muted-foreground p-1 print:p-0 text-center"
+                         placeholder="Min"
+                         disabled={!isAdminOrPJM}
+                       />
+                     </td>
+                     <td className="py-2 text-right align-middle print:hidden">
+                       {isAdminOrPJM && (
+                         <button onClick={() => deleteScheduleMutation.mutate(item.id)} className="text-red-400 opacity-0 group-hover:opacity-100 transition-opacity p-1">
+                           <Icon path="M6 18L18 6M6 6l12 12" className="w-4 h-4" />
+                         </button>
+                       )}
+                     </td>
+                   </tr>
+                 ))}
+                 {schedule.length === 0 && (
+                   <tr>
+                     <td colSpan={7} className="py-4 text-muted-foreground italic text-center">Keine Szenen geplant.</td>
+                   </tr>
+                 )}
+               </tbody>
+             </table>
            </div>
 
            {/* General Notes */}

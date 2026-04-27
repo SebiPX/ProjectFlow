@@ -45,6 +45,11 @@ export interface CallSheetSchedule {
   time_end: string;
   description: string;
   persons: string;
+  scene_name?: string;
+  scene_number?: string;
+  duration_minutes?: number;
+  is_done?: boolean;
+  image_url?: string;
 }
 
 export interface CallSheetContact {
