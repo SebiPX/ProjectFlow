@@ -20,6 +20,10 @@ export interface ShotlistItem {
   take: string;
   duration: string;
   framing: string;
+  is_vfx?: boolean;
+  focal_length?: string;
+  framerate?: string;
+  camera_type?: string;
   cast_list: string;
   props: string;
   notes: string;

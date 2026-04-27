@@ -700,7 +700,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                       <th className="py-2 w-20">Bild</th>
                       <th className="py-2 w-20">Zeit</th>
                       <th className="py-2">Szene</th>
-                      <th className="py-2 w-20">Nr.</th>
+                      <th className="py-2 w-20">BILD</th>
                       <th className="py-2 w-24 text-center">Dauer (Min)</th>
                       <th className="py-2 w-10 print:hidden"></th>
                     </tr>

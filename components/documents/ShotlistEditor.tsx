@@ -82,7 +82,7 @@ export const ShotlistEditor: React.FC<ShotlistEditorProps> = ({ documentId, onBa
     createItemMutation.mutate({ order_index: nextOrder, scene_number: `S${nextOrder + 1}` });
   };
 
-  const handleCellChange = (itemId: string, field: keyof ShotlistItem, value: string) => {
+  const handleCellChange = (itemId: string, field: keyof ShotlistItem, value: any) => {
     updateItemMutation.mutate({ id: itemId, data: { [field]: value } });
   };
 
@@ -106,6 +106,47 @@ export const ShotlistEditor: React.FC<ShotlistEditorProps> = ({ documentId, onBa
   if (!doc) return <div className="p-6 text-red-500">Document not found</div>;
 
   const items: ShotlistItem[] = doc.items || [];
+
+
+  // Helper to parse duration strings to seconds
+  const parseDurationToSeconds = (durationStr: string): number => {
+    if (!durationStr) return 0;
+    const str = durationStr.toLowerCase();
+    let seconds = 0;
+    
+    // Match hours, minutes, seconds using regex
+    const hMatch = str.match(/(\d+)\s*h/);
+    const mMatch = str.match(/(\d+)\s*m/);
+    const sMatch = str.match(/(\d+)\s*s/);
+    
+    if (hMatch) seconds += parseInt(hMatch[1], 10) * 3600;
+    if (mMatch) seconds += parseInt(mMatch[1], 10) * 60;
+    if (sMatch) seconds += parseInt(sMatch[1], 10);
+    
+    // If no h/m/s format is found, try to parse it as raw minutes if it's just a number
+    if (seconds === 0 && /^\d+$/.test(str.trim())) {
+      seconds = parseInt(str.trim(), 10) * 60;
+    }
+    
+    return seconds;
+  };
+
+  const formatSecondsToHMS = (totalSeconds: number): string => {
+    if (totalSeconds === 0) return '00m00s';
+    const h = Math.floor(totalSeconds / 3600);
+    const m = Math.floor((totalSeconds % 3600) / 60);
+    const s = totalSeconds % 60;
+    
+    let parts = [];
+    if (h > 0) parts.push(`${h}h`);
+    if (m > 0 || h > 0) parts.push(`${m}m`);
+    parts.push(`${s}s`);
+    return parts.join(' ');
+  };
+
+  const totalDurationSeconds = (doc?.items || []).reduce((acc: number, item: ShotlistItem) => {
+    return acc + parseDurationToSeconds(item.duration || '');
+  }, 0);
 
   return (
     <div className="flex flex-col h-full bg-background relative">
@@ -136,6 +177,10 @@ export const ShotlistEditor: React.FC<ShotlistEditorProps> = ({ documentId, onBa
               {isAdminOrPJM && <Icon path="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />}
             </h1>
           )}
+          <div className="ml-4 px-3 py-1 bg-muted rounded-full text-sm font-medium text-muted-foreground border border-border flex items-center gap-2">
+            <Icon path="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" className="w-4 h-4" />
+            Gesamtlänge: <span className="text-foreground">{formatSecondsToHMS(totalDurationSeconds)}</span>
+          </div>
         </div>
         <div className="flex items-center gap-2">
            <button 
@@ -159,14 +204,26 @@ export const ShotlistEditor: React.FC<ShotlistEditorProps> = ({ documentId, onBa
 
       {/* Grid */}
       <div className="flex-1 overflow-auto p-6">
+      <datalist id="camera-models">
+        <option value="ARRI Alexa" />
+        <option value="Sony FX9" />
+        <option value="Sony FX6" />
+        <option value="Sony a7iv" />
+        <option value="Ursa Mini 4.6K G2" />
+        <option value="Handy" />
+      </datalist>
         <div className="bg-card border border-border rounded-lg shadow-sm overflow-hidden">
           <table className="w-full text-left text-sm whitespace-nowrap">
             <thead className="bg-muted text-muted-foreground uppercase text-xs">
               <tr>
                 <th className="px-4 py-3 w-10"></th>
                 <th className="px-4 py-3 w-16">Szene</th>
-                <th className="px-4 py-3 w-48">Name/Inhalt</th>
+                <th className="px-4 py-3 w-16 text-center">VFX</th>
+                <th className="px-4 py-3 w-48">BILD</th>
                 <th className="px-4 py-3 w-24">Framing</th>
+                <th className="px-4 py-3 w-24">Brennweite</th>
+                <th className="px-4 py-3 w-24">Framerate</th>
+                <th className="px-4 py-3 w-32">Kamera</th>
                 <th className="px-4 py-3 w-16">Take</th>
                 <th className="px-4 py-3 w-24">Dauer</th>
                 <th className="px-4 py-3">Darsteller</th>
@@ -190,12 +247,21 @@ export const ShotlistEditor: React.FC<ShotlistEditorProps> = ({ documentId, onBa
                       disabled={!isAdminOrPJM}
                     />
                   </td>
+                  <td className="px-2 py-2 text-center">
+                    <input 
+                      type="checkbox" 
+                      defaultChecked={item.is_vfx || false} 
+                      onChange={(e) => handleCellChange(item.id, 'is_vfx', e.target.checked as any)}
+                      className="w-4 h-4 accent-primary cursor-pointer"
+                      disabled={!isAdminOrPJM}
+                    />
+                  </td>
                   <td className="px-2 py-2">
                     <input 
                       type="text" 
                       defaultValue={item.scene_name} 
                       onBlur={(e) => handleCellChange(item.id, 'scene_name', e.target.value)}
-                      className="w-full bg-transparent border-none focus:ring-1 focus:ring-primary rounded px-2 py-1"
+                      className="w-full bg-transparent border-none focus:ring-1 focus:ring-primary rounded px-2 py-1 font-medium"
                       disabled={!isAdminOrPJM}
                     />
                   </td>
@@ -206,6 +272,37 @@ export const ShotlistEditor: React.FC<ShotlistEditorProps> = ({ documentId, onBa
                       onBlur={(e) => handleCellChange(item.id, 'framing', e.target.value)}
                       className="w-full bg-transparent border-none focus:ring-1 focus:ring-primary rounded px-2 py-1 placeholder-muted-foreground/50"
                       placeholder="MCU / CU..."
+                      disabled={!isAdminOrPJM}
+                    />
+                  </td>
+                  <td className="px-2 py-2">
+                    <input 
+                      type="text" 
+                      defaultValue={item.focal_length} 
+                      onBlur={(e) => handleCellChange(item.id, 'focal_length', e.target.value)}
+                      className="w-full bg-transparent border-none focus:ring-1 focus:ring-primary rounded px-2 py-1 placeholder-muted-foreground/50"
+                      placeholder="35mm..."
+                      disabled={!isAdminOrPJM}
+                    />
+                  </td>
+                  <td className="px-2 py-2">
+                    <input 
+                      type="text" 
+                      defaultValue={item.framerate} 
+                      onBlur={(e) => handleCellChange(item.id, 'framerate', e.target.value)}
+                      className="w-full bg-transparent border-none focus:ring-1 focus:ring-primary rounded px-2 py-1 placeholder-muted-foreground/50"
+                      placeholder="25fps..."
+                      disabled={!isAdminOrPJM}
+                    />
+                  </td>
+                  <td className="px-2 py-2">
+                    <input 
+                      type="text" 
+                      list="camera-models"
+                      defaultValue={item.camera_type} 
+                      onBlur={(e) => handleCellChange(item.id, 'camera_type', e.target.value)}
+                      className="w-full bg-transparent border-none focus:ring-1 focus:ring-primary rounded px-2 py-1 placeholder-muted-foreground/50"
+                      placeholder="ARRI..."
                       disabled={!isAdminOrPJM}
                     />
                   </td>
@@ -277,7 +374,7 @@ export const ShotlistEditor: React.FC<ShotlistEditorProps> = ({ documentId, onBa
               ))}
               {items.length === 0 && (
                 <tr>
-                  <td colSpan={10} className="px-6 py-12 text-center text-muted-foreground">
+                  <td colSpan={14} className="px-6 py-12 text-center text-muted-foreground">
                     <p className="mb-4">No shots in this list yet.</p>
                     {isAdminOrPJM && (
                       <button onClick={handleCreateRow} className="px-4 py-2 bg-primary text-primary-foreground rounded-lg">
