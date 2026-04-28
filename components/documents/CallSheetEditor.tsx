@@ -18,6 +18,9 @@ import {
 import { Icon } from '../ui/Icon';
 import { toast } from 'react-toastify';
 import { LocationAutocomplete } from './LocationAutocomplete';
+import { ContactAutocomplete } from './ContactAutocomplete';
+import { directory } from '../../lib/apiClient';
+import { getProfiles } from '../../services/api/profiles';
 
 interface CallSheetEditorProps {
   documentId: string;
@@ -32,9 +35,19 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [titleInput, setTitleInput] = useState('');
 
-  const { data: doc, isLoading } = useQuery({
+  const { data: doc, isLoading } = useQuery<AgencyDocument & { data: CallSheetData, schedule: CallSheetSchedule[], contacts: CallSheetContact[] }>({
     queryKey: ['document', documentId],
-    queryFn: () => getDocumentDetails(documentId),
+    queryFn: () => getDocumentDetails(documentId)
+  });
+
+  const { data: teamProfiles = [] } = useQuery({
+    queryKey: ['profiles'],
+    queryFn: getProfiles
+  });
+
+  const { data: freelancers = [] } = useQuery({
+    queryKey: ['freelancers'],
+    queryFn: directory.freelancers.list
   });
 
   useEffect(() => {
@@ -370,12 +383,12 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                        <div key={contact.id} className="flex items-start justify-between border-b border-border/50 pb-2 group print:break-inside-avoid">
                          <div className="w-full mr-2">
                            <div className="flex gap-2 mb-1">
-                             <input 
-                               type="text" 
-                               defaultValue={contact.name || ''} 
-                               onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { name: e.target.value } })}
-                               className="font-bold bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-1/2 print:p-0"
-                               placeholder="Name..."
+                             <ContactAutocomplete
+                               value={contact.name || ''}
+                               onChange={(newName) => updateContactMutation.mutate({ id: contact.id, data: { name: newName } })}
+                               onSelectCallback={(data) => updateContactMutation.mutate({ id: contact.id, data })}
+                               profiles={teamProfiles}
+                               freelancers={freelancers}
                                disabled={!isAdminOrPJM}
                              />
                              <input 
