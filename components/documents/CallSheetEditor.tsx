@@ -250,7 +250,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
         if (postcode || city) {
           lines.push(`${postcode} ${city}`.trim());
         }
-        const info = lines.filter(Boolean).join('\\n');
+        const info = lines.filter(Boolean).join('\n');
         
         if (idx !== undefined) {
           const newLocs = [...(data.additional_locations || [])];
@@ -579,6 +579,21 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                     placeholder={data.location_lat ? "Auto-Fill klicken für Krankenhaus..." : "Krankenhaus X... (erst Adresse setzen)"}
                     className="w-full bg-transparent text-sm border border-transparent hover:border-border focus:border-primary rounded resize-none p-1 focus:outline-none print:border-none print:p-0"
                     rows={3}
+                    disabled={!isAdminOrPJM}
+                  />
+                </div>
+
+                <div className="mt-4 pt-2 border-t border-border/20">
+                  <label className="block text-xs font-bold text-muted-foreground uppercase mb-1 print:text-gray-500">
+                    Location Hinweise
+                  </label>
+                  <textarea 
+                    defaultValue={data.location_notes || ''} 
+                    onBlur={(e) => handleDataChange('location_notes', e.target.value)}
+                    placeholder="Spezielle Hinweise zur Location, z.B. 'Haus C im Hinterhof'..."
+                    className="w-full bg-transparent text-sm border border-transparent hover:border-border focus:border-primary rounded resize-none p-1 focus:outline-none print:border-none print:p-0"
+                    style={{ fieldSizing: 'content' } as any}
+                    rows={1}
                     disabled={!isAdminOrPJM}
                   />
                 </div>
