@@ -409,6 +409,14 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                  className="w-full bg-transparent font-bold text-lg border-b border-border focus:border-primary focus:outline-none pb-1 print:border-none print:p-0"
                  disabled={!isAdminOrPJM}
                />
+               <input 
+                 type="text" 
+                 defaultValue={data.pjm_phone || ''}
+                 onBlur={(e) => handleDataChange('pjm_phone', e.target.value)}
+                 placeholder="Telefonnummer..."
+                 className="w-full mt-1 bg-transparent text-sm text-muted-foreground border-b border-transparent focus:border-primary focus:outline-none pb-1 print:border-none print:p-0"
+                 disabled={!isAdminOrPJM}
+               />
                <datalist id="producer-list">
                  {teamProfiles.map(p => (
                    <option key={p.id} value={p.full_name || ''} />
