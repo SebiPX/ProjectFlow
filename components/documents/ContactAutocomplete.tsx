@@ -32,9 +32,7 @@ export const ContactAutocomplete: React.FC<ContactAutocompleteProps> = ({
   }, []);
 
   const suggestions = React.useMemo(() => {
-    if (!query || query.length < 2) return [];
-    
-    const lowerQuery = query.toLowerCase();
+    const lowerQuery = (query || '').toLowerCase();
     
     const profileMatches = (profiles || [])
       .filter(p => p.full_name?.toLowerCase().includes(lowerQuery))
@@ -72,6 +70,7 @@ export const ContactAutocomplete: React.FC<ContactAutocompleteProps> = ({
       <input
         type="text"
         value={query}
+        onFocus={() => setIsOpen(true)}
         onChange={(e) => {
           setQuery(e.target.value);
           if (!isOpen) setIsOpen(true);
