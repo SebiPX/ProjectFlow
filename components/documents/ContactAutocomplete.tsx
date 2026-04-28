@@ -7,11 +7,12 @@ interface ContactAutocompleteProps {
   onSelectCallback: (data: { name: string; role: string; email: string; phone: string }) => void;
   profiles: any[];
   freelancers: ApiFreelancer[];
+  clientContacts?: any[];
   disabled?: boolean;
 }
 
 export const ContactAutocomplete: React.FC<ContactAutocompleteProps> = ({ 
-  value, onChange, onSelectCallback, profiles, freelancers, disabled 
+  value, onChange, onSelectCallback, profiles, freelancers, clientContacts = [], disabled 
 }) => {
   const [query, setQuery] = useState(value || '');
   const [isOpen, setIsOpen] = useState(false);
@@ -62,8 +63,19 @@ export const ContactAutocomplete: React.FC<ContactAutocompleteProps> = ({
         };
       });
 
-    return [...profileMatches, ...freelancerMatches].slice(0, 8);
-  }, [query, profiles, freelancers]);
+    const clientMatches = (clientContacts || [])
+      .filter(c => c.full_name?.toLowerCase().includes(lowerQuery))
+      .map(c => ({
+        id: c.id,
+        name: c.full_name || '',
+        role: c.position || 'Kunde',
+        email: c.email || '',
+        phone: c.phone || '',
+        type: 'Kunde'
+      }));
+
+    return [...profileMatches, ...freelancerMatches, ...clientMatches].slice(0, 8);
+  }, [query, profiles, freelancers, clientContacts]);
 
   return (
     <div className="relative w-1/2" ref={wrapperRef}>

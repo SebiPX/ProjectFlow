@@ -21,6 +21,8 @@ import { LocationAutocomplete } from './LocationAutocomplete';
 import { ContactAutocomplete } from './ContactAutocomplete';
 import { directory } from '../../lib/apiClient';
 import { getProfiles } from '../../services/api/profiles';
+import { getProjectById } from '../../services/api/projects';
+import { getClientContacts } from '../../services/api/clientContacts';
 
 interface CallSheetEditorProps {
   documentId: string;
@@ -48,6 +50,18 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
   const { data: freelancers = [] } = useQuery({
     queryKey: ['freelancers'],
     queryFn: directory.freelancers.list
+  });
+
+  const { data: project } = useQuery({
+    queryKey: ['project', doc?.project_id],
+    queryFn: () => getProjectById(doc!.project_id),
+    enabled: !!doc?.project_id
+  });
+
+  const { data: clientContacts = [] } = useQuery({
+    queryKey: ['clientContacts', project?.client_id],
+    queryFn: () => getClientContacts(project!.client_id),
+    enabled: !!project?.client_id
   });
 
   useEffect(() => {
@@ -389,6 +403,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                                onSelectCallback={(data) => updateContactMutation.mutate({ id: contact.id, data })}
                                profiles={teamProfiles}
                                freelancers={freelancers}
+                               clientContacts={clientContacts}
                                disabled={!isAdminOrPJM}
                              />
                              <input 
