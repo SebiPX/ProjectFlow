@@ -441,7 +441,7 @@ Don't try to create RLS policies for admin access to all profiles - use service 
 - 🚧 **Active Focus**: We are currently working on the **Documents Modal** within projects.
 - ✅ **Infrastructure**: Created 5 new PostgreSQL tables (`agency_documents`, `agency_shotlist_items`, etc.) and corresponding `labs-api` Express routes.
 - ✅ **Shotlist Editor**: Airtable-style grid for building structured shotlists with drag & drop functionality. (Image Upload feature upcoming).
-- ✅ **Drehdispo (Call Sheet)**: Form-based document builder combining Schedule, Contacts, Location, and Weather info. Includes Native PDF Print via browser `print:hidden` CSS logic, dynamic Drehtag, and PJM emails.
+- ✅ **Drehdispo (Call Sheet)**: Form-based document builder combining Schedule, Contacts, Location, and Weather info. Includes Native PDF Print via browser `print:hidden` CSS logic, dynamic Drehtag, and PJM emails. **New:** Added deep-copy duplication for documents and manual contact sorting (Up/Down controls with persistent backend ordering).
 
 ### Completed in v2.4.0 ✅ (March 2026) - REAL-TIME CHAT SYSTEM
 
