@@ -78,8 +78,27 @@ export const MultiPersonSelect: React.FC<MultiPersonSelectProps> = ({ value, onC
               onChange={e => setCustomInput(e.target.value)}
               onKeyDown={addCustom}
               placeholder="Name tippen + Enter..."
-              className="w-full text-sm bg-transparent border border-border rounded p-1 focus:border-primary focus:outline-none"
+              className="w-full text-sm bg-transparent border border-border rounded p-1 focus:border-primary focus:outline-none mb-2"
             />
+            {options.length > 0 && !customInput && (
+              <label className="flex items-center p-1 hover:bg-muted cursor-pointer text-sm font-semibold border border-border/50 rounded bg-muted/20">
+                <input 
+                  type="checkbox" 
+                  checked={options.every(opt => selectedNames.includes(opt))}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      const newSelected = Array.from(new Set([...selectedNames, ...options]));
+                      onChange(newSelected.join(', '));
+                    } else {
+                      const newSelected = selectedNames.filter(name => !options.includes(name));
+                      onChange(newSelected.join(', '));
+                    }
+                  }}
+                  className="mr-2 ml-1"
+                />
+                Alle auswählen
+              </label>
+            )}
           </div>
           {options.length === 0 && !customInput && (
             <div className="p-3 text-sm text-muted-foreground italic">Keine Kontakte im Dokument.</div>
