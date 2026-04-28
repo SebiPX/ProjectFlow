@@ -80,6 +80,7 @@ export interface CallSheetContact {
   category?: 'crew' | 'kunde' | 'darsteller' | 'bts';
   phone: string;
   email: string;
+  order_index?: number;
 }
 
 export const getProjectDocuments = (projectId: string) =>
@@ -158,3 +159,9 @@ export const updateCallSheetContact = (itemId: string, data: Partial<CallSheetCo
 
 export const deleteCallSheetContact = (itemId: string) =>
   fetchApi(`/api/documents/contacts/${itemId}`, { method: 'DELETE' });
+
+export const reorderCallSheetContacts = (documentId: string, contacts: {id: string, order_index: number}[]) =>
+  fetchApi(`/api/documents/${documentId}/contacts-reorder`, {
+    method: 'PATCH',
+    body: JSON.stringify({ contacts }),
+  });

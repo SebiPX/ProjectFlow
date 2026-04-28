@@ -10,6 +10,7 @@ import {
   createCallSheetContact,
   updateCallSheetContact,
   deleteCallSheetContact,
+  reorderCallSheetContacts,
   AgencyDocument,
   CallSheetData,
   CallSheetSchedule,
@@ -129,6 +130,35 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
       queryClient.invalidateQueries({ queryKey: ['document', documentId] });
     }
   });
+
+  const reorderContactsMutation = useMutation({
+    mutationFn: (contacts: {id: string, order_index: number}[]) => reorderCallSheetContacts(documentId, contacts),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['document', documentId] });
+    }
+  });
+
+  const handleMoveContact = (category: string, index: number, direction: 1 | -1) => {
+    if (!doc || !doc.contacts) return;
+    const catContacts = doc.contacts.filter(c => (c.category || 'crew') === category);
+    if (index + direction < 0 || index + direction >= catContacts.length) return;
+    
+    const newCatContacts = [...catContacts];
+    const temp = newCatContacts[index];
+    newCatContacts[index] = newCatContacts[index + direction];
+    newCatContacts[index + direction] = temp;
+    
+    const updates = newCatContacts.map((c, i) => ({ id: c.id, order_index: i }));
+    
+    // Optimistic update
+    queryClient.setQueryData(['document', documentId], (old: any) => {
+      if (!old) return old;
+      const otherContacts = old.contacts.filter((c: any) => (c.category || 'crew') !== category);
+      return { ...old, contacts: [...otherContacts, ...newCatContacts] };
+    });
+    
+    reorderContactsMutation.mutate(updates);
+  };
 
 
   const handleTitleSubmit = (e: React.FormEvent) => {
@@ -682,7 +712,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                  <div className="flex justify-between items-end mb-4 border-b border-border pb-2">
                    <h2 className="text-lg font-bold text-foreground print:text-black uppercase">Kunde</h2>
                    {isAdminOrPJM && (
-                     <button onClick={() => createContactMutation.mutate({ name: 'Neuer Kontakt', role: 'Rolle', category: 'kunde' as any, phone: '' })} className="text-primary text-sm font-medium hover:underline print:hidden">
+                     <button onClick={() => createContactMutation.mutate({ name: 'Neuer Kontakt', role: 'Rolle', category: 'kunde' as any, phone: '', order_index: catContacts.length })} className="text-primary text-sm font-medium hover:underline print:hidden">
                        + Hinzufügen
                      </button>
                    )}
@@ -730,9 +760,17 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                          </div>
                        </div>
                        {isAdminOrPJM && (
-                         <button onClick={() => deleteContactMutation.mutate(contact.id)} className="text-red-400 opacity-0 group-hover:opacity-100 transition-opacity p-1 mt-1 print:hidden">
-                           <Icon path="M6 18L18 6M6 6l12 12" className="w-4 h-4" />
-                         </button>
+                         <div className="flex flex-col items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity ml-2 print:hidden mt-1">
+                            <button onClick={() => handleMoveContact(contact.category || 'crew', catContacts.indexOf(contact), -1)} disabled={catContacts.indexOf(contact) === 0} className="text-muted-foreground hover:text-primary disabled:opacity-30 disabled:hover:text-muted-foreground p-0.5">
+                              <Icon path="M5 15l7-7 7 7" className="w-4 h-4" />
+                            </button>
+                            <button onClick={() => deleteContactMutation.mutate(contact.id)} className="text-red-400 hover:text-red-500 p-0.5" title="Löschen">
+                              <Icon path="M6 18L18 6M6 6l12 12" className="w-4 h-4" />
+                            </button>
+                            <button onClick={() => handleMoveContact(contact.category || 'crew', catContacts.indexOf(contact), 1)} disabled={catContacts.indexOf(contact) === catContacts.length - 1} className="text-muted-foreground hover:text-primary disabled:opacity-30 disabled:hover:text-muted-foreground p-0.5">
+                              <Icon path="M19 9l-7 7-7-7" className="w-4 h-4" />
+                            </button>
+                          </div>
                        )}
                      </div>
                    ))}
@@ -766,7 +804,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                  <div className="flex justify-between items-end mb-4 border-b border-border pb-2">
                    <h2 className="text-lg font-bold text-foreground print:text-black uppercase">Darsteller</h2>
                    {isAdminOrPJM && (
-                     <button onClick={() => createContactMutation.mutate({ name: 'Neuer Kontakt', role: 'Rolle', category: 'darsteller' as any, phone: '' })} className="text-primary text-sm font-medium hover:underline print:hidden">
+                     <button onClick={() => createContactMutation.mutate({ name: 'Neuer Kontakt', role: 'Rolle', category: 'darsteller' as any, phone: '', order_index: catContacts.length })} className="text-primary text-sm font-medium hover:underline print:hidden">
                        + Hinzufügen
                      </button>
                    )}
@@ -814,9 +852,17 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                          </div>
                        </div>
                        {isAdminOrPJM && (
-                         <button onClick={() => deleteContactMutation.mutate(contact.id)} className="text-red-400 opacity-0 group-hover:opacity-100 transition-opacity p-1 mt-1 print:hidden">
-                           <Icon path="M6 18L18 6M6 6l12 12" className="w-4 h-4" />
-                         </button>
+                         <div className="flex flex-col items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity ml-2 print:hidden mt-1">
+                            <button onClick={() => handleMoveContact(contact.category || 'crew', catContacts.indexOf(contact), -1)} disabled={catContacts.indexOf(contact) === 0} className="text-muted-foreground hover:text-primary disabled:opacity-30 disabled:hover:text-muted-foreground p-0.5">
+                              <Icon path="M5 15l7-7 7 7" className="w-4 h-4" />
+                            </button>
+                            <button onClick={() => deleteContactMutation.mutate(contact.id)} className="text-red-400 hover:text-red-500 p-0.5" title="Löschen">
+                              <Icon path="M6 18L18 6M6 6l12 12" className="w-4 h-4" />
+                            </button>
+                            <button onClick={() => handleMoveContact(contact.category || 'crew', catContacts.indexOf(contact), 1)} disabled={catContacts.indexOf(contact) === catContacts.length - 1} className="text-muted-foreground hover:text-primary disabled:opacity-30 disabled:hover:text-muted-foreground p-0.5">
+                              <Icon path="M19 9l-7 7-7-7" className="w-4 h-4" />
+                            </button>
+                          </div>
                        )}
                      </div>
                    ))}
@@ -837,7 +883,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                  <div className="flex justify-between items-end mb-4 border-b border-border pb-2">
                    <h2 className="text-lg font-bold text-foreground print:text-black uppercase">BTS</h2>
                    {isAdminOrPJM && (
-                     <button onClick={() => createContactMutation.mutate({ name: 'Neuer Kontakt', role: 'Rolle', category: 'bts' as any, phone: '' })} className="text-primary text-sm font-medium hover:underline print:hidden">
+                     <button onClick={() => createContactMutation.mutate({ name: 'Neuer Kontakt', role: 'Rolle', category: 'bts' as any, phone: '', order_index: catContacts.length })} className="text-primary text-sm font-medium hover:underline print:hidden">
                        + Hinzufügen
                      </button>
                    )}
@@ -885,9 +931,17 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                          </div>
                        </div>
                        {isAdminOrPJM && (
-                         <button onClick={() => deleteContactMutation.mutate(contact.id)} className="text-red-400 opacity-0 group-hover:opacity-100 transition-opacity p-1 mt-1 print:hidden">
-                           <Icon path="M6 18L18 6M6 6l12 12" className="w-4 h-4" />
-                         </button>
+                         <div className="flex flex-col items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity ml-2 print:hidden mt-1">
+                            <button onClick={() => handleMoveContact(contact.category || 'crew', catContacts.indexOf(contact), -1)} disabled={catContacts.indexOf(contact) === 0} className="text-muted-foreground hover:text-primary disabled:opacity-30 disabled:hover:text-muted-foreground p-0.5">
+                              <Icon path="M5 15l7-7 7 7" className="w-4 h-4" />
+                            </button>
+                            <button onClick={() => deleteContactMutation.mutate(contact.id)} className="text-red-400 hover:text-red-500 p-0.5" title="Löschen">
+                              <Icon path="M6 18L18 6M6 6l12 12" className="w-4 h-4" />
+                            </button>
+                            <button onClick={() => handleMoveContact(contact.category || 'crew', catContacts.indexOf(contact), 1)} disabled={catContacts.indexOf(contact) === catContacts.length - 1} className="text-muted-foreground hover:text-primary disabled:opacity-30 disabled:hover:text-muted-foreground p-0.5">
+                              <Icon path="M19 9l-7 7-7-7" className="w-4 h-4" />
+                            </button>
+                          </div>
                        )}
                      </div>
                    ))}
@@ -908,7 +962,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                  <div className="flex justify-between items-end mb-4 border-b border-border pb-2">
                    <h2 className="text-lg font-bold text-foreground print:text-black uppercase">Crew</h2>
                    {isAdminOrPJM && (
-                     <button onClick={() => createContactMutation.mutate({ name: 'Neuer Kontakt', role: 'Rolle', category: 'crew' as any, phone: '' })} className="text-primary text-sm font-medium hover:underline print:hidden">
+                     <button onClick={() => createContactMutation.mutate({ name: 'Neuer Kontakt', role: 'Rolle', category: 'crew' as any, phone: '', order_index: catContacts.length })} className="text-primary text-sm font-medium hover:underline print:hidden">
                        + Hinzufügen
                      </button>
                    )}
@@ -956,9 +1010,17 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                          </div>
                        </div>
                        {isAdminOrPJM && (
-                         <button onClick={() => deleteContactMutation.mutate(contact.id)} className="text-red-400 opacity-0 group-hover:opacity-100 transition-opacity p-1 mt-1 print:hidden">
-                           <Icon path="M6 18L18 6M6 6l12 12" className="w-4 h-4" />
-                         </button>
+                         <div className="flex flex-col items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity ml-2 print:hidden mt-1">
+                            <button onClick={() => handleMoveContact(contact.category || 'crew', catContacts.indexOf(contact), -1)} disabled={catContacts.indexOf(contact) === 0} className="text-muted-foreground hover:text-primary disabled:opacity-30 disabled:hover:text-muted-foreground p-0.5">
+                              <Icon path="M5 15l7-7 7 7" className="w-4 h-4" />
+                            </button>
+                            <button onClick={() => deleteContactMutation.mutate(contact.id)} className="text-red-400 hover:text-red-500 p-0.5" title="Löschen">
+                              <Icon path="M6 18L18 6M6 6l12 12" className="w-4 h-4" />
+                            </button>
+                            <button onClick={() => handleMoveContact(contact.category || 'crew', catContacts.indexOf(contact), 1)} disabled={catContacts.indexOf(contact) === catContacts.length - 1} className="text-muted-foreground hover:text-primary disabled:opacity-30 disabled:hover:text-muted-foreground p-0.5">
+                              <Icon path="M19 9l-7 7-7-7" className="w-4 h-4" />
+                            </button>
+                          </div>
                        )}
                      </div>
                    ))}
