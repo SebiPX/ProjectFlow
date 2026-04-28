@@ -379,7 +379,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                <label className="block text-xs font-bold text-muted-foreground uppercase mb-1 print:text-gray-500">KUNDE</label>
                <input 
                  type="text" 
-                 defaultValue={data.client_name || project?.client_id || ''} 
+                 defaultValue={data.client_name || project?.client?.company_name || ''} 
                  onBlur={(e) => handleDataChange('client_name', e.target.value)}
                  placeholder="Kundenname..."
                  className="w-full bg-transparent font-bold text-lg border-b border-border focus:border-primary focus:outline-none pb-1 print:border-none print:p-0"
@@ -401,7 +401,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                <label className="block text-xs font-bold text-muted-foreground uppercase mb-1 print:text-gray-500">PRODUCER VOR ORT</label>
                <input 
                  type="text" 
-                 defaultValue={data.pjm_name || teamProfiles.find(p => p.id === project?.pjm_id)?.full_name || ''} 
+                 defaultValue={data.pjm_name || project?.project_members?.find(m => m.role?.toLowerCase().includes('pjm') || m.role?.toLowerCase().includes('projektleitung'))?.profile?.full_name || ''} 
                  onBlur={(e) => handleDataChange('pjm_name', e.target.value)}
                  placeholder="Producer Name..."
                  className="w-full bg-transparent font-bold text-lg border-b border-border focus:border-primary focus:outline-none pb-1 print:border-none print:p-0"
