@@ -400,13 +400,20 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
              <div>
                <label className="block text-xs font-bold text-muted-foreground uppercase mb-1 print:text-gray-500">PRODUCER VOR ORT</label>
                <input 
+                 list="producer-list"
                  type="text" 
+                 autoComplete="off"
                  defaultValue={data.pjm_name || project?.project_members?.find(m => m.role?.toLowerCase().includes('pjm') || m.role?.toLowerCase().includes('projektleitung'))?.profile?.full_name || ''} 
                  onBlur={(e) => handleDataChange('pjm_name', e.target.value)}
                  placeholder="Producer Name..."
                  className="w-full bg-transparent font-bold text-lg border-b border-border focus:border-primary focus:outline-none pb-1 print:border-none print:p-0"
                  disabled={!isAdminOrPJM}
                />
+               <datalist id="producer-list">
+                 {teamProfiles.map(p => (
+                   <option key={p.id} value={p.full_name || ''} />
+                 ))}
+               </datalist>
              </div>
            </div>
            {/* Grid Info */}
