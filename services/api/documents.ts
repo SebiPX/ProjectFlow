@@ -71,6 +71,7 @@ export interface CallSheetContact {
   document_id: string;
   name: string;
   role: string;
+  category?: 'crew' | 'kunde' | 'darsteller' | 'bts';
   phone: string;
   email: string;
 }

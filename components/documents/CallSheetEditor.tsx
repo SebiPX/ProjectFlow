@@ -344,63 +344,82 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
              </div>
            </div>
 
-           {/* Contacts Table */}
-           <div className="mb-8 print:break-inside-avoid">
-             <div className="flex justify-between items-end mb-4 border-b border-border pb-2">
-               <h2 className="text-xl font-bold text-foreground print:text-black">Kontakte / Crew</h2>
-               {isAdminOrPJM && (
-                 <button onClick={() => createContactMutation.mutate({ name: 'Neuer Kontakt', role: 'Rolle', phone: '0123...' })} className="text-primary text-sm font-medium hover:underline print:hidden">
-                   + Kontakt hinzufügen
-                 </button>
-               )}
-             </div>
-             <div className="grid grid-cols-2 gap-x-8 gap-y-4">
-               {contacts.map(contact => (
-                 <div key={contact.id} className="flex items-start justify-between border-b border-border/50 pb-2 group print:break-inside-avoid">
-                   <div className="w-full mr-2">
-                     <div className="flex gap-2 mb-1">
-                       <input 
-                         type="text" 
-                         defaultValue={contact.name || ''} 
-                         onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { name: e.target.value } })}
-                         className="font-bold bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-1/2 print:p-0"
-                         disabled={!isAdminOrPJM}
-                       />
-                       <input 
-                         type="text" 
-                         defaultValue={contact.role || ''} 
-                         onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { role: e.target.value } })}
-                         className="text-muted-foreground bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-1/2 text-right italic print:p-0"
-                         disabled={!isAdminOrPJM}
-                       />
-                     </div>
-                     <div className="flex gap-2">
-                       <input 
-                         type="text" 
-                         defaultValue={contact.phone || ''} 
-                         onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { phone: e.target.value } })}
-                         className="text-sm bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-1/2 print:p-0"
-                         placeholder="Tel..."
-                         disabled={!isAdminOrPJM}
-                       />
-                       <input 
-                         type="text" 
-                         defaultValue={contact.email || ''} 
-                         onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { email: e.target.value } })}
-                         className="text-sm text-primary bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-1/2 text-right print:p-0"
-                         placeholder="Email..."
-                         disabled={!isAdminOrPJM}
-                       />
-                     </div>
+           {/* Contacts Tables */}
+           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8 mb-8">
+             {[
+               { id: 'kunde', title: 'Kunde' },
+               { id: 'darsteller', title: 'Darsteller' },
+               { id: 'bts', title: 'BTS' },
+               { id: 'crew', title: 'Crew' }
+             ].map(cat => {
+               const catContacts = contacts.filter(c => (c.category || 'crew') === cat.id);
+               if (!isAdminOrPJM && catContacts.length === 0) return null;
+
+               return (
+                 <div key={cat.id} className="print:break-inside-avoid">
+                   <div className="flex justify-between items-end mb-4 border-b border-border pb-2">
+                     <h2 className="text-lg font-bold text-foreground print:text-black uppercase">{cat.title}</h2>
+                     {isAdminOrPJM && (
+                       <button onClick={() => createContactMutation.mutate({ name: 'Neuer Kontakt', role: 'Rolle', category: cat.id as any, phone: '' })} className="text-primary text-sm font-medium hover:underline print:hidden">
+                         + Hinzufügen
+                       </button>
+                     )}
                    </div>
-                   {isAdminOrPJM && (
-                     <button onClick={() => deleteContactMutation.mutate(contact.id)} className="text-red-400 opacity-0 group-hover:opacity-100 transition-opacity p-1 mt-1 print:hidden">
-                       <Icon path="M6 18L18 6M6 6l12 12" className="w-4 h-4" />
-                     </button>
-                   )}
+                   <div className="grid grid-cols-1 gap-y-4">
+                     {catContacts.map(contact => (
+                       <div key={contact.id} className="flex items-start justify-between border-b border-border/50 pb-2 group print:break-inside-avoid">
+                         <div className="w-full mr-2">
+                           <div className="flex gap-2 mb-1">
+                             <input 
+                               type="text" 
+                               defaultValue={contact.name || ''} 
+                               onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { name: e.target.value } })}
+                               className="font-bold bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-1/2 print:p-0"
+                               placeholder="Name..."
+                               disabled={!isAdminOrPJM}
+                             />
+                             <input 
+                               type="text" 
+                               defaultValue={contact.role || ''} 
+                               onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { role: e.target.value } })}
+                               className="text-muted-foreground bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-1/2 text-right italic print:p-0"
+                               placeholder="Rolle..."
+                               disabled={!isAdminOrPJM}
+                             />
+                           </div>
+                           <div className="flex gap-2">
+                             <input 
+                               type="text" 
+                               defaultValue={contact.phone || ''} 
+                               onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { phone: e.target.value } })}
+                               className="text-sm bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-1/2 print:p-0"
+                               placeholder="Tel..."
+                               disabled={!isAdminOrPJM}
+                             />
+                             <input 
+                               type="text" 
+                               defaultValue={contact.email || ''} 
+                               onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { email: e.target.value } })}
+                               className="text-sm text-primary bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-1/2 text-right print:p-0"
+                               placeholder="Email..."
+                               disabled={!isAdminOrPJM}
+                             />
+                           </div>
+                         </div>
+                         {isAdminOrPJM && (
+                           <button onClick={() => deleteContactMutation.mutate(contact.id)} className="text-red-400 opacity-0 group-hover:opacity-100 transition-opacity p-1 mt-1 print:hidden">
+                             <Icon path="M6 18L18 6M6 6l12 12" className="w-4 h-4" />
+                           </button>
+                         )}
+                       </div>
+                     ))}
+                     {catContacts.length === 0 && (
+                       <div className="text-sm text-muted-foreground italic print:hidden">Keine Einträge in {cat.title}</div>
+                     )}
+                   </div>
                  </div>
-               ))}
-             </div>
+               );
+             })}
            </div>
 
            {/* General Notes and Catering */}
