@@ -19,6 +19,7 @@ import { Icon } from '../ui/Icon';
 import { toast } from 'react-toastify';
 import { LocationAutocomplete } from './LocationAutocomplete';
 import { ContactAutocomplete } from './ContactAutocomplete';
+import { MultiPersonSelect } from './MultiPersonSelect';
 import { directory } from '../../lib/apiClient';
 import { getProfiles } from '../../services/api/profiles';
 import { getProjectById } from '../../services/api/projects';
@@ -482,7 +483,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
              <table className="w-full text-left text-sm print:table">
                <thead className="print:table-header-group">
                  <tr>
-                   <td colSpan={5} className="pb-4">
+                   <td colSpan={6} className="pb-4">
                      <div className="flex justify-between items-end border-b border-border pb-2">
                        <h2 className="text-xl font-bold text-foreground print:text-black uppercase">
                          ABLAUFPLAN
@@ -517,7 +518,8 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                  </tr>
                   <tr className="text-xs uppercase text-muted-foreground print:text-gray-500">
                     <th className="py-2 w-20">Wann (Zeit)</th>
-                    <th className="py-2">Was & Wer</th>
+                    <th className="py-2">Was</th>
+                    <th className="py-2 w-48">Wer</th>
                     <th className="py-2 w-48">Wo (Location)</th>
                     <th className="py-2 w-24 text-center">Dauer (Min)</th>
                     <th className="py-2 w-10 print:hidden"></th>
@@ -542,7 +544,15 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                               defaultValue={item.scene_name || ''} 
                               onBlur={(e) => updateScheduleMutation.mutate({ id: item.id, data: { scene_name: e.target.value } })}
                               className="w-full bg-transparent border-none focus:ring-1 focus:ring-primary rounded p-1 print:p-0 font-medium"
-                              placeholder="Was passiert / Wer ist da..."
+                              placeholder="Was passiert..."
+                              disabled={!isAdminOrPJM}
+                            />
+                          </td>
+                          <td className="py-2 align-middle">
+                            <MultiPersonSelect
+                              value={item.persons || ''}
+                              onChange={(val) => updateScheduleMutation.mutate({ id: item.id, data: { persons: val } })}
+                              options={Array.from(new Set(doc?.contacts?.map(c => c.name).filter((n): n is string => !!n) || []))}
                               disabled={!isAdminOrPJM}
                             />
                           </td>
@@ -581,7 +591,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                  ))}
                  {schedule.length === 0 && (
                    <tr>
-                     <td colSpan={5} className="py-4 text-muted-foreground italic text-center">
+                     <td colSpan={6} className="py-4 text-muted-foreground italic text-center">
                         Keine Einträge geplant.
                       </td>
                    </tr>
