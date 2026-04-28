@@ -1015,11 +1015,12 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                             />
                           </td>
                           <td className="py-2 align-middle">
-                            <input 
-                              type="text"
+                            <textarea 
                               defaultValue={item.scene_name || ''} 
                               onBlur={(e) => updateScheduleMutation.mutate({ id: item.id, data: { scene_name: e.target.value } })}
-                              className="w-full bg-transparent border-none focus:ring-1 focus:ring-primary rounded p-1 print:p-0 font-medium"
+                              className="w-full bg-transparent border-none focus:ring-1 focus:ring-primary rounded p-1 print:p-0 font-medium resize-none overflow-hidden"
+                              style={{ fieldSizing: 'content' } as any}
+                              rows={1}
                               placeholder="Was passiert..."
                               disabled={!isAdminOrPJM}
                             />
