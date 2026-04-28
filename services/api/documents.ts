@@ -50,6 +50,10 @@ export interface CallSheetData {
   catering_info?: string;
   directions_notes?: string;
   additional_locations?: CallSheetLocation[];
+  client_name?: string;
+  project_name?: string;
+  pjm_name?: string;
+  job_title?: string;
 }
 
 export interface CallSheetSchedule {

@@ -372,234 +372,43 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
              </div>
            </div>
 
-           {/* Contacts Tables */}
-           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8 mb-8">
-             {[
-               { id: 'kunde', title: 'Kunde' },
-               { id: 'darsteller', title: 'Darsteller' },
-               { id: 'bts', title: 'BTS' },
-               { id: 'crew', title: 'Crew' }
-             ].map(cat => {
-               const catContacts = contacts.filter(c => (c.category || 'crew') === cat.id);
-               if (!isAdminOrPJM && catContacts.length === 0) return null;
 
-               return (
-                 <div key={cat.id} className="print:break-inside-avoid">
-                   <div className="flex justify-between items-end mb-4 border-b border-border pb-2">
-                     <h2 className="text-lg font-bold text-foreground print:text-black uppercase">{cat.title}</h2>
-                     {isAdminOrPJM && (
-                       <button onClick={() => createContactMutation.mutate({ name: 'Neuer Kontakt', role: 'Rolle', category: cat.id as any, phone: '' })} className="text-primary text-sm font-medium hover:underline print:hidden">
-                         + Hinzufügen
-                       </button>
-                     )}
-                   </div>
-                   <div className="grid grid-cols-1 gap-y-4">
-                     {catContacts.map(contact => (
-                       <div key={contact.id} className="flex items-start justify-between border-b border-border/50 pb-2 group print:break-inside-avoid">
-                         <div className="w-full mr-2">
-                           <div className="flex gap-2 mb-1">
-                             <ContactAutocomplete
-                               value={contact.name || ''}
-                               onChange={(newName) => updateContactMutation.mutate({ id: contact.id, data: { name: newName } })}
-                               onSelectCallback={(data) => updateContactMutation.mutate({ id: contact.id, data })}
-                               profiles={teamProfiles}
-                               freelancers={freelancers}
-                               clientContacts={clientContacts}
-                               disabled={!isAdminOrPJM}
-                             />
-                             <input 
-                               type="text" 
-                               defaultValue={contact.role || ''} 
-                               onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { role: e.target.value } })}
-                               className="text-muted-foreground bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-1/2 text-right italic print:p-0"
-                               placeholder="Rolle..."
-                               disabled={!isAdminOrPJM}
-                             />
-                           </div>
-                           <div className="flex gap-2">
-                             <input 
-                               type="text" 
-                               defaultValue={contact.phone || ''} 
-                               onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { phone: e.target.value } })}
-                               className="text-sm bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-1/2 print:p-0"
-                               placeholder="Tel..."
-                               disabled={!isAdminOrPJM}
-                             />
-                             <input 
-                               type="text" 
-                               defaultValue={contact.email || ''} 
-                               onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { email: e.target.value } })}
-                               className="text-sm text-primary bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-1/2 text-right print:p-0"
-                               placeholder="Email..."
-                               disabled={!isAdminOrPJM}
-                             />
-                           </div>
-                         </div>
-                         {isAdminOrPJM && (
-                           <button onClick={() => deleteContactMutation.mutate(contact.id)} className="text-red-400 opacity-0 group-hover:opacity-100 transition-opacity p-1 mt-1 print:hidden">
-                             <Icon path="M6 18L18 6M6 6l12 12" className="w-4 h-4" />
-                           </button>
-                         )}
-                       </div>
-                     ))}
-                     {catContacts.length === 0 && (
-                       <div className="text-sm text-muted-foreground italic print:hidden">Keine Einträge in {cat.title}</div>
-                     )}
-                   </div>
-                 </div>
-               );
-             })}
-           </div>
-
-           {/* General Notes and Catering */}
-           <div className="grid grid-cols-2 gap-8 mb-12 print:break-inside-avoid">
+           {/* Project Info 3-Columns */}
+           <div className="grid grid-cols-3 gap-8 mb-12 print:break-inside-avoid">
              <div>
-               <h2 className="text-sm font-bold text-muted-foreground uppercase mb-2 print:text-gray-500">ALLGEMEINE NOTIZEN</h2>
-               <textarea 
-                 defaultValue={data.general_notes || ''} 
-                 onBlur={(e) => handleDataChange('general_notes', e.target.value)}
-                 placeholder="Parkhinweise, Besonderheiten..."
-                 className="w-full bg-transparent border border-transparent hover:border-border focus:border-primary rounded p-2 focus:outline-none min-h-[100px] print:border-none print:p-0"
+               <label className="block text-xs font-bold text-muted-foreground uppercase mb-1 print:text-gray-500">KUNDE</label>
+               <input 
+                 type="text" 
+                 defaultValue={data.client_name || project?.client_id || ''} 
+                 onBlur={(e) => handleDataChange('client_name', e.target.value)}
+                 placeholder="Kundenname..."
+                 className="w-full bg-transparent font-bold text-lg border-b border-border focus:border-primary focus:outline-none pb-1 print:border-none print:p-0"
                  disabled={!isAdminOrPJM}
                />
              </div>
              <div>
-               <h2 className="text-sm font-bold text-muted-foreground uppercase mb-2 print:text-gray-500 flex items-center gap-1">
-                 <Icon path="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" className="w-4 h-4 text-primary print:hidden" />
-                 CATERING / MITTAGESSEN (ANZAHL PERSONEN)
-               </h2>
-               <textarea 
-                 defaultValue={data.catering_info || ''} 
-                 onBlur={(e) => handleDataChange('catering_info', e.target.value)}
-                 placeholder="z.B. 15 Personen (davon 2 Vegetarier)..."
-                 className="w-full bg-transparent border border-transparent hover:border-border focus:border-primary rounded p-2 focus:outline-none min-h-[100px] print:border-none print:p-0 font-medium"
+               <label className="block text-xs font-bold text-muted-foreground uppercase mb-1 print:text-gray-500">PRODUKT</label>
+               <input 
+                 type="text" 
+                 defaultValue={data.project_name || project?.title || ''} 
+                 onBlur={(e) => handleDataChange('project_name', e.target.value)}
+                 placeholder="Projektname..."
+                 className="w-full bg-transparent font-bold text-lg border-b border-border focus:border-primary focus:outline-none pb-1 print:border-none print:p-0"
+                 disabled={!isAdminOrPJM}
+               />
+             </div>
+             <div>
+               <label className="block text-xs font-bold text-muted-foreground uppercase mb-1 print:text-gray-500">PRODUCER VOR ORT</label>
+               <input 
+                 type="text" 
+                 defaultValue={data.pjm_name || teamProfiles.find(p => p.id === project?.pjm_id)?.full_name || ''} 
+                 onBlur={(e) => handleDataChange('pjm_name', e.target.value)}
+                 placeholder="Producer Name..."
+                 className="w-full bg-transparent font-bold text-lg border-b border-border focus:border-primary focus:outline-none pb-1 print:border-none print:p-0"
                  disabled={!isAdminOrPJM}
                />
              </div>
            </div>
-
-           {/* Drehplan Table */}
-           <div className="mb-12 print:break-inside-auto">
-             <table className="w-full text-left text-sm print:table">
-               <thead className="print:table-header-group">
-                 <tr>
-                   <td colSpan={6} className="pb-4">
-                     <div className="flex justify-between items-end border-b border-border pb-2">
-                       <h2 className="text-xl font-bold text-foreground print:text-black uppercase">
-                         ABLAUFPLAN
-                       </h2>
-                       {isAdminOrPJM && (
-                         <button onClick={() => {
-                           let nextTime = '08:00';
-                           if (schedule.length > 0) {
-                             const lastItem = schedule[schedule.length - 1];
-                             if (lastItem.time_start) {
-                               const duration = lastItem.duration_minutes || 0;
-                               const parts = lastItem.time_start.split(':');
-                               if (parts.length === 2) {
-                                 const hours = parseInt(parts[0], 10);
-                                 const minutes = parseInt(parts[1], 10);
-                                 if (!isNaN(hours) && !isNaN(minutes)) {
-                                   const totalMinutes = hours * 60 + minutes + duration;
-                                   const nextHours = Math.floor(totalMinutes / 60) % 24;
-                                   const nextMins = totalMinutes % 60;
-                                   nextTime = `${nextHours.toString().padStart(2, '0')}:${nextMins.toString().padStart(2, '0')}`;
-                                 }
-                               }
-                             }
-                           }
-                           createScheduleMutation.mutate({ time_start: nextTime, scene_name: 'Neuer Eintrag' });
-                         }} className="text-primary text-sm font-medium hover:underline print:hidden">
-                           + Eintrag hinzufügen
-                         </button>
-                       )}
-                     </div>
-                   </td>
-                 </tr>
-                  <tr className="text-xs uppercase text-muted-foreground print:text-gray-500">
-                    <th className="py-2 w-20">Wann (Zeit)</th>
-                    <th className="py-2">Was</th>
-                    <th className="py-2 w-48">Wer</th>
-                    <th className="py-2 w-48">Wo (Location)</th>
-                    <th className="py-2 w-24 text-center">Dauer (Min)</th>
-                    <th className="py-2 w-10 print:hidden"></th>
-                  </tr>
-               </thead>
-               <tbody className="divide-y divide-border/50 print:table-row-group">
-                 {schedule.map(item => (
-                   <tr key={item.id} className="group print:break-inside-avoid">
-                        <>
-                          <td className="py-2 align-middle font-mono">
-                            <input 
-                              type="text" 
-                              defaultValue={item.time_start || ''} 
-                              onBlur={(e) => updateScheduleMutation.mutate({ id: item.id, data: { time_start: e.target.value } })}
-                              className="w-16 bg-transparent border-none focus:ring-1 focus:ring-primary rounded p-1 print:p-0 font-bold"
-                              disabled={!isAdminOrPJM}
-                            />
-                          </td>
-                          <td className="py-2 align-middle">
-                            <input 
-                              type="text"
-                              defaultValue={item.scene_name || ''} 
-                              onBlur={(e) => updateScheduleMutation.mutate({ id: item.id, data: { scene_name: e.target.value } })}
-                              className="w-full bg-transparent border-none focus:ring-1 focus:ring-primary rounded p-1 print:p-0 font-medium"
-                              placeholder="Was passiert..."
-                              disabled={!isAdminOrPJM}
-                            />
-                          </td>
-                          <td className="py-2 align-middle">
-                            <MultiPersonSelect
-                              value={item.persons || ''}
-                              onChange={(val) => updateScheduleMutation.mutate({ id: item.id, data: { persons: val } })}
-                              options={Array.from(new Set(doc?.contacts?.map(c => c.name).filter((n): n is string => !!n) || []))}
-                              disabled={!isAdminOrPJM}
-                            />
-                          </td>
-                          <td className="py-2 align-middle">
-                            <select
-                              value={item.description || ''}
-                              onChange={(e) => updateScheduleMutation.mutate({ id: item.id, data: { description: e.target.value } })}
-                              className="w-full bg-transparent border-none focus:ring-1 focus:ring-primary rounded p-1 print:p-0"
-                              disabled={!isAdminOrPJM}
-                            >
-                              <option value="">-- Keine --</option>
-                              {allLocations.map((loc, idx) => (
-                                <option key={idx} value={loc.name}>{loc.name}</option>
-                              ))}
-                            </select>
-                          </td>
-                          <td className="py-2 align-middle text-center">
-                            <input 
-                              type="number" 
-                              defaultValue={item.duration_minutes || ''} 
-                              onBlur={(e) => updateScheduleMutation.mutate({ id: item.id, data: { duration_minutes: parseInt(e.target.value) || 0 } })}
-                              className="w-16 bg-transparent border-none focus:ring-1 focus:ring-primary rounded text-muted-foreground p-1 print:p-0 text-center mx-auto block"
-                              placeholder="Min"
-                              disabled={!isAdminOrPJM}
-                            />
-                          </td>
-                          <td className="py-2 text-right align-middle print:hidden">
-                            {isAdminOrPJM && (
-                              <button onClick={() => deleteScheduleMutation.mutate(item.id)} className="text-red-400 opacity-0 group-hover:opacity-100 transition-opacity p-1">
-                                <Icon path="M6 18L18 6M6 6l12 12" className="w-4 h-4" />
-                              </button>
-                            )}
-                          </td>
-                        </>
-                   </tr>
-                 ))}
-                 {schedule.length === 0 && (
-                   <tr>
-                     <td colSpan={6} className="py-4 text-muted-foreground italic text-center">
-                        Keine Einträge geplant.
-                      </td>
-                   </tr>
-                 )}
-               </tbody>
-             </table>
-           </div>
-
            {/* Grid Info */}
            <div className="grid grid-cols-2 gap-8 mb-10">
               <div className="space-y-4">
@@ -833,6 +642,425 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
               </div>
            </div>
 
+
+           {/* Kunde Contacts */}
+           {(() => {
+             const catContacts = contacts.filter(c => (c.category || 'crew') === 'kunde');
+             if (!isAdminOrPJM && catContacts.length === 0) return null;
+             return (
+               <div className="mb-8 print:break-inside-avoid">
+                 <div className="flex justify-between items-end mb-4 border-b border-border pb-2">
+                   <h2 className="text-lg font-bold text-foreground print:text-black uppercase">Kunde</h2>
+                   {isAdminOrPJM && (
+                     <button onClick={() => createContactMutation.mutate({ name: 'Neuer Kontakt', role: 'Rolle', category: 'kunde' as any, phone: '' })} className="text-primary text-sm font-medium hover:underline print:hidden">
+                       + Hinzufügen
+                     </button>
+                   )}
+                 </div>
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                   {catContacts.map(contact => (
+                     <div key={contact.id} className="flex items-start justify-between border-b border-border/50 pb-2 group print:break-inside-avoid">
+                       <div className="w-full mr-2">
+                         <div className="flex gap-2 mb-1">
+                           <ContactAutocomplete
+                             value={contact.name || ''}
+                             onChange={(newName) => updateContactMutation.mutate({ id: contact.id, data: { name: newName } })}
+                             onSelectCallback={(data) => updateContactMutation.mutate({ id: contact.id, data })}
+                             profiles={teamProfiles}
+                             freelancers={freelancers}
+                             clientContacts={clientContacts}
+                             disabled={!isAdminOrPJM}
+                           />
+                           <input 
+                             type="text" 
+                             defaultValue={contact.role || ''} 
+                             onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { role: e.target.value } })}
+                             className="text-muted-foreground bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-1/2 text-right italic print:p-0"
+                             placeholder="Rolle..."
+                             disabled={!isAdminOrPJM}
+                           />
+                         </div>
+                         <div className="flex gap-2">
+                           <input 
+                             type="text" 
+                             defaultValue={contact.phone || ''} 
+                             onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { phone: e.target.value } })}
+                             className="text-sm bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-1/2 print:p-0"
+                             placeholder="Tel..."
+                             disabled={!isAdminOrPJM}
+                           />
+                           <input 
+                             type="text" 
+                             defaultValue={contact.email || ''} 
+                             onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { email: e.target.value } })}
+                             className="text-sm text-primary bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-1/2 text-right print:p-0"
+                             placeholder="Email..."
+                             disabled={!isAdminOrPJM}
+                           />
+                         </div>
+                       </div>
+                       {isAdminOrPJM && (
+                         <button onClick={() => deleteContactMutation.mutate(contact.id)} className="text-red-400 opacity-0 group-hover:opacity-100 transition-opacity p-1 mt-1 print:hidden">
+                           <Icon path="M6 18L18 6M6 6l12 12" className="w-4 h-4" />
+                         </button>
+                       )}
+                     </div>
+                   ))}
+                   {catContacts.length === 0 && (
+                     <div className="text-sm text-muted-foreground italic print:hidden col-span-2">Keine Einträge in Kunde</div>
+                   )}
+                 </div>
+               </div>
+             );
+           })()}
+
+           {/* Job-Titel */}
+           <div className="mb-12 print:break-inside-avoid">
+             <label className="block text-xs font-bold text-muted-foreground uppercase mb-1 print:text-gray-500">JOB-TITEL</label>
+             <input 
+               type="text" 
+               defaultValue={data.job_title || (project ? `${project.project_number} - ${project.title}` : '')} 
+               onBlur={(e) => handleDataChange('job_title', e.target.value)}
+               placeholder="Job-Titel..."
+               className="w-full bg-transparent font-bold text-xl border-b border-border focus:border-primary focus:outline-none pb-1 print:border-none print:p-0"
+               disabled={!isAdminOrPJM}
+             />
+           </div>
+
+           {/* Darsteller Contacts */}
+           {(() => {
+             const catContacts = contacts.filter(c => (c.category || 'crew') === 'darsteller');
+             if (!isAdminOrPJM && catContacts.length === 0) return null;
+             return (
+               <div className="mb-8 print:break-inside-avoid">
+                 <div className="flex justify-between items-end mb-4 border-b border-border pb-2">
+                   <h2 className="text-lg font-bold text-foreground print:text-black uppercase">Darsteller</h2>
+                   {isAdminOrPJM && (
+                     <button onClick={() => createContactMutation.mutate({ name: 'Neuer Kontakt', role: 'Rolle', category: 'darsteller' as any, phone: '' })} className="text-primary text-sm font-medium hover:underline print:hidden">
+                       + Hinzufügen
+                     </button>
+                   )}
+                 </div>
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                   {catContacts.map(contact => (
+                     <div key={contact.id} className="flex items-start justify-between border-b border-border/50 pb-2 group print:break-inside-avoid">
+                       <div className="w-full mr-2">
+                         <div className="flex gap-2 mb-1">
+                           <ContactAutocomplete
+                             value={contact.name || ''}
+                             onChange={(newName) => updateContactMutation.mutate({ id: contact.id, data: { name: newName } })}
+                             onSelectCallback={(data) => updateContactMutation.mutate({ id: contact.id, data })}
+                             profiles={teamProfiles}
+                             freelancers={freelancers}
+                             clientContacts={clientContacts}
+                             disabled={!isAdminOrPJM}
+                           />
+                           <input 
+                             type="text" 
+                             defaultValue={contact.role || ''} 
+                             onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { role: e.target.value } })}
+                             className="text-muted-foreground bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-1/2 text-right italic print:p-0"
+                             placeholder="Rolle..."
+                             disabled={!isAdminOrPJM}
+                           />
+                         </div>
+                         <div className="flex gap-2">
+                           <input 
+                             type="text" 
+                             defaultValue={contact.phone || ''} 
+                             onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { phone: e.target.value } })}
+                             className="text-sm bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-1/2 print:p-0"
+                             placeholder="Tel..."
+                             disabled={!isAdminOrPJM}
+                           />
+                           <input 
+                             type="text" 
+                             defaultValue={contact.email || ''} 
+                             onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { email: e.target.value } })}
+                             className="text-sm text-primary bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-1/2 text-right print:p-0"
+                             placeholder="Email..."
+                             disabled={!isAdminOrPJM}
+                           />
+                         </div>
+                       </div>
+                       {isAdminOrPJM && (
+                         <button onClick={() => deleteContactMutation.mutate(contact.id)} className="text-red-400 opacity-0 group-hover:opacity-100 transition-opacity p-1 mt-1 print:hidden">
+                           <Icon path="M6 18L18 6M6 6l12 12" className="w-4 h-4" />
+                         </button>
+                       )}
+                     </div>
+                   ))}
+                   {catContacts.length === 0 && (
+                     <div className="text-sm text-muted-foreground italic print:hidden col-span-2">Keine Einträge in Darsteller</div>
+                   )}
+                 </div>
+               </div>
+             );
+           })()}
+
+           {/* BTS Contacts */}
+           {(() => {
+             const catContacts = contacts.filter(c => (c.category || 'crew') === 'bts');
+             if (!isAdminOrPJM && catContacts.length === 0) return null;
+             return (
+               <div className="mb-8 print:break-inside-avoid">
+                 <div className="flex justify-between items-end mb-4 border-b border-border pb-2">
+                   <h2 className="text-lg font-bold text-foreground print:text-black uppercase">BTS</h2>
+                   {isAdminOrPJM && (
+                     <button onClick={() => createContactMutation.mutate({ name: 'Neuer Kontakt', role: 'Rolle', category: 'bts' as any, phone: '' })} className="text-primary text-sm font-medium hover:underline print:hidden">
+                       + Hinzufügen
+                     </button>
+                   )}
+                 </div>
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                   {catContacts.map(contact => (
+                     <div key={contact.id} className="flex items-start justify-between border-b border-border/50 pb-2 group print:break-inside-avoid">
+                       <div className="w-full mr-2">
+                         <div className="flex gap-2 mb-1">
+                           <ContactAutocomplete
+                             value={contact.name || ''}
+                             onChange={(newName) => updateContactMutation.mutate({ id: contact.id, data: { name: newName } })}
+                             onSelectCallback={(data) => updateContactMutation.mutate({ id: contact.id, data })}
+                             profiles={teamProfiles}
+                             freelancers={freelancers}
+                             clientContacts={clientContacts}
+                             disabled={!isAdminOrPJM}
+                           />
+                           <input 
+                             type="text" 
+                             defaultValue={contact.role || ''} 
+                             onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { role: e.target.value } })}
+                             className="text-muted-foreground bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-1/2 text-right italic print:p-0"
+                             placeholder="Rolle..."
+                             disabled={!isAdminOrPJM}
+                           />
+                         </div>
+                         <div className="flex gap-2">
+                           <input 
+                             type="text" 
+                             defaultValue={contact.phone || ''} 
+                             onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { phone: e.target.value } })}
+                             className="text-sm bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-1/2 print:p-0"
+                             placeholder="Tel..."
+                             disabled={!isAdminOrPJM}
+                           />
+                           <input 
+                             type="text" 
+                             defaultValue={contact.email || ''} 
+                             onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { email: e.target.value } })}
+                             className="text-sm text-primary bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-1/2 text-right print:p-0"
+                             placeholder="Email..."
+                             disabled={!isAdminOrPJM}
+                           />
+                         </div>
+                       </div>
+                       {isAdminOrPJM && (
+                         <button onClick={() => deleteContactMutation.mutate(contact.id)} className="text-red-400 opacity-0 group-hover:opacity-100 transition-opacity p-1 mt-1 print:hidden">
+                           <Icon path="M6 18L18 6M6 6l12 12" className="w-4 h-4" />
+                         </button>
+                       )}
+                     </div>
+                   ))}
+                   {catContacts.length === 0 && (
+                     <div className="text-sm text-muted-foreground italic print:hidden col-span-2">Keine Einträge in BTS</div>
+                   )}
+                 </div>
+               </div>
+             );
+           })()}
+
+           {/* Crew Contacts */}
+           {(() => {
+             const catContacts = contacts.filter(c => (c.category || 'crew') === 'crew');
+             if (!isAdminOrPJM && catContacts.length === 0) return null;
+             return (
+               <div className="mb-8 print:break-inside-avoid">
+                 <div className="flex justify-between items-end mb-4 border-b border-border pb-2">
+                   <h2 className="text-lg font-bold text-foreground print:text-black uppercase">Crew</h2>
+                   {isAdminOrPJM && (
+                     <button onClick={() => createContactMutation.mutate({ name: 'Neuer Kontakt', role: 'Rolle', category: 'crew' as any, phone: '' })} className="text-primary text-sm font-medium hover:underline print:hidden">
+                       + Hinzufügen
+                     </button>
+                   )}
+                 </div>
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                   {catContacts.map(contact => (
+                     <div key={contact.id} className="flex items-start justify-between border-b border-border/50 pb-2 group print:break-inside-avoid">
+                       <div className="w-full mr-2">
+                         <div className="flex gap-2 mb-1">
+                           <ContactAutocomplete
+                             value={contact.name || ''}
+                             onChange={(newName) => updateContactMutation.mutate({ id: contact.id, data: { name: newName } })}
+                             onSelectCallback={(data) => updateContactMutation.mutate({ id: contact.id, data })}
+                             profiles={teamProfiles}
+                             freelancers={freelancers}
+                             clientContacts={clientContacts}
+                             disabled={!isAdminOrPJM}
+                           />
+                           <input 
+                             type="text" 
+                             defaultValue={contact.role || ''} 
+                             onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { role: e.target.value } })}
+                             className="text-muted-foreground bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-1/2 text-right italic print:p-0"
+                             placeholder="Rolle..."
+                             disabled={!isAdminOrPJM}
+                           />
+                         </div>
+                         <div className="flex gap-2">
+                           <input 
+                             type="text" 
+                             defaultValue={contact.phone || ''} 
+                             onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { phone: e.target.value } })}
+                             className="text-sm bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-1/2 print:p-0"
+                             placeholder="Tel..."
+                             disabled={!isAdminOrPJM}
+                           />
+                           <input 
+                             type="text" 
+                             defaultValue={contact.email || ''} 
+                             onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { email: e.target.value } })}
+                             className="text-sm text-primary bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-1/2 text-right print:p-0"
+                             placeholder="Email..."
+                             disabled={!isAdminOrPJM}
+                           />
+                         </div>
+                       </div>
+                       {isAdminOrPJM && (
+                         <button onClick={() => deleteContactMutation.mutate(contact.id)} className="text-red-400 opacity-0 group-hover:opacity-100 transition-opacity p-1 mt-1 print:hidden">
+                           <Icon path="M6 18L18 6M6 6l12 12" className="w-4 h-4" />
+                         </button>
+                       )}
+                     </div>
+                   ))}
+                   {catContacts.length === 0 && (
+                     <div className="text-sm text-muted-foreground italic print:hidden col-span-2">Keine Einträge in Crew</div>
+                   )}
+                 </div>
+               </div>
+             );
+           })()}
+           {/* Drehplan Table */}
+           <div className="mb-12 print:break-inside-auto">
+             <table className="w-full text-left text-sm print:table">
+               <thead className="print:table-header-group">
+                 <tr>
+                   <td colSpan={6} className="pb-4">
+                     <div className="flex justify-between items-end border-b border-border pb-2">
+                       <h2 className="text-xl font-bold text-foreground print:text-black uppercase">
+                         ABLAUFPLAN
+                       </h2>
+                       {isAdminOrPJM && (
+                         <button onClick={() => {
+                           let nextTime = '08:00';
+                           if (schedule.length > 0) {
+                             const lastItem = schedule[schedule.length - 1];
+                             if (lastItem.time_start) {
+                               const duration = lastItem.duration_minutes || 0;
+                               const parts = lastItem.time_start.split(':');
+                               if (parts.length === 2) {
+                                 const hours = parseInt(parts[0], 10);
+                                 const minutes = parseInt(parts[1], 10);
+                                 if (!isNaN(hours) && !isNaN(minutes)) {
+                                   const totalMinutes = hours * 60 + minutes + duration;
+                                   const nextHours = Math.floor(totalMinutes / 60) % 24;
+                                   const nextMins = totalMinutes % 60;
+                                   nextTime = `${nextHours.toString().padStart(2, '0')}:${nextMins.toString().padStart(2, '0')}`;
+                                 }
+                               }
+                             }
+                           }
+                           createScheduleMutation.mutate({ time_start: nextTime, scene_name: 'Neuer Eintrag' });
+                         }} className="text-primary text-sm font-medium hover:underline print:hidden">
+                           + Eintrag hinzufügen
+                         </button>
+                       )}
+                     </div>
+                   </td>
+                 </tr>
+                  <tr className="text-xs uppercase text-muted-foreground print:text-gray-500">
+                    <th className="py-2 w-20">Wann (Zeit)</th>
+                    <th className="py-2">Was</th>
+                    <th className="py-2 w-48">Wer</th>
+                    <th className="py-2 w-48">Wo (Location)</th>
+                    <th className="py-2 w-24 text-center">Dauer (Min)</th>
+                    <th className="py-2 w-10 print:hidden"></th>
+                  </tr>
+               </thead>
+               <tbody className="divide-y divide-border/50 print:table-row-group">
+                 {schedule.map(item => (
+                   <tr key={item.id} className="group print:break-inside-avoid">
+                        <>
+                          <td className="py-2 align-middle font-mono">
+                            <input 
+                              type="text" 
+                              defaultValue={item.time_start || ''} 
+                              onBlur={(e) => updateScheduleMutation.mutate({ id: item.id, data: { time_start: e.target.value } })}
+                              className="w-16 bg-transparent border-none focus:ring-1 focus:ring-primary rounded p-1 print:p-0 font-bold"
+                              disabled={!isAdminOrPJM}
+                            />
+                          </td>
+                          <td className="py-2 align-middle">
+                            <input 
+                              type="text"
+                              defaultValue={item.scene_name || ''} 
+                              onBlur={(e) => updateScheduleMutation.mutate({ id: item.id, data: { scene_name: e.target.value } })}
+                              className="w-full bg-transparent border-none focus:ring-1 focus:ring-primary rounded p-1 print:p-0 font-medium"
+                              placeholder="Was passiert..."
+                              disabled={!isAdminOrPJM}
+                            />
+                          </td>
+                          <td className="py-2 align-middle">
+                            <MultiPersonSelect
+                              value={item.persons || ''}
+                              onChange={(val) => updateScheduleMutation.mutate({ id: item.id, data: { persons: val } })}
+                              options={Array.from(new Set(doc?.contacts?.map(c => c.name).filter((n): n is string => !!n) || []))}
+                              disabled={!isAdminOrPJM}
+                            />
+                          </td>
+                          <td className="py-2 align-middle">
+                            <select
+                              value={item.description || ''}
+                              onChange={(e) => updateScheduleMutation.mutate({ id: item.id, data: { description: e.target.value } })}
+                              className="w-full bg-transparent border-none focus:ring-1 focus:ring-primary rounded p-1 print:p-0"
+                              disabled={!isAdminOrPJM}
+                            >
+                              <option value="">-- Keine --</option>
+                              {allLocations.map((loc, idx) => (
+                                <option key={idx} value={loc.name}>{loc.name}</option>
+                              ))}
+                            </select>
+                          </td>
+                          <td className="py-2 align-middle text-center">
+                            <input 
+                              type="number" 
+                              defaultValue={item.duration_minutes || ''} 
+                              onBlur={(e) => updateScheduleMutation.mutate({ id: item.id, data: { duration_minutes: parseInt(e.target.value) || 0 } })}
+                              className="w-16 bg-transparent border-none focus:ring-1 focus:ring-primary rounded text-muted-foreground p-1 print:p-0 text-center mx-auto block"
+                              placeholder="Min"
+                              disabled={!isAdminOrPJM}
+                            />
+                          </td>
+                          <td className="py-2 text-right align-middle print:hidden">
+                            {isAdminOrPJM && (
+                              <button onClick={() => deleteScheduleMutation.mutate(item.id)} className="text-red-400 opacity-0 group-hover:opacity-100 transition-opacity p-1">
+                                <Icon path="M6 18L18 6M6 6l12 12" className="w-4 h-4" />
+                              </button>
+                            )}
+                          </td>
+                        </>
+                   </tr>
+                 ))}
+                 {schedule.length === 0 && (
+                   <tr>
+                     <td colSpan={6} className="py-4 text-muted-foreground italic text-center">
+                        Keine Einträge geplant.
+                      </td>
+                   </tr>
+                 )}
+               </tbody>
+             </table>
+           </div>
+
            {/* Anfahrt & Parken */}
            <div className="mb-12">
              <div className="flex justify-between items-end mb-4 border-b border-border pb-2 print:break-inside-avoid">
@@ -866,9 +1094,10 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
              })()}
            </div>
 
-           {/* Hinweise */}
-           <div className="print:break-inside-avoid">
-             <h2 className="text-sm font-bold text-muted-foreground uppercase mb-2 print:text-gray-500">HINWEISE</h2>
+
+           {/* Anreise */}
+           <div className="mb-12 print:break-inside-avoid">
+             <h2 className="text-xl font-bold text-foreground uppercase mb-4 print:text-black border-b border-border pb-2">ANREISE</h2>
              <textarea 
                defaultValue={data.directions_notes || ''} 
                onBlur={(e) => handleDataChange('directions_notes', e.target.value)}
@@ -878,6 +1107,17 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
              />
            </div>
 
+           {/* Produktionshinweise */}
+           <div className="mb-12 print:break-inside-avoid">
+             <h2 className="text-xl font-bold text-foreground uppercase mb-4 print:text-black border-b border-border pb-2">PRODUKTIONSHINWEISE</h2>
+             <textarea 
+               defaultValue={data.general_notes || ''} 
+               onBlur={(e) => handleDataChange('general_notes', e.target.value)}
+               placeholder="Parkhinweise, Besonderheiten..."
+               className="w-full bg-transparent border border-transparent hover:border-border focus:border-primary rounded p-2 focus:outline-none min-h-[100px] print:border-none print:p-0"
+               disabled={!isAdminOrPJM}
+             />
+           </div>
         </div>
       </div>
     </div>
