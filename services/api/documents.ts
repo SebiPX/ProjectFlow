@@ -55,6 +55,7 @@ export interface CallSheetData {
   pjm_name?: string;
   pjm_phone?: string;
   job_title?: string;
+  location_notes?: string;
 }
 
 export interface CallSheetSchedule {

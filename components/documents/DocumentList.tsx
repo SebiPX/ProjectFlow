@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getProjectDocuments, createDocument, deleteDocument, AgencyDocument } from '../../services/api/documents';
+import { getProjectDocuments, createDocument, deleteDocument, duplicateDocument, AgencyDocument } from '../../services/api/documents';
 import { Icon } from '../ui/Icon';
 import { toast } from 'react-toastify';
 import { ShotlistEditor } from './ShotlistEditor';
@@ -47,6 +47,17 @@ export const DocumentList: React.FC<DocumentListProps> = ({ projectId, projectTi
     },
     onError: (err: any) => {
       toast.error(`Failed to delete: ${err.message}`);
+    }
+  });
+
+  const duplicateMutation = useMutation({
+    mutationFn: duplicateDocument,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['documents', projectId] });
+      toast.success('Document duplicated successfully');
+    },
+    onError: (err: any) => {
+      toast.error(`Failed to duplicate: ${err.message}`);
     }
   });
 
@@ -158,12 +169,22 @@ export const DocumentList: React.FC<DocumentListProps> = ({ projectId, projectTi
                     )}
                   </div>
                   {!isClient && (
-                    <button 
-                      onClick={(e) => { e.stopPropagation(); if (confirm('Delete document?')) deleteMutation.mutate(doc.id); }}
-                      className="text-muted-foreground hover:text-red-400 p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <Icon path="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" className="w-5 h-5" />
-                    </button>
+                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); duplicateMutation.mutate(doc.id); }}
+                        className="text-muted-foreground hover:text-blue-400 p-1"
+                        title="Duplicate"
+                      >
+                        <Icon path="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" className="w-5 h-5" />
+                      </button>
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); if (confirm('Delete document?')) deleteMutation.mutate(doc.id); }}
+                        className="text-muted-foreground hover:text-red-400 p-1"
+                        title="Delete"
+                      >
+                        <Icon path="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" className="w-5 h-5" />
+                      </button>
+                    </div>
                   )}
                 </div>
                 
