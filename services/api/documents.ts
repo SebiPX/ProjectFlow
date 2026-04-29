@@ -4,11 +4,23 @@ export interface AgencyDocument {
   id: string;
   project_id: string;
   title: string;
-  type: 'shotlist' | 'call_sheet' | 'event_sheet';
+  type: 'shotlist' | 'call_sheet' | 'event_sheet' | 'packing_list';
   created_at: string;
   updated_at: string;
   created_by?: string;
   author_name?: string;
+}
+
+export interface PackingListItem {
+  id: string;
+  document_id: string;
+  inventar_item_id?: string;
+  name: string;
+  category: string;
+  quantity: number;
+  weight_kg: number;
+  is_packed: boolean;
+  order_index: number;
 }
 
 export interface ShotlistItem {
@@ -92,7 +104,7 @@ export interface CallSheetContact {
 export const getProjectDocuments = (projectId: string) =>
   fetchApi(`/api/documents/project/${projectId}`);
 
-export const createDocument = (projectId: string, title: string, type: 'shotlist' | 'call_sheet') =>
+export const createDocument = (projectId: string, title: string, type: 'shotlist' | 'call_sheet' | 'event_sheet' | 'packing_list') =>
   fetchApi('/api/documents', {
     method: 'POST',
     body: JSON.stringify({ project_id: projectId, title, type }),
@@ -173,4 +185,22 @@ export const reorderCallSheetContacts = (documentId: string, contacts: {id: stri
   fetchApi(`/api/documents/${documentId}/contacts-reorder`, {
     method: 'PATCH',
     body: JSON.stringify({ contacts }),
+  });
+
+// Packing List Items
+export const addPackingListItem = (documentId: string, data: Partial<PackingListItem>) =>
+  fetchApi(`/api/documents/${documentId}/packing-list-items`, {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+
+export const updatePackingListItem = (itemId: string, data: Partial<PackingListItem>) =>
+  fetchApi(`/api/documents/packing-list-items/${itemId}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  });
+
+export const deletePackingListItem = (itemId: string) =>
+  fetchApi(`/api/documents/packing-list-items/${itemId}`, {
+    method: 'DELETE',
   });

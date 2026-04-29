@@ -8,6 +8,7 @@ import { Icon } from '../ui/Icon';
 import { toast } from 'react-toastify';
 import { ShotlistEditor } from './ShotlistEditor';
 import { CallSheetEditor } from './CallSheetEditor';
+import { PackingListEditor } from './PackingListEditor';
 import { AssetPreviewModal } from '../AssetPreviewModal';
 
 interface DocumentListProps {
@@ -41,7 +42,7 @@ export const DocumentList: React.FC<DocumentListProps> = ({ projectId, projectTi
   });
 
   const createMutation = useMutation({
-    mutationFn: ({ title, type }: { title: string; type: 'shotlist' | 'call_sheet' }) =>
+    mutationFn: ({ title, type }: { title: string; type: 'shotlist' | 'call_sheet' | 'event_sheet' | 'packing_list' }) =>
       createDocument(projectId, title, type),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['documents', projectId] });
@@ -131,7 +132,7 @@ export const DocumentList: React.FC<DocumentListProps> = ({ projectId, projectTi
     }
   };
 
-  const handleCreate = (type: 'shotlist' | 'call_sheet' | 'event_sheet') => {
+  const handleCreate = (type: 'shotlist' | 'call_sheet' | 'event_sheet' | 'packing_list' | 'event_sheet') => {
     setIsCreating(true);
     let title = 'New Document';
     
@@ -217,17 +218,28 @@ export const DocumentList: React.FC<DocumentListProps> = ({ projectId, projectTi
                     <Icon path="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" className="w-4 h-4 text-purple-500" />
                     Eventdispo
                   </button>
-                  <button
-                    onClick={() => {
-                      setIsDropdownOpen(false);
-                      handleCreate('shotlist');
-                    }}
-                    disabled={isCreating}
-                    className="w-full text-left px-4 py-3 hover:bg-muted transition-colors flex items-center gap-3 text-sm font-medium text-foreground"
-                  >
-                    <Icon path="M4 6h16M4 10h16M4 14h16M4 18h16" className="w-4 h-4 text-secondary" />
-                    Shotlist
-                  </button>
+                                      <button
+                      onClick={() => {
+                        setIsDropdownOpen(false);
+                        handleCreate('shotlist');
+                      }}
+                      disabled={isCreating}
+                      className="w-full text-left px-4 py-3 hover:bg-muted transition-colors flex items-center gap-3 text-sm font-medium text-foreground border-b border-border/50"
+                    >
+                      <Icon path="M4 6h16M4 10h16M4 14h16M4 18h16" className="w-4 h-4 text-secondary" />
+                      Shotlist
+                    </button>
+                    <button
+                      onClick={() => {
+                        setIsDropdownOpen(false);
+                        handleCreate('packing_list');
+                      }}
+                      disabled={isCreating}
+                      className="w-full text-left px-4 py-3 hover:bg-muted transition-colors flex items-center gap-3 text-sm font-medium text-foreground"
+                    >
+                      <Icon path="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" className="w-4 h-4 text-orange-500" />
+                      Packliste
+                    </button>
                 </div>
               )}
             </div>
@@ -247,9 +259,11 @@ export const DocumentList: React.FC<DocumentListProps> = ({ projectId, projectTi
             <div key={doc.id} onClick={() => setSelectedDocument(doc)} className="bg-card cursor-pointer group rounded-xl border border-border overflow-hidden hover:border-primary transition-all shadow-sm">
               <div className="p-5">
                 <div className="flex justify-between items-start mb-4">
-                  <div className={`p-3 rounded-lg flex-shrink-0 ${doc.type === 'shotlist' ? 'bg-purple-500/20 text-purple-400' : 'bg-blue-500/20 text-blue-400'}`}>
-                    {doc.type === 'shotlist' ? (
+                  <div className={`p-3 rounded-lg flex-shrink-0 ${doc.type === 'shotlist' ? 'bg-purple-500/20 text-purple-400' : doc.type === 'packing_list' ? 'bg-orange-500/20 text-orange-400' : 'bg-blue-500/20 text-blue-400'}`}>
+                                        {doc.type === 'shotlist' ? (
                       <Icon path="M4 6h16M4 10h16M4 14h16M4 18h16" className="w-6 h-6" />
+                    ) : doc.type === 'packing_list' ? (
+                      <Icon path="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" className="w-6 h-6" />
                     ) : (
                       <Icon path="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" className="w-6 h-6" />
                     )}
@@ -403,3 +417,5 @@ export const DocumentList: React.FC<DocumentListProps> = ({ projectId, projectTi
     </div>
   );
 };
+
+
