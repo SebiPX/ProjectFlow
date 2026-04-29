@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getProjectDocuments, createDocument, deleteDocument, duplicateDocument, AgencyDocument } from '../../services/api/documents';
 import { getAssetsByProject, uploadAsset, downloadAsset, deleteAsset } from '../../services/api/assets';
+import { getProjects } from '../../services/api/projects';
 import { Asset } from '../../types/supabase';
 import { Icon } from '../ui/Icon';
 import { toast } from 'react-toastify';
@@ -22,6 +23,8 @@ export const DocumentList: React.FC<DocumentListProps> = ({ projectId, projectTi
   const [isCreating, setIsCreating] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState<AgencyDocument | null>(null);
+  const [duplicateModalDoc, setDuplicateModalDoc] = useState<AgencyDocument | null>(null);
+  const [duplicateTargetProject, setDuplicateTargetProject] = useState<string>('');
   const [previewAsset, setPreviewAsset] = useState<Asset | null>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -62,11 +65,23 @@ export const DocumentList: React.FC<DocumentListProps> = ({ projectId, projectTi
     }
   });
 
+  const { data: allProjects = [] } = useQuery({
+    queryKey: ['projects'],
+    queryFn: getProjects,
+    enabled: !!duplicateModalDoc
+  });
+
   const duplicateMutation = useMutation({
-    mutationFn: duplicateDocument,
-    onSuccess: () => {
+    mutationFn: ({ docId, targetProjectId }: { docId: string, targetProjectId?: string }) => duplicateDocument(docId, targetProjectId),
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['documents', projectId] });
-      toast.success('Document duplicated successfully');
+      if (variables.targetProjectId && variables.targetProjectId !== projectId) {
+        toast.success('Document duplicated to the selected project');
+      } else {
+        toast.success('Document duplicated successfully');
+      }
+      setDuplicateModalDoc(null);
+      setDuplicateTargetProject('');
     },
     onError: (err: any) => {
       toast.error(`Failed to duplicate: ${err.message}`);
@@ -242,7 +257,7 @@ export const DocumentList: React.FC<DocumentListProps> = ({ projectId, projectTi
                   {!isClient && (
                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button 
-                        onClick={(e) => { e.stopPropagation(); duplicateMutation.mutate(doc.id); }}
+                        onClick={(e) => { e.stopPropagation(); setDuplicateModalDoc(doc); setDuplicateTargetProject(projectId); }}
                         className="text-muted-foreground hover:text-blue-400 p-1"
                         title="Duplicate"
                       >
@@ -336,10 +351,55 @@ export const DocumentList: React.FC<DocumentListProps> = ({ projectId, projectTi
         isOpen={!!previewAsset}
         onClose={() => setPreviewAsset(null)}
         asset={previewAsset}
-        onDownload={previewAsset ? () => {
-          if (previewAsset.storage_path) downloadAsset(previewAsset.storage_path, previewAsset.name);
-        } : undefined}
+        onDownload={previewAsset?.storage_path ? () => handleDownloadAsset(previewAsset.storage_path!, previewAsset.name) : undefined}
       />
+
+      {duplicateModalDoc && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
+          <div className="bg-card rounded-2xl shadow-xl w-full max-w-md border border-border p-6 relative">
+            <button 
+              onClick={() => setDuplicateModalDoc(null)} 
+              className="absolute top-4 right-4 text-muted-foreground hover:text-foreground hover:bg-muted p-1 rounded-full transition-colors"
+            >
+              <Icon path="M6 18L18 6M6 6l12 12" className="w-5 h-5" />
+            </button>
+            <h2 className="text-xl font-bold text-foreground mb-4">Duplicate Document</h2>
+            <p className="text-sm text-muted-foreground mb-6">
+              You are duplicating <strong>{duplicateModalDoc.title}</strong>. Where do you want to save the copy?
+            </p>
+            
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-foreground mb-2">Target Project</label>
+              <select
+                value={duplicateTargetProject}
+                onChange={(e) => setDuplicateTargetProject(e.target.value)}
+                className="w-full bg-background border border-input text-foreground rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+              >
+                <option value={projectId}>This Project (Current)</option>
+                {allProjects.filter(p => p.id !== projectId).map(p => (
+                  <option key={p.id} value={p.id}>{p.project_number ? `P${p.project_number}` : ''} {p.title}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setDuplicateModalDoc(null)}
+                className="px-4 py-2 bg-muted hover:bg-muted/80 text-foreground rounded-lg transition-colors font-medium text-sm"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => duplicateMutation.mutate({ docId: duplicateModalDoc.id, targetProjectId: duplicateTargetProject })}
+                disabled={duplicateMutation.isPending}
+                className="px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-colors flex items-center gap-2 font-medium text-sm disabled:opacity-50"
+              >
+                {duplicateMutation.isPending ? 'Duplicating...' : 'Duplicate'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

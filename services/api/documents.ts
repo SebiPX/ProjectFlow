@@ -99,8 +99,11 @@ export const getDocumentDetails = (id: string) =>
 export const deleteDocument = (id: string) =>
   fetchApi(`/api/documents/${id}`, { method: 'DELETE' });
 
-export const duplicateDocument = (id: string) =>
-  fetchApi(`/api/documents/${id}/duplicate`, { method: 'POST' });
+export const duplicateDocument = (id: string, targetProjectId?: string) =>
+  fetchApi(`/api/documents/${id}/duplicate`, { 
+    method: 'POST',
+    body: targetProjectId ? JSON.stringify({ targetProjectId }) : undefined
+  });
 
 export const updateDocumentTitle = (id: string, title: string) =>
   fetchApi(`/api/documents/${id}`, {
