@@ -7,6 +7,7 @@ import { Icon } from '../ui/Icon';
 import { toast } from 'react-toastify';
 import { ShotlistEditor } from './ShotlistEditor';
 import { CallSheetEditor } from './CallSheetEditor';
+import { AssetPreviewModal } from '../AssetPreviewModal';
 
 interface DocumentListProps {
   projectId: string;
@@ -21,6 +22,7 @@ export const DocumentList: React.FC<DocumentListProps> = ({ projectId, projectTi
   const [isCreating, setIsCreating] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState<AgencyDocument | null>(null);
+  const [previewAsset, setPreviewAsset] = useState<Asset | null>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -281,7 +283,11 @@ export const DocumentList: React.FC<DocumentListProps> = ({ projectId, projectTi
           <h3 className="text-lg font-bold text-foreground mb-4 border-b border-border pb-2">Project Files</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {projectFiles.map((file: Asset) => (
-              <div key={file.id} className="bg-card rounded-xl border border-border overflow-hidden hover:border-primary transition-all shadow-sm flex flex-col">
+              <div 
+                key={file.id} 
+                className="bg-card rounded-xl border border-border overflow-hidden hover:border-primary transition-all shadow-sm flex flex-col cursor-pointer"
+                onClick={() => setPreviewAsset(file)}
+              >
                 <div className="p-4 flex-1">
                   <div className="flex justify-between items-start mb-3">
                     <div className="p-2 rounded-lg bg-secondary/20 text-secondary flex-shrink-0">
@@ -325,6 +331,15 @@ export const DocumentList: React.FC<DocumentListProps> = ({ projectId, projectTi
           </div>
         </div>
       )}
+
+      <AssetPreviewModal
+        isOpen={!!previewAsset}
+        onClose={() => setPreviewAsset(null)}
+        asset={previewAsset}
+        onDownload={previewAsset ? () => {
+          if (previewAsset.storage_path) downloadAsset(previewAsset.storage_path, previewAsset.name);
+        } : undefined}
+      />
     </div>
   );
 };
