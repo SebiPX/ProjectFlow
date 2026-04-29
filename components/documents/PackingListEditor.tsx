@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getProjectDocuments, updateDocument, addPackingListItem, updatePackingListItem, deletePackingListItem, AgencyDocument, PackingListItem } from '../../services/api/documents';
+import { getProjectDocuments, updateDocumentTitle, getDocumentDetails, addPackingListItem, updatePackingListItem, deletePackingListItem, AgencyDocument, PackingListItem } from '../../services/api/documents';
 import { getInventarItems, InventarItem } from '../../services/api/inventar';
 import { Icon } from '../ui/Icon';
 import { toast } from 'react-toastify';
@@ -23,18 +23,7 @@ export const PackingListEditor: React.FC<PackingListEditorProps> = ({ documentId
   // Data fetching
   const { data: document, isLoading } = useQuery({
     queryKey: ['document', documentId],
-    queryFn: async () => {
-      // In this setup, we actually need to fetch the single document.
-      // Wait, the existing getProjectDocuments fetches all project docs, but here we can just find it.
-      // Assuming getProjectDocuments is an array, we need the specific doc. But there's no getDocumentById in the API service yet,
-      // Let's rely on the queryClient cache or fetch all and find. Wait, we'll just fetch all for the project from cache.
-      // But we don't have projectId passed. Let's just create a quick fetch to the single doc.
-      const res = await fetch(`/api/agency/documents/${documentId}`, {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-      });
-      if (!res.ok) throw new Error('Failed to fetch document');
-      return res.json();
-    }
+    queryFn: () => getDocumentDetails(documentId)
   });
 
   const { data: inventarItems = [] } = useQuery({
@@ -403,3 +392,5 @@ export const PackingListEditor: React.FC<PackingListEditorProps> = ({ documentId
     </div>
   );
 };
+
+
