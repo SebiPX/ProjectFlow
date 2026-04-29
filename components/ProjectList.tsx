@@ -208,8 +208,20 @@ export const ProjectList: React.FC<{ onSelectProject: (project: Project) => void
   }, {} as Record<string, Project[]>);
 
   const sortedClients = Object.keys(groupedProjects).sort((a, b) => {
-    if (a === 'Ohne Kunden') return 1;
-    if (b === 'Ohne Kunden') return -1;
+    const getRank = (name: string) => {
+      if (name.startsWith('Pixelschickeria')) return 3;
+      if (name === 'PX AKQUISE') return 2;
+      if (name === 'Ohne Kunden') return 1;
+      return 0;
+    };
+    
+    const rankA = getRank(a);
+    const rankB = getRank(b);
+    
+    if (rankA !== rankB) {
+      return rankA - rankB;
+    }
+    
     return a.localeCompare(b);
   });
 
