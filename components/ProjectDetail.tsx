@@ -314,14 +314,10 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
         }
 
         // Filter assets for clients (handled in KanbanBoard too, but useful for empty check if we want)
-        // Actually, KanbanBoard handles filtering columns. We pass all assets to it, or filtered assets?
-        // Better to pass all assets and let KanbanBoard hide columns, OR filter assets passed to it.
-        // If we filter assets here, we must ensure drag/drop logic works.
-        // Let's pass ALL assets to KanbanBoard, but if isClient, KanbanBoard only shows relevant columns.
-        // However, we should filter assets so clients don't get data for hidden assets in the props (safety).
+        // Also filter out internal project files from the assets tab
         const displayedAssets = isClient
-          ? assets.filter(asset => asset.status === 'client_review' || asset.status === 'approved')
-          : assets;
+          ? assets.filter(asset => (asset.status === 'client_review' || asset.status === 'approved') && !asset.description?.includes('[SYSTEM:PROJECT_FILE]'))
+          : assets.filter(asset => !asset.description?.includes('[SYSTEM:PROJECT_FILE]'));
 
         return (
           <div className="flex flex-col h-full bg-background/50">

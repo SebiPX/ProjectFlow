@@ -227,6 +227,9 @@ export const AssetList: React.FC<AssetListProps> = ({ onSelectProject, searchQue
   // Filter Logic
   const filterAssets = (assets: Asset[]): Asset[] => {
     return assets.filter(asset => {
+      // Hide internal project files
+      if (asset.description?.includes('[SYSTEM:PROJECT_FILE]')) return false;
+
       // Only Me filter
       if (onlyMe && asset.uploaded_by !== user?.id) return false;
 

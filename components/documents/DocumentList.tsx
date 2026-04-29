@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getProjectDocuments, createDocument, deleteDocument, duplicateDocument, AgencyDocument } from '../../services/api/documents';
+import { getAssetsByProject, uploadAsset, downloadAsset, deleteAsset } from '../../services/api/assets';
+import { Asset } from '../../types/supabase';
 import { Icon } from '../ui/Icon';
 import { toast } from 'react-toastify';
 import { ShotlistEditor } from './ShotlistEditor';
@@ -17,12 +19,20 @@ interface DocumentListProps {
 export const DocumentList: React.FC<DocumentListProps> = ({ projectId, projectTitle, pjmEmail, isClient, isAdminOrPJM }) => {
   const queryClient = useQueryClient();
   const [isCreating, setIsCreating] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState<AgencyDocument | null>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const { data: documents = [], isLoading } = useQuery({
+  const { data: documents = [], isLoading: docsLoading } = useQuery({
     queryKey: ['documents', projectId],
     queryFn: () => getProjectDocuments(projectId),
+  });
+
+  const { data: projectFiles = [], isLoading: filesLoading } = useQuery({
+    queryKey: ['assets', projectId],
+    queryFn: () => getAssetsByProject(projectId),
+    select: (data) => data.filter(a => a.description?.includes('[SYSTEM:PROJECT_FILE]'))
   });
 
   const createMutation = useMutation({
@@ -61,6 +71,49 @@ export const DocumentList: React.FC<DocumentListProps> = ({ projectId, projectTi
     }
   });
 
+  const uploadFileMutation = useMutation({
+    mutationFn: async (file: File) => {
+      return uploadAsset(file, {
+        project_id: projectId,
+        name: file.name,
+        description: '[SYSTEM:PROJECT_FILE]',
+        category: 'other' as any,
+        status: 'upload' as any,
+        is_visible_to_client: false
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['assets', projectId] });
+      toast.success('File uploaded successfully');
+      setIsUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    },
+    onError: (err: any) => {
+      toast.error(`Failed to upload file: ${err.message}`);
+      setIsUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  });
+
+  const deleteFileMutation = useMutation({
+    mutationFn: deleteAsset,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['assets', projectId] });
+      toast.success('File deleted');
+    },
+    onError: (err: any) => {
+      toast.error(`Failed to delete file: ${err.message}`);
+    }
+  });
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setIsUploading(true);
+      uploadFileMutation.mutate(file);
+    }
+  };
+
   const handleCreate = (type: 'shotlist' | 'call_sheet' | 'event_sheet') => {
     setIsCreating(true);
     let title = 'New Document';
@@ -98,53 +151,69 @@ export const DocumentList: React.FC<DocumentListProps> = ({ projectId, projectTi
           <p className="text-sm text-muted-foreground">Manage your Dispos, Shotlists, and more.</p>
         </div>
         {!isClient && (
-          <div className="relative">
+          <div className="flex items-center gap-3">
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileUpload}
+              className="hidden"
+            />
             <button
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-colors flex items-center gap-2"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isUploading}
+              className="px-4 py-2 bg-secondary hover:bg-secondary/90 text-secondary-foreground rounded-lg transition-colors flex items-center gap-2"
             >
-              <Icon path="M12 4v16m8-8H4" className="w-5 h-5" />
-              New Document
-              <Icon path={isDropdownOpen ? "M5 15l7-7 7 7" : "M19 9l-7 7-7-7"} className="w-4 h-4 ml-1" />
+              <Icon path="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" className="w-5 h-5" />
+              {isUploading ? 'Uploading...' : 'Upload File'}
             </button>
-            
-            {isDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-56 bg-card border border-border rounded-lg shadow-lg overflow-hidden z-50">
-                <button
-                  onClick={() => {
-                    setIsDropdownOpen(false);
-                    handleCreate('call_sheet');
-                  }}
-                  disabled={isCreating}
-                  className="w-full text-left px-4 py-3 hover:bg-muted transition-colors flex items-center gap-3 border-b border-border/50 text-sm font-medium text-foreground"
-                >
-                  <Icon path="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" className="w-4 h-4 text-primary" />
-                  Drehdispo
-                </button>
-                <button
-                  onClick={() => {
-                    setIsDropdownOpen(false);
-                    handleCreate('event_sheet');
-                  }}
-                  disabled={isCreating}
-                  className="w-full text-left px-4 py-3 hover:bg-muted transition-colors flex items-center gap-3 border-b border-border/50 text-sm font-medium text-foreground"
-                >
-                  <Icon path="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" className="w-4 h-4 text-purple-500" />
-                  Eventdispo
-                </button>
-                <button
-                  onClick={() => {
-                    setIsDropdownOpen(false);
-                    handleCreate('shotlist');
-                  }}
-                  disabled={isCreating}
-                  className="w-full text-left px-4 py-3 hover:bg-muted transition-colors flex items-center gap-3 text-sm font-medium text-foreground"
-                >
-                  <Icon path="M4 6h16M4 10h16M4 14h16M4 18h16" className="w-4 h-4 text-secondary" />
-                  Shotlist
-                </button>
-              </div>
-            )}
+            <div className="relative">
+              <button
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                className="px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-colors flex items-center gap-2"
+              >
+                <Icon path="M12 4v16m8-8H4" className="w-5 h-5" />
+                New Document
+                <Icon path={isDropdownOpen ? "M5 15l7-7 7 7" : "M19 9l-7 7-7-7"} className="w-4 h-4 ml-1" />
+              </button>
+              
+              {isDropdownOpen && (
+                <div className="absolute right-0 mt-2 w-56 bg-card border border-border rounded-lg shadow-lg overflow-hidden z-50">
+                  <button
+                    onClick={() => {
+                      setIsDropdownOpen(false);
+                      handleCreate('call_sheet');
+                    }}
+                    disabled={isCreating}
+                    className="w-full text-left px-4 py-3 hover:bg-muted transition-colors flex items-center gap-3 border-b border-border/50 text-sm font-medium text-foreground"
+                  >
+                    <Icon path="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" className="w-4 h-4 text-primary" />
+                    Drehdispo
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIsDropdownOpen(false);
+                      handleCreate('event_sheet');
+                    }}
+                    disabled={isCreating}
+                    className="w-full text-left px-4 py-3 hover:bg-muted transition-colors flex items-center gap-3 border-b border-border/50 text-sm font-medium text-foreground"
+                  >
+                    <Icon path="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" className="w-4 h-4 text-purple-500" />
+                    Eventdispo
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIsDropdownOpen(false);
+                      handleCreate('shotlist');
+                    }}
+                    disabled={isCreating}
+                    className="w-full text-left px-4 py-3 hover:bg-muted transition-colors flex items-center gap-3 text-sm font-medium text-foreground"
+                  >
+                    <Icon path="M4 6h16M4 10h16M4 14h16M4 18h16" className="w-4 h-4 text-secondary" />
+                    Shotlist
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>
@@ -204,6 +273,56 @@ export const DocumentList: React.FC<DocumentListProps> = ({ projectId, projectTi
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {projectFiles.length > 0 && (
+        <div className="mt-12">
+          <h3 className="text-lg font-bold text-foreground mb-4 border-b border-border pb-2">Project Files</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {projectFiles.map((file: Asset) => (
+              <div key={file.id} className="bg-card rounded-xl border border-border overflow-hidden hover:border-primary transition-all shadow-sm flex flex-col">
+                <div className="p-4 flex-1">
+                  <div className="flex justify-between items-start mb-3">
+                    <div className="p-2 rounded-lg bg-secondary/20 text-secondary flex-shrink-0">
+                      <Icon path="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" className="w-5 h-5" />
+                    </div>
+                    {!isClient && (
+                      <button 
+                        onClick={(e) => { 
+                          e.stopPropagation(); 
+                          if (confirm('Delete file?')) deleteFileMutation.mutate(file.id); 
+                        }}
+                        className="text-muted-foreground hover:text-red-400 p-1"
+                        title="Delete"
+                      >
+                        <Icon path="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                  <h4 className="text-sm font-bold text-foreground truncate" title={file.name}>{file.name}</h4>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Uploaded {new Date(file.created_at).toLocaleDateString()}
+                  </p>
+                </div>
+                <div className="bg-muted/30 p-3 border-t border-border flex justify-between items-center">
+                  <span className="text-xs text-muted-foreground">
+                    {file.file_size ? `${(file.file_size / 1024 / 1024).toFixed(2)} MB` : 'Unknown size'}
+                  </span>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (file.storage_path) downloadAsset(file.storage_path, file.name);
+                    }}
+                    className="text-xs text-primary hover:text-primary/80 font-medium flex items-center gap-1"
+                  >
+                    <Icon path="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" className="w-3 h-3" />
+                    Download
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>
