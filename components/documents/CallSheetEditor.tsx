@@ -39,11 +39,36 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
   const queryClient = useQueryClient();
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [titleInput, setTitleInput] = useState('');
+  const [scheduleFilter, setScheduleFilter] = useState<string>('');
 
   const { data: doc, isLoading } = useQuery<AgencyDocument & { data: CallSheetData, schedule: CallSheetSchedule[], contacts: CallSheetContact[] }>({
     queryKey: ['document', documentId],
     queryFn: () => getDocumentDetails(documentId)
   });
+
+  const safeSchedule = doc?.schedule || [];
+
+  const allAssignedPersons = useMemo(() => {
+    const personsSet = new Set<string>();
+    safeSchedule.forEach(item => {
+      if (item.persons) {
+        item.persons.split(',').forEach(p => {
+          const trimmed = p.trim();
+          if (trimmed) personsSet.add(trimmed);
+        });
+      }
+    });
+    return Array.from(personsSet).sort();
+  }, [safeSchedule]);
+
+  const filteredSchedule = useMemo(() => {
+    if (!scheduleFilter) return safeSchedule;
+    return safeSchedule.filter(item => {
+      if (!item.persons) return false;
+      const itemPersons = item.persons.split(',').map(p => p.trim());
+      return itemPersons.includes(scheduleFilter);
+    });
+  }, [safeSchedule, scheduleFilter]);
 
   const { data: teamProfiles = [] } = useQuery({
     queryKey: ['profiles'],
@@ -441,30 +466,6 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
     }
   };
   const texts = t[effectiveLang as 'de' | 'en'];
-
-  const [scheduleFilter, setScheduleFilter] = useState<string>('');
-
-  const allAssignedPersons = useMemo(() => {
-    const personsSet = new Set<string>();
-    schedule.forEach(item => {
-      if (item.persons) {
-        item.persons.split(',').forEach(p => {
-          const trimmed = p.trim();
-          if (trimmed) personsSet.add(trimmed);
-        });
-      }
-    });
-    return Array.from(personsSet).sort();
-  }, [schedule]);
-
-  const filteredSchedule = useMemo(() => {
-    if (!scheduleFilter) return schedule;
-    return schedule.filter(item => {
-      if (!item.persons) return false;
-      const itemPersons = item.persons.split(',').map(p => p.trim());
-      return itemPersons.includes(scheduleFilter);
-    });
-  }, [schedule, scheduleFilter]);
 
   return (
     <div className="flex flex-col h-full bg-background relative print:bg-white print:text-black print:h-auto print:block">
