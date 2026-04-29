@@ -131,7 +131,7 @@ export const DocumentList: React.FC<DocumentListProps> = ({ projectId, projectTi
     createMutation.mutate({ title, type });
   };
 
-  if (isLoading) {
+  if (docsLoading) {
     return <div className="p-6 text-muted-foreground">Loading documents...</div>;
   }
 
