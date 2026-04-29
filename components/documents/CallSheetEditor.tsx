@@ -721,7 +721,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
              const catContacts = contacts.filter(c => (c.category || 'crew') === 'kunde');
              if (!isAdminOrPJM && catContacts.length === 0) return null;
              return (
-               <div className="mb-8 print:break-inside-avoid">
+               <div className={`mb-8 print:break-inside-avoid ${catContacts.length === 0 ? 'print:hidden' : ''}`}>
                  <div className="flex justify-between items-end mb-4 border-b border-border pb-2 print-heading-wrapper">
                    <h2 className="text-lg font-bold text-foreground print:text-black uppercase">Kunde</h2>
                    {isAdminOrPJM && (
@@ -802,7 +802,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
              const catContacts = contacts.filter(c => (c.category || 'crew') === 'darsteller');
              if (!isAdminOrPJM && catContacts.length === 0) return null;
              return (
-               <div className="mb-8 print:break-inside-avoid">
+               <div className={`mb-8 print:break-inside-avoid ${catContacts.length === 0 ? 'print:hidden' : ''}`}>
                  <div className="flex justify-between items-end mb-4 border-b border-border pb-2 print-heading-wrapper">
                    <h2 className="text-lg font-bold text-foreground print:text-black uppercase">Darsteller</h2>
                    {isAdminOrPJM && (
@@ -881,7 +881,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
              const catContacts = contacts.filter(c => (c.category || 'crew') === 'bts');
              if (!isAdminOrPJM && catContacts.length === 0) return null;
              return (
-               <div className="mb-8 print:break-inside-avoid">
+               <div className={`mb-8 print:break-inside-avoid ${catContacts.length === 0 ? 'print:hidden' : ''}`}>
                  <div className="flex justify-between items-end mb-4 border-b border-border pb-2 print-heading-wrapper">
                    <h2 className="text-lg font-bold text-foreground print:text-black uppercase">BTS</h2>
                    {isAdminOrPJM && (
@@ -960,7 +960,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
              const catContacts = contacts.filter(c => (c.category || 'crew') === 'crew');
              if (!isAdminOrPJM && catContacts.length === 0) return null;
              return (
-               <div className="mb-8 print:break-inside-avoid">
+               <div className={`mb-8 print:break-inside-avoid ${catContacts.length === 0 ? 'print:hidden' : ''}`}>
                  <div className="flex justify-between items-end mb-4 border-b border-border pb-2 print-heading-wrapper">
                    <h2 className="text-lg font-bold text-foreground print:text-black uppercase">Crew</h2>
                    {isAdminOrPJM && (
