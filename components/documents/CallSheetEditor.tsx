@@ -20,6 +20,7 @@ import { Icon } from '../ui/Icon';
 import { toast } from 'react-toastify';
 import { LocationAutocomplete } from './LocationAutocomplete';
 import { ContactAutocomplete } from './ContactAutocomplete';
+import { DirectoryLocationAutocomplete } from './DirectoryLocationAutocomplete';
 import { MultiPersonSelect } from './MultiPersonSelect';
 import { directory } from '../../lib/apiClient';
 import { getProfiles } from '../../services/api/profiles';
@@ -52,6 +53,11 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
   const { data: freelancers = [] } = useQuery({
     queryKey: ['freelancers'],
     queryFn: directory.freelancers.list
+  });
+
+  const { data: apiLocations = [] } = useQuery({
+    queryKey: ['locations'],
+    queryFn: directory.locations.list
   });
 
   const { data: project } = useQuery({
@@ -567,12 +573,16 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                 <div className="p-3 bg-muted/30 rounded-lg border border-border/50">
                   <div className="mb-3">
                     <label className="block text-xs font-bold text-muted-foreground uppercase mb-1 print:text-gray-500">{texts.location}</label>
-                    <input 
-                      type="text" 
-                      defaultValue={data.location_name || ''} 
-                      onBlur={(e) => handleDataChange('location_name', e.target.value)}
-                      placeholder="Studio 1..."
-                      className="w-full bg-transparent font-medium text-lg border-b border-border focus:border-primary focus:outline-none pb-1 print:border-none print:p-0"
+                    <DirectoryLocationAutocomplete
+                      value={data.location_name || ''}
+                      onChange={(newName) => handleDataChange('location_name', newName)}
+                      onSelectCallback={(loc) => {
+                        updateDataMutation.mutate({
+                          location_name: loc.name,
+                          location_address: loc.address
+                        });
+                      }}
+                      locations={apiLocations}
                       disabled={!isAdminOrPJM}
                     />
                   </div>
@@ -610,16 +620,19 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                     )}
                     <div className="mb-3">
                       <label className="block text-xs font-bold text-muted-foreground uppercase mb-1 print:text-gray-500">Location {idx + 2}</label>
-                      <input 
-                        type="text" 
-                        defaultValue={loc.name || ''} 
-                        onBlur={(e) => {
+                      <DirectoryLocationAutocomplete
+                        value={loc.name || ''}
+                        onChange={(newName) => {
                           const newLocs = [...(data.additional_locations || [])];
-                          newLocs[idx] = { ...newLocs[idx], name: e.target.value };
+                          newLocs[idx] = { ...newLocs[idx], name: newName };
                           handleDataChange('additional_locations', newLocs);
                         }}
-                        placeholder={`Location ${idx + 2}...`}
-                        className="w-full bg-transparent font-medium text-lg border-b border-border focus:border-primary focus:outline-none pb-1 print:border-none print:p-0"
+                        onSelectCallback={(selectedLoc) => {
+                          const newLocs = [...(data.additional_locations || [])];
+                          newLocs[idx] = { ...newLocs[idx], name: selectedLoc.name, address: selectedLoc.address };
+                          handleDataChange('additional_locations', newLocs);
+                        }}
+                        locations={apiLocations}
                         disabled={!isAdminOrPJM}
                       />
                     </div>
