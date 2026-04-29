@@ -418,12 +418,12 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
              </div>
              <div>
                <label className="block text-xs font-bold text-muted-foreground uppercase mb-1 print:text-gray-500">PRODUKT</label>
-               <input 
-                 type="text" 
+               <textarea 
                  defaultValue={data.project_name || project?.title || ''} 
                  onBlur={(e) => handleDataChange('project_name', e.target.value)}
                  placeholder="Projektname..."
-                 className="w-full bg-transparent font-bold text-lg border-b border-border focus:border-primary focus:outline-none pb-1 print:border-none print:p-0"
+                 className="w-full bg-transparent font-bold text-lg border-b border-border focus:border-primary focus:outline-none pb-1 print:border-none print:p-0 resize-none overflow-hidden"
+                 rows={2}
                  disabled={!isAdminOrPJM}
                />
              </div>
@@ -717,7 +717,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                      </button>
                    )}
                  </div>
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                 <div className="grid grid-cols-1 md:grid-cols-2 print:grid-cols-2 gap-x-8 gap-y-4">
                    {catContacts.map(contact => (
                      <div key={contact.id} className="flex items-start justify-between border-b border-border/50 pb-2 group print:break-inside-avoid">
                        <div className="w-full mr-2">
@@ -809,7 +809,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                      </button>
                    )}
                  </div>
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                 <div className="grid grid-cols-1 md:grid-cols-2 print:grid-cols-2 gap-x-8 gap-y-4">
                    {catContacts.map(contact => (
                      <div key={contact.id} className="flex items-start justify-between border-b border-border/50 pb-2 group print:break-inside-avoid">
                        <div className="w-full mr-2">
@@ -888,7 +888,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                      </button>
                    )}
                  </div>
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                 <div className="grid grid-cols-1 md:grid-cols-2 print:grid-cols-2 gap-x-8 gap-y-4">
                    {catContacts.map(contact => (
                      <div key={contact.id} className="flex items-start justify-between border-b border-border/50 pb-2 group print:break-inside-avoid">
                        <div className="w-full mr-2">
@@ -967,7 +967,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                      </button>
                    )}
                  </div>
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                 <div className="grid grid-cols-1 md:grid-cols-2 print:grid-cols-2 gap-x-8 gap-y-4">
                    {catContacts.map(contact => (
                      <div key={contact.id} className="flex items-start justify-between border-b border-border/50 pb-2 group print:break-inside-avoid">
                        <div className="w-full mr-2">
