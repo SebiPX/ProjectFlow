@@ -703,6 +703,19 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
            </div>
 
 
+           {/* Job-Titel */}
+           <div className="mb-12 print:break-inside-avoid">
+             <label className="block text-xs font-bold text-muted-foreground uppercase mb-1 print:text-gray-500">JOB-TITEL</label>
+             <input 
+               type="text" 
+               defaultValue={data.job_title || (project ? `${project.project_number} - ${project.title}` : '')} 
+               onBlur={(e) => handleDataChange('job_title', e.target.value)}
+               placeholder="Job-Titel..."
+               className="w-full bg-transparent font-bold text-xl border-b border-border focus:border-primary focus:outline-none pb-1 print:border-none print:p-0"
+               disabled={!isAdminOrPJM}
+             />
+           </div>
+
            {/* Kunde Contacts */}
            {(() => {
              const catContacts = contacts.filter(c => (c.category || 'crew') === 'kunde');
@@ -782,18 +795,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
              );
            })()}
 
-           {/* Job-Titel */}
-           <div className="mb-12 print:break-inside-avoid">
-             <label className="block text-xs font-bold text-muted-foreground uppercase mb-1 print:text-gray-500">JOB-TITEL</label>
-             <input 
-               type="text" 
-               defaultValue={data.job_title || (project ? `${project.project_number} - ${project.title}` : '')} 
-               onBlur={(e) => handleDataChange('job_title', e.target.value)}
-               placeholder="Job-Titel..."
-               className="w-full bg-transparent font-bold text-xl border-b border-border focus:border-primary focus:outline-none pb-1 print:border-none print:p-0"
-               disabled={!isAdminOrPJM}
-             />
-           </div>
+
 
            {/* Darsteller Contacts */}
            {(() => {
