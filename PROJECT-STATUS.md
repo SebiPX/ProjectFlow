@@ -436,9 +436,8 @@ Don't try to create RLS policies for admin access to all profiles - use service 
 - ✅ **Smart Task Mapping**: Time entries without a defined task fallback securely to the project's primary MOCO "Leistung" (Task).
 - ✅ **Automatic Descriptions**: PX-Flow Task Titles and Descriptions dynamically populate MOCO billing entries.
 
-### In Progress: v2.3.0 🚧 (March 2026) - NATIVE PROJECT DOCUMENTS
+### Completed in v2.3.0 ✅ (March 2026) - NATIVE PROJECT DOCUMENTS
 
-- 🚧 **Active Focus**: We are currently working on the **Documents Modal** within projects.
 - ✅ **Infrastructure**: Created 5 new PostgreSQL tables (`agency_documents`, `agency_shotlist_items`, etc.) and corresponding `labs-api` Express routes.
 - ✅ **Shotlist Editor**: Airtable-style grid for building structured shotlists with drag & drop functionality. (Image Upload feature upcoming).
 - ✅ **Drehdispo (Call Sheet)**: Form-based document builder combining Schedule, Contacts, Location, and Weather info. Includes Native PDF Print via browser `print:hidden` CSS logic, dynamic Drehtag, and PJM emails. **New:** Added deep-copy duplication for documents and manual contact sorting (Up/Down controls with persistent backend ordering).
@@ -464,6 +463,35 @@ Don't try to create RLS policies for admin access to all profiles - use service 
 - ✅ **Project Listing Structure**: Advanced the main Projects component to exclusively categorize and sort alphabetically grouped by "Client Name", reducing visual clutter.
 - ✅ **Completed Projects Archival Strategy**: Completed projects are now intentionally hidden by default to keep the Active workspace clean. Introduced a discrete 'Completed' toggle filter to explicitly invoke these projects optionally.
 - ✅ **News Widget Integration**: Integrated the external `ai_news` PostgreSQL database directly into the Dashboard for side-by-side thumbnail rendering of curated tech news.
+
+### Completed in v2.4.0 ✅ (March 2026) - REAL-TIME CHAT SYSTEM
+
+- ✅ **Agency Messaging**: Built a complete Slack/Teams-style UI inside the browser for global and project-specific chat.
+- ✅ **Backend Integration**: Created `agency_chat_messages` table and custom REST endpoints in `labs-api`.
+- ✅ **Real-Time Polling**: React Query interval-based fetching tuned for instant messaging, optimized for background tabs.
+- ✅ **Smart Read-Receipts**: Unread notification red dots per channel, powered by `localStorage` cross-tab sync and a fast `GET /api/chat/summary` endpoint.
+- ✅ **Auto-Scroll & UX**: Messages auto-scroll to bottom, optimistic UI updates, integrated user avatars and timestamps.
+
+### Completed in v2.5.0 ✅ (March 2026) - UI/UX ALIGNMENT & ECOSYSTEM SYNC
+
+- ✅ **Unified Styling**: Replaced generic text logos with adaptive the PX Logo images supporting strict Light & Dark mode variants explicitly via CSS.
+- ✅ **Category Naming**: Renamed the generic "Home" sidebar category string cleanly to "PX Desk" to enforce ecosystem nomenclature globally.
+- ✅ **Ecosystem Linking**: Implemented a responsive direct external linking button in the top header bridging users instantly back and forth between "PX-Studio" and "PX-Flow".
+
+### Completed in v2.6.0 ✅ (April 2026) - UI/UX REFINEMENTS
+
+- ✅ **Team Grid Clarity**: Removed sensitive financial statistics (Weekly Hours, Billable Rate, Internal Cost) from the public Team view component for better privacy.
+- ✅ **Quick Tasks View**: Clicking any team member card now instantly opens a detailed Modal indicating all their active assigned tasks.
+- ✅ **Project Listing Structure**: Advanced the main Projects component to exclusively categorize and sort alphabetically grouped by "Client Name", reducing visual clutter.
+- ✅ **Completed Projects Archival Strategy**: Completed projects are now intentionally hidden by default to keep the Active workspace clean. Introduced a discrete 'Completed' toggle filter to explicitly invoke these projects optionally.
+- ✅ **News Widget Integration**: Integrated the external `ai_news` PostgreSQL database directly into the Dashboard for side-by-side thumbnail rendering of curated tech news.
+
+### Completed in v2.7.0 ✅ (April 2026) - EVENT DISPO & CONTACT MANAGEMENT
+
+- ✅ **Client Auto-Population**: The backend now seamlessly parses `agency_projects` relationships to automatically query and populate client contacts (Kunde) dynamically upon the creation of new Call Sheets.
+- ✅ **Contact Layout Modernization**: Solved PDF rendering layout breaks. Email addresses were migrated to scalable `textarea` elements sitting on dedicated full-width rows inside contact cards, resolving deep truncation.
+- ✅ **Manual Contact Sorting**: Project managers and Admins can now arbitrarily reorder contacts using Up/Down arrow indicators, persisting sorting dynamically per contact category natively within PostgreSQL.
+- ✅ **Print-Ready Lists**: Refactored the `MultiPersonSelect` arrays to forcefully re-inject trailing commas when preparing output specifically for PDF Print Modes.
 
 1. **Integrations & Export (Phase 2)**
    - [x] Automation email notifications (Edge Functions)
