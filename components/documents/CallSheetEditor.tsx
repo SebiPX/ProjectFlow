@@ -980,9 +980,9 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                      </button>
                    )}
                  </div>
-                 <div className="grid grid-cols-1 md:grid-cols-2 print:grid-cols-2 gap-x-8 gap-y-4">
+                 <div className="grid grid-cols-1 md:grid-cols-2 print:flex print:flex-row print:flex-wrap gap-x-8 gap-y-4">
                    {catContacts.map(contact => (
-                     <div key={contact.id} className="flex items-start justify-between border-b border-border/50 pb-2 group print:break-inside-avoid">
+                     <div key={contact.id} className="flex items-start justify-between border-b border-border/50 pb-2 group print:break-inside-avoid print:w-[calc(50%-1rem)] print:mb-2">
                        <div className="w-full mr-2">
                          <div className="flex gap-2 mb-1">
                            <ContactAutocomplete
@@ -1061,9 +1061,9 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                      </button>
                    )}
                  </div>
-                 <div className="grid grid-cols-1 md:grid-cols-2 print:grid-cols-2 gap-x-8 gap-y-4">
+                 <div className="grid grid-cols-1 md:grid-cols-2 print:flex print:flex-row print:flex-wrap gap-x-8 gap-y-4">
                    {catContacts.map(contact => (
-                     <div key={contact.id} className="flex items-start justify-between border-b border-border/50 pb-2 group print:break-inside-avoid">
+                     <div key={contact.id} className="flex items-start justify-between border-b border-border/50 pb-2 group print:break-inside-avoid print:w-[calc(50%-1rem)] print:mb-2">
                        <div className="w-full mr-2">
                          <div className="flex gap-2 mb-1">
                            <ContactAutocomplete
@@ -1140,9 +1140,9 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                      </button>
                    )}
                  </div>
-                 <div className="grid grid-cols-1 md:grid-cols-2 print:grid-cols-2 gap-x-8 gap-y-4">
+                 <div className="grid grid-cols-1 md:grid-cols-2 print:flex print:flex-row print:flex-wrap gap-x-8 gap-y-4">
                    {catContacts.map(contact => (
-                     <div key={contact.id} className="flex items-start justify-between border-b border-border/50 pb-2 group print:break-inside-avoid">
+                     <div key={contact.id} className="flex items-start justify-between border-b border-border/50 pb-2 group print:break-inside-avoid print:w-[calc(50%-1rem)] print:mb-2">
                        <div className="w-full mr-2">
                          <div className="flex gap-2 mb-1">
                            <ContactAutocomplete
@@ -1219,9 +1219,9 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                      </button>
                    )}
                  </div>
-                 <div className="grid grid-cols-1 md:grid-cols-2 print:grid-cols-2 gap-x-8 gap-y-4">
+                 <div className="grid grid-cols-1 md:grid-cols-2 print:flex print:flex-row print:flex-wrap gap-x-8 gap-y-4">
                    {catContacts.map(contact => (
-                     <div key={contact.id} className="flex items-start justify-between border-b border-border/50 pb-2 group print:break-inside-avoid">
+                     <div key={contact.id} className="flex items-start justify-between border-b border-border/50 pb-2 group print:break-inside-avoid print:w-[calc(50%-1rem)] print:mb-2">
                        <div className="w-full mr-2">
                          <div className="flex gap-2 mb-1">
                            <ContactAutocomplete

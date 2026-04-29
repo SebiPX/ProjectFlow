@@ -82,6 +82,13 @@
 }
 
 @media print {
+  /* Make placeholders transparent during print so empty fields are blank */
+  ::-webkit-input-placeholder { color: transparent !important; }
+  :-moz-placeholder { color: transparent !important; }
+  ::-moz-placeholder { color: transparent !important; }
+  :-ms-input-placeholder { color: transparent !important; }
+  ::placeholder { color: transparent !important; }
+
   html, body, #root {
     height: auto !important;
     min-height: auto !important;
