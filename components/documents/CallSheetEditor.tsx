@@ -316,6 +316,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
   const schedule: CallSheetSchedule[] = doc.schedule || [];
   const contacts: CallSheetContact[] = doc.contacts || [];
 
+
   const allLocations = [];
   if (data.location_address || data.location_name) {
     allLocations.push({ name: data.location_name || 'Hauptlocation', address: data.location_address || '' });
@@ -325,6 +326,98 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
       if (loc.address || loc.name) allLocations.push({ name: loc.name || `Location ${idx + 2}`, address: loc.address || '' });
     });
   }
+
+  // Determine effective language
+  const effectiveLang = data.language || (doc.type === 'event_sheet' ? 'en' : 'de');
+
+  const t = {
+    de: {
+      typeHeader: doc.type === 'event_sheet' ? 'Eventdispo' : 'Drehdispo',
+      dateLabel: doc.type === 'event_sheet' ? 'Eventtag:' : 'Drehtag:',
+      client: 'KUNDE',
+      project: 'PRODUKT',
+      producer: 'PRODUCER VOR ORT',
+      location: 'Location',
+      address: 'Adresse',
+      addLocation: '{texts.addLocation}',
+      weather: 'Wetter',
+      autoFill: 'Auto-Fill',
+      loading: 'Lade...',
+      searching: 'Suche...',
+      nearestHospital: 'Nächstes Krankenhaus',
+      locationNotes: '{texts.locationNotes}',
+      jobTitle: 'JOB-TITEL',
+      contactKunde: 'Kunde',
+      contactDarsteller: doc.type === 'event_sheet' ? 'Lieferanten' : 'Darsteller',
+      contactBts: doc.type === 'event_sheet' ? 'VIPs' : 'BTS',
+      contactCrew: 'Crew',
+      noEntriesIn: '{texts.noEntriesIn}',
+      schedule: '{texts.schedule}',
+      time: '{texts.time}',
+      what: 'Was',
+      who: 'Wer',
+      where: 'Wo (Location)',
+      duration: 'Dauer (Min)',
+      addEntry: '{texts.addEntry}',
+      directionsAndParking: 'ANFAHRT & PARKEN',
+      travel: 'ANREISE',
+      exportPrint: 'Export PDF / Print',
+      add: '{texts.add}',
+      rolePlaceholder: 'Rolle...',
+      telPlaceholder: 'Tel...',
+      emailPlaceholder: 'Email...',
+      descPlaceholder: 'Szenen-Details, Notizen...',
+      personsPlaceholder: 'z.B. 1, 2, 4',
+      sceneNamePlaceholder: 'Szene 1...',
+      durationPlaceholder: 'Min...',
+      addressPrompt: '{texts.addressPrompt}',
+      directionsPlaceholder: 'Hinweise zur Anfahrt, Parkmöglichkeiten...'
+    },
+    en: {
+      typeHeader: doc.type === 'event_sheet' ? 'Event Sheet' : 'Call Sheet',
+      dateLabel: 'Date:',
+      client: 'CLIENT',
+      project: 'PROJECT',
+      producer: 'ONSITE PRODUCER',
+      location: 'Location',
+      address: 'Address',
+      addLocation: '+ Add Location',
+      weather: 'Weather',
+      autoFill: 'Auto-Fill',
+      loading: 'Loading...',
+      searching: 'Search...',
+      nearestHospital: 'Nearest Hospital',
+      locationNotes: 'Location Notes',
+      jobTitle: 'JOB TITLE',
+      contactKunde: 'Client',
+      contactDarsteller: doc.type === 'event_sheet' ? 'SUPPLIERS' : 'Talent',
+      contactBts: doc.type === 'event_sheet' ? 'VIPs' : 'BTS',
+      contactCrew: 'Crew',
+      noEntriesIn: 'No entries in',
+      schedule: 'SCHEDULE',
+      time: 'Time',
+      what: 'What',
+      who: 'Who',
+      where: 'Where',
+      duration: 'Duration (Min)',
+      addEntry: '+ Add entry',
+      directionsAndParking: 'DIRECTIONS & PARKING',
+      travel: 'TRAVEL',
+      exportPrint: 'Export PDF / Print',
+      add: '+ Add',
+      rolePlaceholder: 'Role...',
+      telPlaceholder: 'Phone...',
+      emailPlaceholder: 'Email...',
+      descPlaceholder: 'Scene details, notes...',
+      personsPlaceholder: 'e.g. 1, 2, 4',
+      sceneNamePlaceholder: 'Scene 1...',
+      durationPlaceholder: 'Min...',
+      addressPrompt: 'Please enter address above to load map.',
+      directionsPlaceholder: 'Directions, parking notes...'
+    }
+  };
+  const texts = t[effectiveLang as 'de' | 'en'];
+
 
   return (
     <div className="flex flex-col h-full bg-background relative print:bg-white print:text-black print:h-auto print:block">
@@ -356,13 +449,27 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
             </h1>
           )}
         </div>
-        <div className="flex gap-2">
+                <div className="flex gap-2 items-center">
+           <div className="flex items-center bg-muted rounded-lg p-1 text-sm mr-4">
+             <button 
+               onClick={() => handleDataChange('language', 'de')} 
+               className={`px-3 py-1 rounded-md transition-colors ${effectiveLang === 'de' ? 'bg-background shadow-sm font-bold text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+             >
+               DE
+             </button>
+             <button 
+               onClick={() => handleDataChange('language', 'en')} 
+               className={`px-3 py-1 rounded-md transition-colors ${effectiveLang === 'en' ? 'bg-background shadow-sm font-bold text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+             >
+               EN
+             </button>
+           </div>
            <button 
              className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors flex items-center gap-2 text-sm"
              onClick={printDocument}
            >
              <Icon path="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" className="w-4 h-4" />
-             Export PDF / Print
+             {texts.exportPrint}
            </button>
         </div>
       </div>
@@ -375,14 +482,14 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
            <div className="flex justify-between items-start border-b-2 border-primary pb-6 mb-8">
              <div>
                <h1 className="text-4xl font-black tracking-tight text-foreground uppercase print:text-black">
-                 {doc.type === 'event_sheet' ? 'Eventdispo' : 'Drehdispo'}
+                 {texts.typeHeader}
                </h1>
                <div className="mt-2 text-xl font-medium text-muted-foreground print:text-gray-800">
                  {doc.type === 'event_sheet' && projectTitle ? projectTitle : doc.title}
                </div>
                <div className="mt-2 text-sm text-foreground flex items-center gap-2">
                  <span className="font-bold uppercase text-muted-foreground">
-                   {doc.type === 'event_sheet' ? 'Eventtag:' : 'Drehtag:'}
+                   {texts.dateLabel}
                  </span>
                  <input 
                     type="date"
@@ -406,7 +513,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
            {/* Project Info 3-Columns */}
            <div className="grid grid-cols-3 gap-8 mb-12 print:break-inside-avoid">
              <div>
-               <label className="block text-xs font-bold text-muted-foreground uppercase mb-1 print:text-gray-500">KUNDE</label>
+               <label className="block text-xs font-bold text-muted-foreground uppercase mb-1 print:text-gray-500">{texts.client}</label>
                <input 
                  type="text" 
                  defaultValue={data.client_name || project?.client?.company_name || ''} 
@@ -417,7 +524,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                />
              </div>
              <div>
-               <label className="block text-xs font-bold text-muted-foreground uppercase mb-1 print:text-gray-500">PRODUKT</label>
+               <label className="block text-xs font-bold text-muted-foreground uppercase mb-1 print:text-gray-500">{texts.project}</label>
                <textarea 
                  defaultValue={data.project_name || project?.title || ''} 
                  onBlur={(e) => handleDataChange('project_name', e.target.value)}
@@ -428,7 +535,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                />
              </div>
              <div>
-               <label className="block text-xs font-bold text-muted-foreground uppercase mb-1 print:text-gray-500">PRODUCER VOR ORT</label>
+               <label className="block text-xs font-bold text-muted-foreground uppercase mb-1 print:text-gray-500">{texts.producer}</label>
                <input 
                  list="producer-list"
                  type="text" 
@@ -459,7 +566,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
               <div className="space-y-4">
                 <div className="p-3 bg-muted/30 rounded-lg border border-border/50">
                   <div className="mb-3">
-                    <label className="block text-xs font-bold text-muted-foreground uppercase mb-1 print:text-gray-500">Location</label>
+                    <label className="block text-xs font-bold text-muted-foreground uppercase mb-1 print:text-gray-500">{texts.location}</label>
                     <input 
                       type="text" 
                       defaultValue={data.location_name || ''} 
@@ -470,7 +577,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-muted-foreground uppercase mb-1 print:text-gray-500">Adresse</label>
+                    <label className="block text-xs font-bold text-muted-foreground uppercase mb-1 print:text-gray-500">{texts.address}</label>
                     <LocationAutocomplete 
                       value={data.location_address || ''} 
                       onChange={(val) => handleDataChange('location_address', val)}
@@ -517,7 +624,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-muted-foreground uppercase mb-1 print:text-gray-500">Adresse</label>
+                      <label className="block text-xs font-bold text-muted-foreground uppercase mb-1 print:text-gray-500">{texts.address}</label>
                       <LocationAutocomplete 
                         value={loc.address || ''} 
                         onChange={(val) => {
@@ -544,7 +651,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                     }}
                     className="text-primary text-sm font-medium hover:underline flex items-center gap-1 print:hidden w-full justify-center p-2 border border-dashed border-border rounded-lg"
                   >
-                    + Weitere Location
+                    {texts.addLocation}
                   </button>
                 )}
               </div>
@@ -563,7 +670,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                         }`}
                         title="Benötigt Datum & Adresse (Autocomplete)"
                       >
-                        {isWeatherLoading ? 'Lade...' : 'Auto-Fill'}
+                        {isWeatherLoading ? texts.loading : texts.autoFill}
                       </button>
                     )}
                   </div>
@@ -594,7 +701,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                         }`}
                         title="Sucht das nächste Krankenhaus via Koordinaten"
                       >
-                        {isHospitalLoading ? 'Suche...' : 'Auto-Fill'}
+                        {isHospitalLoading ? texts.searching : texts.autoFill}
                       </button>
                     )}
                   </div>
@@ -615,7 +722,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
 
                 <div className="mt-4 pt-2 border-t border-border/20">
                   <label className="block text-xs font-bold text-muted-foreground uppercase mb-1 print:text-gray-500">
-                    Location Hinweise
+                    {texts.locationNotes}
                   </label>
                   <textarea 
                     defaultValue={data.location_notes || ''} 
@@ -634,7 +741,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                     <div>
                       <div className="flex items-center justify-between mb-1">
                         <label className="block text-xs font-bold text-muted-foreground uppercase flex items-center gap-1 print:text-gray-500">
-                          <Icon path="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" className="w-3 h-3" /> Wetter {loc.name ? `(${loc.name})` : ''}
+                          <Icon path="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" className="w-3 h-3" /> {texts.weather} {loc.name ? `(${loc.name})` : ''}
                         </label>
                         {isAdminOrPJM && (
                           <button 
@@ -644,7 +751,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                             }`}
                             title="Benötigt Datum & Adresse (Autocomplete)"
                           >
-                            {isWeatherLoading ? 'Lade...' : 'Auto-Fill'}
+                            {isWeatherLoading ? texts.loading : texts.autoFill}
                           </button>
                         )}
                       </div>
@@ -667,7 +774,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                     <div>
                       <div className="flex items-center justify-between mb-1">
                         <label className="block text-xs font-bold text-muted-foreground uppercase flex items-center gap-1 text-red-400 print:text-red-600">
-                          <Icon path="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" className="w-3 h-3" /> Nächstes Krankenhaus {loc.name ? `(${loc.name})` : ''}
+                          <Icon path="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" className="w-3 h-3" /> {texts.nearestHospital} {loc.name ? `(${loc.name})` : ''}
                         </label>
                         {isAdminOrPJM && (
                           <button 
@@ -677,7 +784,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                             }`}
                             title="Sucht das nächste Krankenhaus via Koordinaten"
                           >
-                            {isHospitalLoading ? 'Suche...' : 'Auto-Fill'}
+                            {isHospitalLoading ? texts.searching : texts.autoFill}
                           </button>
                         )}
                       </div>
@@ -705,7 +812,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
 
            {/* Job-Titel */}
            <div className="mb-12 print:break-inside-avoid">
-             <label className="block text-xs font-bold text-muted-foreground uppercase mb-1 print:text-gray-500">JOB-TITEL</label>
+             <label className="block text-xs font-bold text-muted-foreground uppercase mb-1 print:text-gray-500">{texts.jobTitle}</label>
              <input 
                type="text" 
                defaultValue={data.job_title || (project ? `${project.project_number} - ${project.title}` : '')} 
@@ -723,10 +830,10 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
              return (
                <div className={`mb-8 print:break-inside-avoid ${catContacts.length === 0 ? 'print:hidden' : ''}`}>
                  <div className="flex justify-between items-end mb-4 border-b border-border pb-2 print-heading-wrapper">
-                   <h2 className="text-lg font-bold text-foreground print:text-black uppercase">Kunde</h2>
+                   <h2 className="text-lg font-bold text-foreground print:text-black uppercase">{texts.contactKunde}</h2>
                    {isAdminOrPJM && (
                      <button onClick={() => createContactMutation.mutate({ name: 'Neuer Kontakt', role: 'Rolle', category: 'kunde' as any, phone: '', order_index: catContacts.length })} className="text-primary text-sm font-medium hover:underline print:hidden">
-                       + Hinzufügen
+                       {texts.add}
                      </button>
                    )}
                  </div>
@@ -749,7 +856,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                              defaultValue={contact.role || ''} 
                              onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { role: e.target.value } })}
                              className="text-muted-foreground bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-1/2 text-right italic print:p-0"
-                             placeholder="Rolle..."
+                             placeholder={texts.rolePlaceholder}
                              disabled={!isAdminOrPJM}
                            />
                          </div>
@@ -759,7 +866,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                              defaultValue={contact.phone || ''} 
                              onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { phone: e.target.value } })}
                              className="text-sm bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-1/2 print:p-0"
-                             placeholder="Tel..."
+                             placeholder={texts.telPlaceholder}
                              disabled={!isAdminOrPJM}
                            />
                            <input 
@@ -767,7 +874,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                              defaultValue={contact.email || ''} 
                              onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { email: e.target.value } })}
                              className="text-sm text-primary bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-1/2 text-right print:p-0"
-                             placeholder="Email..."
+                             placeholder={texts.emailPlaceholder}
                              disabled={!isAdminOrPJM}
                            />
                          </div>
@@ -788,7 +895,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                      </div>
                    ))}
                    {catContacts.length === 0 && (
-                     <div className="text-sm text-muted-foreground italic print:hidden col-span-2">Keine Einträge in Kunde</div>
+                     <div className="text-sm text-muted-foreground italic print:hidden col-span-2">{texts.noEntriesIn} Kunde</div>
                    )}
                  </div>
                </div>
@@ -804,10 +911,10 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
              return (
                <div className={`mb-8 print:break-inside-avoid ${catContacts.length === 0 ? 'print:hidden' : ''}`}>
                  <div className="flex justify-between items-end mb-4 border-b border-border pb-2 print-heading-wrapper">
-                   <h2 className="text-lg font-bold text-foreground print:text-black uppercase">Darsteller</h2>
+                   <h2 className="text-lg font-bold text-foreground print:text-black uppercase">{texts.contactDarsteller}</h2>
                    {isAdminOrPJM && (
                      <button onClick={() => createContactMutation.mutate({ name: 'Neuer Kontakt', role: 'Rolle', category: 'darsteller' as any, phone: '', order_index: catContacts.length })} className="text-primary text-sm font-medium hover:underline print:hidden">
-                       + Hinzufügen
+                       {texts.add}
                      </button>
                    )}
                  </div>
@@ -830,7 +937,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                              defaultValue={contact.role || ''} 
                              onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { role: e.target.value } })}
                              className="text-muted-foreground bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-1/2 text-right italic print:p-0"
-                             placeholder="Rolle..."
+                             placeholder={texts.rolePlaceholder}
                              disabled={!isAdminOrPJM}
                            />
                          </div>
@@ -840,7 +947,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                              defaultValue={contact.phone || ''} 
                              onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { phone: e.target.value } })}
                              className="text-sm bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-1/2 print:p-0"
-                             placeholder="Tel..."
+                             placeholder={texts.telPlaceholder}
                              disabled={!isAdminOrPJM}
                            />
                            <input 
@@ -848,7 +955,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                              defaultValue={contact.email || ''} 
                              onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { email: e.target.value } })}
                              className="text-sm text-primary bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-1/2 text-right print:p-0"
-                             placeholder="Email..."
+                             placeholder={texts.emailPlaceholder}
                              disabled={!isAdminOrPJM}
                            />
                          </div>
@@ -869,7 +976,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                      </div>
                    ))}
                    {catContacts.length === 0 && (
-                     <div className="text-sm text-muted-foreground italic print:hidden col-span-2">Keine Einträge in Darsteller</div>
+                     <div className="text-sm text-muted-foreground italic print:hidden col-span-2">{texts.noEntriesIn} Darsteller</div>
                    )}
                  </div>
                </div>
@@ -883,10 +990,10 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
              return (
                <div className={`mb-8 print:break-inside-avoid ${catContacts.length === 0 ? 'print:hidden' : ''}`}>
                  <div className="flex justify-between items-end mb-4 border-b border-border pb-2 print-heading-wrapper">
-                   <h2 className="text-lg font-bold text-foreground print:text-black uppercase">BTS</h2>
+                   <h2 className="text-lg font-bold text-foreground print:text-black uppercase">{texts.contactBts}</h2>
                    {isAdminOrPJM && (
                      <button onClick={() => createContactMutation.mutate({ name: 'Neuer Kontakt', role: 'Rolle', category: 'bts' as any, phone: '', order_index: catContacts.length })} className="text-primary text-sm font-medium hover:underline print:hidden">
-                       + Hinzufügen
+                       {texts.add}
                      </button>
                    )}
                  </div>
@@ -909,7 +1016,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                              defaultValue={contact.role || ''} 
                              onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { role: e.target.value } })}
                              className="text-muted-foreground bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-1/2 text-right italic print:p-0"
-                             placeholder="Rolle..."
+                             placeholder={texts.rolePlaceholder}
                              disabled={!isAdminOrPJM}
                            />
                          </div>
@@ -919,7 +1026,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                              defaultValue={contact.phone || ''} 
                              onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { phone: e.target.value } })}
                              className="text-sm bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-1/2 print:p-0"
-                             placeholder="Tel..."
+                             placeholder={texts.telPlaceholder}
                              disabled={!isAdminOrPJM}
                            />
                            <input 
@@ -927,7 +1034,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                              defaultValue={contact.email || ''} 
                              onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { email: e.target.value } })}
                              className="text-sm text-primary bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-1/2 text-right print:p-0"
-                             placeholder="Email..."
+                             placeholder={texts.emailPlaceholder}
                              disabled={!isAdminOrPJM}
                            />
                          </div>
@@ -948,7 +1055,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                      </div>
                    ))}
                    {catContacts.length === 0 && (
-                     <div className="text-sm text-muted-foreground italic print:hidden col-span-2">Keine Einträge in BTS</div>
+                     <div className="text-sm text-muted-foreground italic print:hidden col-span-2">{texts.noEntriesIn} BTS</div>
                    )}
                  </div>
                </div>
@@ -962,10 +1069,10 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
              return (
                <div className={`mb-8 print:break-inside-avoid ${catContacts.length === 0 ? 'print:hidden' : ''}`}>
                  <div className="flex justify-between items-end mb-4 border-b border-border pb-2 print-heading-wrapper">
-                   <h2 className="text-lg font-bold text-foreground print:text-black uppercase">Crew</h2>
+                   <h2 className="text-lg font-bold text-foreground print:text-black uppercase">{texts.contactCrew}</h2>
                    {isAdminOrPJM && (
                      <button onClick={() => createContactMutation.mutate({ name: 'Neuer Kontakt', role: 'Rolle', category: 'crew' as any, phone: '', order_index: catContacts.length })} className="text-primary text-sm font-medium hover:underline print:hidden">
-                       + Hinzufügen
+                       {texts.add}
                      </button>
                    )}
                  </div>
@@ -988,7 +1095,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                              defaultValue={contact.role || ''} 
                              onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { role: e.target.value } })}
                              className="text-muted-foreground bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-1/2 text-right italic print:p-0"
-                             placeholder="Rolle..."
+                             placeholder={texts.rolePlaceholder}
                              disabled={!isAdminOrPJM}
                            />
                          </div>
@@ -998,7 +1105,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                              defaultValue={contact.phone || ''} 
                              onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { phone: e.target.value } })}
                              className="text-sm bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-1/2 print:p-0"
-                             placeholder="Tel..."
+                             placeholder={texts.telPlaceholder}
                              disabled={!isAdminOrPJM}
                            />
                            <input 
@@ -1006,7 +1113,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                              defaultValue={contact.email || ''} 
                              onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { email: e.target.value } })}
                              className="text-sm text-primary bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-1/2 text-right print:p-0"
-                             placeholder="Email..."
+                             placeholder={texts.emailPlaceholder}
                              disabled={!isAdminOrPJM}
                            />
                          </div>
@@ -1027,7 +1134,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                      </div>
                    ))}
                    {catContacts.length === 0 && (
-                     <div className="text-sm text-muted-foreground italic print:hidden col-span-2">Keine Einträge in Crew</div>
+                     <div className="text-sm text-muted-foreground italic print:hidden col-span-2">{texts.noEntriesIn} Crew</div>
                    )}
                  </div>
                </div>
@@ -1041,7 +1148,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                    <td colSpan={6} className="pb-4">
                      <div className="flex justify-between items-end border-b border-border pb-2 print-heading-wrapper">
                        <h2 className="text-xl font-bold text-foreground print:text-black uppercase">
-                         ABLAUFPLAN
+                         {texts.schedule}
                        </h2>
                        {isAdminOrPJM && (
                          <button onClick={() => {
@@ -1065,14 +1172,14 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                            }
                            createScheduleMutation.mutate({ time_start: nextTime, scene_name: 'Neuer Eintrag' });
                          }} className="text-primary text-sm font-medium hover:underline print:hidden">
-                           + Eintrag hinzufügen
+                           {texts.addEntry}
                          </button>
                        )}
                      </div>
                    </td>
                  </tr>
                   <tr className="text-xs uppercase text-muted-foreground print:text-gray-500">
-                    <th className="py-2 w-20">Wann (Zeit)</th>
+                    <th className="py-2 w-20">{texts.time}</th>
                     <th className="py-2">Was</th>
                     <th className="py-2 w-48">Wer</th>
                     <th className="py-2 w-48">Wo (Location)</th>
@@ -1159,11 +1266,11 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
            {/* Anfahrt & Parken */}
            <div className="mb-12">
              <div className="flex justify-between items-end mb-4 border-b border-border pb-2 print:break-inside-avoid print-heading-wrapper">
-               <h2 className="text-xl font-bold text-foreground print:text-black">ANFAHRT & PARKEN</h2>
+               <h2 className="text-xl font-bold text-foreground print:text-black">{texts.directionsAndParking}</h2>
              </div>
              {(() => {
                 if (allLocations.filter(loc => loc.address).length === 0) {
-                  return <p className="text-muted-foreground italic print:break-inside-avoid">Bitte Adresse oben eingeben, um die Karte zu laden.</p>;
+                  return <p className="text-muted-foreground italic print:break-inside-avoid">{texts.addressPrompt}</p>;
                 }
                 
                 return (
@@ -1192,11 +1299,11 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
 
            {/* Anreise */}
            <div className="mb-12 print:break-inside-avoid">
-             <h2 className="text-xl font-bold text-foreground uppercase mb-4 print:text-black border-b border-border pb-2 print-heading-wrapper">ANREISE</h2>
+             <h2 className="text-xl font-bold text-foreground uppercase mb-4 print:text-black border-b border-border pb-2 print-heading-wrapper">{texts.travel}</h2>
              <textarea 
                defaultValue={data.directions_notes || ''} 
                onBlur={(e) => handleDataChange('directions_notes', e.target.value)}
-               placeholder="Hinweise zur Anfahrt, Parkmöglichkeiten..."
+               placeholder={texts.directionsPlaceholder}
                className="w-full bg-transparent border border-transparent hover:border-border focus:border-primary rounded p-2 focus:outline-none min-h-[100px] print:border-none print:p-0"
                disabled={!isAdminOrPJM}
              />
