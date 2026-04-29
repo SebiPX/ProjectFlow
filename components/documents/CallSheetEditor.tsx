@@ -709,7 +709,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
              if (!isAdminOrPJM && catContacts.length === 0) return null;
              return (
                <div className="mb-8 print:break-inside-avoid">
-                 <div className="flex justify-between items-end mb-4 border-b border-border pb-2">
+                 <div className="flex justify-between items-end mb-4 border-b border-border pb-2 print-heading-wrapper">
                    <h2 className="text-lg font-bold text-foreground print:text-black uppercase">Kunde</h2>
                    {isAdminOrPJM && (
                      <button onClick={() => createContactMutation.mutate({ name: 'Neuer Kontakt', role: 'Rolle', category: 'kunde' as any, phone: '', order_index: catContacts.length })} className="text-primary text-sm font-medium hover:underline print:hidden">
@@ -801,7 +801,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
              if (!isAdminOrPJM && catContacts.length === 0) return null;
              return (
                <div className="mb-8 print:break-inside-avoid">
-                 <div className="flex justify-between items-end mb-4 border-b border-border pb-2">
+                 <div className="flex justify-between items-end mb-4 border-b border-border pb-2 print-heading-wrapper">
                    <h2 className="text-lg font-bold text-foreground print:text-black uppercase">Darsteller</h2>
                    {isAdminOrPJM && (
                      <button onClick={() => createContactMutation.mutate({ name: 'Neuer Kontakt', role: 'Rolle', category: 'darsteller' as any, phone: '', order_index: catContacts.length })} className="text-primary text-sm font-medium hover:underline print:hidden">
@@ -880,7 +880,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
              if (!isAdminOrPJM && catContacts.length === 0) return null;
              return (
                <div className="mb-8 print:break-inside-avoid">
-                 <div className="flex justify-between items-end mb-4 border-b border-border pb-2">
+                 <div className="flex justify-between items-end mb-4 border-b border-border pb-2 print-heading-wrapper">
                    <h2 className="text-lg font-bold text-foreground print:text-black uppercase">BTS</h2>
                    {isAdminOrPJM && (
                      <button onClick={() => createContactMutation.mutate({ name: 'Neuer Kontakt', role: 'Rolle', category: 'bts' as any, phone: '', order_index: catContacts.length })} className="text-primary text-sm font-medium hover:underline print:hidden">
@@ -959,7 +959,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
              if (!isAdminOrPJM && catContacts.length === 0) return null;
              return (
                <div className="mb-8 print:break-inside-avoid">
-                 <div className="flex justify-between items-end mb-4 border-b border-border pb-2">
+                 <div className="flex justify-between items-end mb-4 border-b border-border pb-2 print-heading-wrapper">
                    <h2 className="text-lg font-bold text-foreground print:text-black uppercase">Crew</h2>
                    {isAdminOrPJM && (
                      <button onClick={() => createContactMutation.mutate({ name: 'Neuer Kontakt', role: 'Rolle', category: 'crew' as any, phone: '', order_index: catContacts.length })} className="text-primary text-sm font-medium hover:underline print:hidden">
@@ -1037,7 +1037,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                <thead className="print:table-header-group">
                  <tr>
                    <td colSpan={6} className="pb-4">
-                     <div className="flex justify-between items-end border-b border-border pb-2">
+                     <div className="flex justify-between items-end border-b border-border pb-2 print-heading-wrapper">
                        <h2 className="text-xl font-bold text-foreground print:text-black uppercase">
                          ABLAUFPLAN
                        </h2>
@@ -1156,7 +1156,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
 
            {/* Anfahrt & Parken */}
            <div className="mb-12">
-             <div className="flex justify-between items-end mb-4 border-b border-border pb-2 print:break-inside-avoid">
+             <div className="flex justify-between items-end mb-4 border-b border-border pb-2 print:break-inside-avoid print-heading-wrapper">
                <h2 className="text-xl font-bold text-foreground print:text-black">ANFAHRT & PARKEN</h2>
              </div>
              {(() => {
@@ -1190,7 +1190,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
 
            {/* Anreise */}
            <div className="mb-12 print:break-inside-avoid">
-             <h2 className="text-xl font-bold text-foreground uppercase mb-4 print:text-black border-b border-border pb-2">ANREISE</h2>
+             <h2 className="text-xl font-bold text-foreground uppercase mb-4 print:text-black border-b border-border pb-2 print-heading-wrapper">ANREISE</h2>
              <textarea 
                defaultValue={data.directions_notes || ''} 
                onBlur={(e) => handleDataChange('directions_notes', e.target.value)}

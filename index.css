@@ -93,4 +93,11 @@
   * {
     overflow: visible !important;
   }
+
+  /* Prevent headings from being left alone at the bottom of a printed page */
+  h1, h2, h3, h4, h5, h6,
+  .print-heading-wrapper {
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+  }
 }
