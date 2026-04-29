@@ -33,14 +33,7 @@ export const PackingListEditor: React.FC<PackingListEditorProps> = ({ documentId
   });
 
   const updateTitleMutation = useMutation({
-    mutationFn: (newTitle: string) => fetch(`/api/agency/documents/${documentId}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      },
-      body: JSON.stringify({ title: newTitle })
-    }),
+    mutationFn: (newTitle: string) => updateDocumentTitle(documentId, newTitle),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['document', documentId] });
       queryClient.invalidateQueries({ queryKey: ['documents'] }); // Invalidate all documents list
