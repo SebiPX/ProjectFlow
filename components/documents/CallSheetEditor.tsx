@@ -998,7 +998,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                              type="text" 
                              defaultValue={contact.role || ''} 
                              onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { role: e.target.value } })}
-                             className="text-muted-foreground bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-1/2 text-right italic print:p-0"
+                             className="text-muted-foreground bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-[40%] text-right italic print:p-0"
                              placeholder={texts.rolePlaceholder}
                              disabled={!isAdminOrPJM}
                            />
@@ -1008,7 +1008,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                              type="text" 
                              defaultValue={contact.phone || ''} 
                              onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { phone: e.target.value } })}
-                             className="text-sm bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-1/2 print:p-0"
+                             className="text-sm bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-[35%] print:p-0"
                              placeholder={texts.telPlaceholder}
                              disabled={!isAdminOrPJM}
                            />
@@ -1016,7 +1016,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                              type="text" 
                              defaultValue={contact.email || ''} 
                              onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { email: e.target.value } })}
-                             className="text-sm text-primary bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-1/2 text-right print:p-0"
+                             className="text-sm text-primary bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-[65%] text-right print:p-0"
                              placeholder={texts.emailPlaceholder}
                              disabled={!isAdminOrPJM}
                            />
@@ -1079,7 +1079,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                              type="text" 
                              defaultValue={contact.role || ''} 
                              onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { role: e.target.value } })}
-                             className="text-muted-foreground bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-1/2 text-right italic print:p-0"
+                             className="text-muted-foreground bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-[40%] text-right italic print:p-0"
                              placeholder={texts.rolePlaceholder}
                              disabled={!isAdminOrPJM}
                            />
@@ -1089,7 +1089,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                              type="text" 
                              defaultValue={contact.phone || ''} 
                              onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { phone: e.target.value } })}
-                             className="text-sm bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-1/2 print:p-0"
+                             className="text-sm bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-[35%] print:p-0"
                              placeholder={texts.telPlaceholder}
                              disabled={!isAdminOrPJM}
                            />
@@ -1097,7 +1097,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                              type="text" 
                              defaultValue={contact.email || ''} 
                              onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { email: e.target.value } })}
-                             className="text-sm text-primary bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-1/2 text-right print:p-0"
+                             className="text-sm text-primary bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-[65%] text-right print:p-0"
                              placeholder={texts.emailPlaceholder}
                              disabled={!isAdminOrPJM}
                            />
@@ -1158,7 +1158,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                              type="text" 
                              defaultValue={contact.role || ''} 
                              onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { role: e.target.value } })}
-                             className="text-muted-foreground bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-1/2 text-right italic print:p-0"
+                             className="text-muted-foreground bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-[40%] text-right italic print:p-0"
                              placeholder={texts.rolePlaceholder}
                              disabled={!isAdminOrPJM}
                            />
@@ -1168,7 +1168,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                              type="text" 
                              defaultValue={contact.phone || ''} 
                              onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { phone: e.target.value } })}
-                             className="text-sm bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-1/2 print:p-0"
+                             className="text-sm bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-[35%] print:p-0"
                              placeholder={texts.telPlaceholder}
                              disabled={!isAdminOrPJM}
                            />
@@ -1176,7 +1176,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                              type="text" 
                              defaultValue={contact.email || ''} 
                              onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { email: e.target.value } })}
-                             className="text-sm text-primary bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-1/2 text-right print:p-0"
+                             className="text-sm text-primary bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-[65%] text-right print:p-0"
                              placeholder={texts.emailPlaceholder}
                              disabled={!isAdminOrPJM}
                            />
@@ -1237,7 +1237,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                              type="text" 
                              defaultValue={contact.role || ''} 
                              onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { role: e.target.value } })}
-                             className="text-muted-foreground bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-1/2 text-right italic print:p-0"
+                             className="text-muted-foreground bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-[40%] text-right italic print:p-0"
                              placeholder={texts.rolePlaceholder}
                              disabled={!isAdminOrPJM}
                            />
@@ -1247,7 +1247,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                              type="text" 
                              defaultValue={contact.phone || ''} 
                              onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { phone: e.target.value } })}
-                             className="text-sm bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-1/2 print:p-0"
+                             className="text-sm bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-[35%] print:p-0"
                              placeholder={texts.telPlaceholder}
                              disabled={!isAdminOrPJM}
                            />
@@ -1255,7 +1255,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                              type="text" 
                              defaultValue={contact.email || ''} 
                              onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { email: e.target.value } })}
-                             className="text-sm text-primary bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-1/2 text-right print:p-0"
+                             className="text-sm text-primary bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-[65%] text-right print:p-0"
                              placeholder={texts.emailPlaceholder}
                              disabled={!isAdminOrPJM}
                            />

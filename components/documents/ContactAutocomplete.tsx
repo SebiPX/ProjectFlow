@@ -78,7 +78,7 @@ export const ContactAutocomplete: React.FC<ContactAutocompleteProps> = ({
   }, [query, profiles, freelancers, clientContacts]);
 
   return (
-    <div className="relative w-1/2" ref={wrapperRef}>
+    <div className="relative w-[60%]" ref={wrapperRef}>
       <input
         type="text"
         value={query}
