@@ -53,9 +53,9 @@ export const MultiPersonSelect: React.FC<MultiPersonSelectProps> = ({ value, onC
         {selectedNames.length === 0 ? (
           <span className="text-muted-foreground text-sm">Wer...</span>
         ) : (
-          selectedNames.map(name => (
+          selectedNames.map((name, index) => (
             <span key={name} className="bg-primary/10 text-primary text-xs px-2 py-0.5 rounded print:bg-transparent print:p-0 print:text-black">
-              {name}
+              {name}{index < selectedNames.length - 1 && <span className="hidden print:inline">, </span>}
               {!disabled && (
                 <button 
                   onClick={(e) => { e.stopPropagation(); toggleName(name); }} 

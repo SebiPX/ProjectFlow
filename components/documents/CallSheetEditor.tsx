@@ -1003,12 +1003,12 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                              disabled={!isAdminOrPJM}
                            />
                          </div>
-                         <div className="flex gap-2 items-start">
+                         <div className="flex flex-col mt-1">
                            <input 
                              type="text" 
                              defaultValue={contact.phone || ''} 
                              onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { phone: e.target.value } })}
-                             className="text-sm bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-2/5 print:p-0"
+                             className="text-sm bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-full print:p-0 mb-1"
                              placeholder={texts.telPlaceholder}
                              disabled={!isAdminOrPJM}
                            />
@@ -1016,7 +1016,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                              rows={1}
                              defaultValue={contact.email || ''} 
                              onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { email: e.target.value } })}
-                             className="text-sm text-primary bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-3/5 text-right resize-none overflow-hidden print:p-0"
+                             className="text-sm text-primary bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-full resize-none overflow-hidden print:p-0"
                              placeholder={texts.emailPlaceholder}
                              disabled={!isAdminOrPJM}
                            />
@@ -1084,12 +1084,12 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                              disabled={!isAdminOrPJM}
                            />
                          </div>
-                         <div className="flex gap-2 items-start">
+                         <div className="flex flex-col mt-1">
                            <input 
                              type="text" 
                              defaultValue={contact.phone || ''} 
                              onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { phone: e.target.value } })}
-                             className="text-sm bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-2/5 print:p-0"
+                             className="text-sm bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-full print:p-0 mb-1"
                              placeholder={texts.telPlaceholder}
                              disabled={!isAdminOrPJM}
                            />
@@ -1097,7 +1097,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                              rows={1}
                              defaultValue={contact.email || ''} 
                              onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { email: e.target.value } })}
-                             className="text-sm text-primary bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-3/5 text-right resize-none overflow-hidden print:p-0"
+                             className="text-sm text-primary bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-full resize-none overflow-hidden print:p-0"
                              placeholder={texts.emailPlaceholder}
                              disabled={!isAdminOrPJM}
                            />
@@ -1163,12 +1163,12 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                              disabled={!isAdminOrPJM}
                            />
                          </div>
-                         <div className="flex gap-2 items-start">
+                         <div className="flex flex-col mt-1">
                            <input 
                              type="text" 
                              defaultValue={contact.phone || ''} 
                              onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { phone: e.target.value } })}
-                             className="text-sm bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-2/5 print:p-0"
+                             className="text-sm bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-full print:p-0 mb-1"
                              placeholder={texts.telPlaceholder}
                              disabled={!isAdminOrPJM}
                            />
@@ -1176,7 +1176,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                              rows={1}
                              defaultValue={contact.email || ''} 
                              onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { email: e.target.value } })}
-                             className="text-sm text-primary bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-3/5 text-right resize-none overflow-hidden print:p-0"
+                             className="text-sm text-primary bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-full resize-none overflow-hidden print:p-0"
                              placeholder={texts.emailPlaceholder}
                              disabled={!isAdminOrPJM}
                            />
@@ -1242,12 +1242,12 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                              disabled={!isAdminOrPJM}
                            />
                          </div>
-                         <div className="flex gap-2 items-start">
+                         <div className="flex flex-col mt-1">
                            <input 
                              type="text" 
                              defaultValue={contact.phone || ''} 
                              onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { phone: e.target.value } })}
-                             className="text-sm bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-2/5 print:p-0"
+                             className="text-sm bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-full print:p-0 mb-1"
                              placeholder={texts.telPlaceholder}
                              disabled={!isAdminOrPJM}
                            />
@@ -1255,7 +1255,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                              rows={1}
                              defaultValue={contact.email || ''} 
                              onBlur={(e) => updateContactMutation.mutate({ id: contact.id, data: { email: e.target.value } })}
-                             className="text-sm text-primary bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-3/5 text-right resize-none overflow-hidden print:p-0"
+                             className="text-sm text-primary bg-transparent focus:ring-1 focus:ring-primary rounded outline-none w-full resize-none overflow-hidden print:p-0"
                              placeholder={texts.emailPlaceholder}
                              disabled={!isAdminOrPJM}
                            />
