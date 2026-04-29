@@ -35,15 +35,20 @@ export interface CallSheetLocation {
   address: string;
   lat?: string;
   lng?: string;
+  phone?: string;
+  website?: string;
 }
 
 export interface CallSheetData {
   document_id: string;
   shoot_date?: string;
+  timezone?: string;
   location_name: string;
   location_address: string;
   location_lat?: string;
   location_lng?: string;
+  location_phone?: string;
+  location_website?: string;
   weather_info: string;
   hospital_info: string;
   general_notes: string;

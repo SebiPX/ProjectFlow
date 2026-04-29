@@ -236,15 +236,33 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
 
   const [isHospitalLoading, setIsHospitalLoading] = useState(false);
 
-  const fetchHospital = async (lat: string, lng: string, idx?: number) => {
-    if (!lat || !lng) {
-      toast.error('Bitte erst eine Location (mit Autocomplete) auswählen!');
-      return;
-    }
+  const fetchHospital = async (lat: string | undefined, lng: string | undefined, address: string | undefined, idx?: number) => {
     setIsHospitalLoading(true);
+    let searchLat = lat;
+    let searchLng = lng;
+
     try {
+      if (!searchLat || !searchLng) {
+        if (!address) {
+          toast.error('Bitte erst eine Location eingeben!');
+          setIsHospitalLoading(false);
+          return;
+        }
+        const geoUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address)}&format=json&limit=1`;
+        const geoRes = await fetch(geoUrl);
+        const geoData = await geoRes.json();
+        if (geoData && geoData.length > 0) {
+          searchLat = geoData[0].lat;
+          searchLng = geoData[0].lon;
+        } else {
+          toast.error('Konnte keine Koordinaten für diese Location finden. Bitte genauere Adresse eingeben.');
+          setIsHospitalLoading(false);
+          return;
+        }
+      }
+
       const boxSize = 0.2; // approx 22km radius bounding box
-      const url = `https://nominatim.openstreetmap.org/search?amenity=hospital&format=json&addressdetails=1&viewbox=${parseFloat(lng)-boxSize},${parseFloat(lat)+boxSize},${parseFloat(lng)+boxSize},${parseFloat(lat)-boxSize}&bounded=1&limit=5`;
+      const url = `https://nominatim.openstreetmap.org/search?amenity=hospital&format=json&addressdetails=1&viewbox=${parseFloat(searchLng as string)-boxSize},${parseFloat(searchLat as string)+boxSize},${parseFloat(searchLng as string)+boxSize},${parseFloat(searchLat as string)-boxSize}&bounded=1&limit=5`;
       
       const res = await fetch(url);
       const resData = await res.json();
@@ -348,9 +366,9 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
       addLocation: '+ Weitere Location',
       weather: 'Wetter',
       autoFill: 'Auto-Fill',
-      loading: 'Lade...',
-      searching: 'Suche...',
-      nearestHospital: 'Nächstes Krankenhaus',
+      loading: 'Loading...',
+      searching: 'Searching...',
+      nearestHospital: 'Nearest Hospital',
       locationNotes: 'Location Hinweise',
       jobTitle: 'JOB-TITEL',
       contactKunde: 'Kunde',
@@ -384,7 +402,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
       dateLabel: 'Date:',
       client: 'CLIENT',
       project: 'PROJECT',
-      producer: 'ONSITE PRODUCER',
+      producer: doc.type === 'event_sheet' ? 'EVENT MANAGER' : 'ONSITE PRODUCER',
       location: 'Location',
       address: 'Address',
       addLocation: '+ Add Location',
@@ -601,11 +619,67 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                       disabled={!isAdminOrPJM}
                     />
                   </div>
+                  <div className="flex gap-4 mt-3">
+                    <div className="flex-1">
+                      <label className="block text-xs font-bold text-muted-foreground uppercase mb-1 print:hidden">Phone</label>
+                      <input 
+                        type="text" 
+                        defaultValue={data.location_phone || ''}
+                        onBlur={(e) => handleDataChange('location_phone', e.target.value)}
+                        placeholder="+49 123..."
+                        className="w-full bg-transparent text-sm border-b border-transparent hover:border-border focus:border-primary focus:outline-none pb-1 print:border-none print:p-0"
+                        disabled={!isAdminOrPJM}
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <label className="block text-xs font-bold text-muted-foreground uppercase mb-1 print:hidden">Website</label>
+                      <input 
+                        type="text" 
+                        defaultValue={data.location_website || ''}
+                        onBlur={(e) => handleDataChange('location_website', e.target.value)}
+                        placeholder="www.example.com"
+                        className="w-full bg-transparent text-sm border-b border-transparent hover:border-border focus:border-primary focus:outline-none pb-1 print:border-none print:p-0"
+                        disabled={!isAdminOrPJM}
+                      />
+                    </div>
+                  </div>
                 </div>
 
                 {/* Additional Locations */}
                 {(data.additional_locations || []).map((loc, idx) => (
                   <div key={idx} className="p-3 bg-muted/30 rounded-lg border border-border/50 relative group">
+                    {isAdminOrPJM && (
+                      <div className="absolute -top-3 right-6 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity print:hidden">
+                        {idx > 0 && (
+                          <button 
+                            onClick={() => {
+                              const newLocs = [...(data.additional_locations || [])];
+                              const temp = newLocs[idx - 1];
+                              newLocs[idx - 1] = newLocs[idx];
+                              newLocs[idx] = temp;
+                              handleDataChange('additional_locations', newLocs);
+                            }}
+                            className="bg-background text-foreground p-1.5 rounded-md hover:bg-muted shadow-sm border border-border"
+                          >
+                            <Icon path="M5 15l7-7 7 7" className="w-3 h-3" />
+                          </button>
+                        )}
+                        {idx < (data.additional_locations || []).length - 1 && (
+                          <button 
+                            onClick={() => {
+                              const newLocs = [...(data.additional_locations || [])];
+                              const temp = newLocs[idx + 1];
+                              newLocs[idx + 1] = newLocs[idx];
+                              newLocs[idx] = temp;
+                              handleDataChange('additional_locations', newLocs);
+                            }}
+                            className="bg-background text-foreground p-1.5 rounded-md hover:bg-muted shadow-sm border border-border"
+                          >
+                            <Icon path="M19 9l-7 7-7-7" className="w-3 h-3" />
+                          </button>
+                        )}
+                      </div>
+                    )}
                     {isAdminOrPJM && (
                       <button 
                         onClick={() => {
@@ -613,7 +687,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                           newLocs.splice(idx, 1);
                           handleDataChange('additional_locations', newLocs);
                         }}
-                        className="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity print:hidden shadow-sm"
+                        className="absolute -top-3 -right-2 bg-red-500 text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity print:hidden shadow-sm"
                       >
                         <Icon path="M6 18L18 6M6 6l12 12" className="w-3 h-3" />
                       </button>
@@ -652,6 +726,38 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                         }}
                         disabled={!isAdminOrPJM}
                       />
+                    </div>
+                    <div className="flex gap-4 mt-3">
+                      <div className="flex-1">
+                        <label className="block text-xs font-bold text-muted-foreground uppercase mb-1 print:hidden">Phone</label>
+                        <input 
+                          type="text" 
+                          defaultValue={loc.phone || ''}
+                          onBlur={(e) => {
+                            const newLocs = [...(data.additional_locations || [])];
+                            newLocs[idx] = { ...newLocs[idx], phone: e.target.value };
+                            handleDataChange('additional_locations', newLocs);
+                          }}
+                          placeholder="+49 123..."
+                          className="w-full bg-transparent text-sm border-b border-transparent hover:border-border focus:border-primary focus:outline-none pb-1 print:border-none print:p-0"
+                          disabled={!isAdminOrPJM}
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <label className="block text-xs font-bold text-muted-foreground uppercase mb-1 print:hidden">Website</label>
+                        <input 
+                          type="text" 
+                          defaultValue={loc.website || ''}
+                          onBlur={(e) => {
+                            const newLocs = [...(data.additional_locations || [])];
+                            newLocs[idx] = { ...newLocs[idx], website: e.target.value };
+                            handleDataChange('additional_locations', newLocs);
+                          }}
+                          placeholder="www.example.com"
+                          className="w-full bg-transparent text-sm border-b border-transparent hover:border-border focus:border-primary focus:outline-none pb-1 print:border-none print:p-0"
+                          disabled={!isAdminOrPJM}
+                        />
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -708,11 +814,11 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                     </label>
                     {isAdminOrPJM && (
                       <button 
-                        onClick={() => fetchHospital(data.location_lat as string, data.location_lng as string)}
+                        onClick={() => fetchHospital(data.location_lat, data.location_lng, data.location_address || data.location_name, undefined)}
                         className={`text-[10px] font-bold bg-red-400/10 text-red-400 hover:bg-red-400/20 px-2 rounded print:hidden transition-colors ${
-                          (!data.location_lat || isHospitalLoading) ? 'opacity-50 cursor-pointer' : ''
+                          (!data.location_name && !data.location_address) || isHospitalLoading ? 'opacity-50 cursor-pointer' : ''
                         }`}
-                        title="Sucht das nächste Krankenhaus via Koordinaten"
+                        title="Sucht das nächste Krankenhaus"
                       >
                         {isHospitalLoading ? texts.searching : texts.autoFill}
                       </button>
@@ -791,11 +897,11 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                         </label>
                         {isAdminOrPJM && (
                           <button 
-                            onClick={() => fetchHospital(loc.lat as string, loc.lng as string, idx)}
+                            onClick={() => fetchHospital(loc.lat, loc.lng, loc.address || loc.name, idx)}
                             className={`text-[10px] font-bold bg-red-400/10 text-red-400 hover:bg-red-400/20 px-2 rounded print:hidden transition-colors ${
-                              (!loc.lat || isHospitalLoading) ? 'opacity-50 cursor-pointer' : ''
+                              (!loc.name && !loc.address) || isHospitalLoading ? 'opacity-50 cursor-pointer' : ''
                             }`}
-                            title="Sucht das nächste Krankenhaus via Koordinaten"
+                            title="Sucht das nächste Krankenhaus"
                           >
                             {isHospitalLoading ? texts.searching : texts.autoFill}
                           </button>
@@ -1160,9 +1266,21 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                  <tr>
                    <td colSpan={6} className="pb-4">
                      <div className="flex justify-between items-end border-b border-border pb-2 print-heading-wrapper">
-                       <h2 className="text-xl font-bold text-foreground print:text-black uppercase">
-                         {texts.schedule}
-                       </h2>
+                       <div className="flex items-center gap-4">
+                         <h2 className="text-xl font-bold text-foreground print:text-black uppercase">
+                           {texts.schedule}
+                         </h2>
+                         <div className="flex items-center gap-2">
+                           <span className="text-xs text-muted-foreground uppercase font-bold print:hidden">Timezone:</span>
+                           <input 
+                             type="text" 
+                             defaultValue={data.timezone || 'CET'}
+                             onBlur={(e) => handleDataChange('timezone', e.target.value)}
+                             className="bg-muted/50 border border-transparent hover:border-border focus:border-primary rounded px-2 py-0.5 text-xs font-bold text-foreground uppercase w-20 outline-none print:border-none print:p-0 print:bg-transparent"
+                             placeholder="e.g. CET"
+                           />
+                         </div>
+                       </div>
                        {isAdminOrPJM && (
                          <button onClick={() => {
                            let nextTime = '08:00';
@@ -1324,7 +1442,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
 
            {/* Produktionshinweise */}
            <div className="mb-12 print:break-inside-avoid">
-             <h2 className="text-xl font-bold text-foreground uppercase mb-4 print:text-black border-b border-border pb-2">PRODUKTIONSHINWEISE</h2>
+             <h2 className="text-xl font-bold text-foreground uppercase mb-4 print:text-black border-b border-border pb-2">PRODUCTION NOTES</h2>
              <textarea 
                defaultValue={data.general_notes || ''} 
                onBlur={(e) => handleDataChange('general_notes', e.target.value)}
