@@ -42,7 +42,7 @@ interface ProjectDetailProps {
 type ProjectTab = 'overview' | 'tasks' | 'finances' | 'assets' | 'team' | 'services' | 'documents' | 'cases';
 
 const tabs: { id: ProjectTab; label: string }[] = [
-  { id: 'overview', label: 'Overview' },
+  { id: 'overview', label: 'Briefing' },
   { id: 'tasks', label: 'Tasks' },
   { id: 'finances', label: 'Finances' },
   { id: 'assets', label: 'Assets' },
@@ -698,11 +698,47 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
       case 'overview':
       default:
         return (
-          <div className="p-6 h-full bg-background/50">
+          <div className="p-6 h-full bg-background/50 flex flex-col gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl">
+              <div className="bg-card p-4 rounded-lg border border-border shadow-sm flex items-center gap-3">
+                <div className="p-2 bg-primary/20 text-primary rounded-lg">
+                  <Icon path="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground uppercase font-semibold">Start Date</p>
+                  <p className="text-sm font-medium text-foreground">
+                    {project.start_date ? new Date(project.start_date).toLocaleDateString('de-DE') : 'Not set'}
+                  </p>
+                </div>
+              </div>
+              <div className="bg-card p-4 rounded-lg border border-border shadow-sm flex items-center gap-3">
+                <div className="p-2 bg-red-500/20 text-red-400 rounded-lg">
+                  <Icon path="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground uppercase font-semibold">Due Date</p>
+                  <p className="text-sm font-medium text-foreground">
+                    {project.deadline ? new Date(project.deadline).toLocaleDateString('de-DE') : 'Not set'}
+                  </p>
+                </div>
+              </div>
+              <div className="bg-card p-4 rounded-lg border border-border shadow-sm flex items-center gap-3">
+                <div className="p-2 bg-purple-500/20 text-purple-400 rounded-lg">
+                  <Icon path="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground uppercase font-semibold">Category</p>
+                  <p className="text-sm font-medium text-foreground capitalize">
+                    {project.category ? project.category.replace(/_/g, ' ') : 'Not set'}
+                  </p>
+                </div>
+              </div>
+            </div>
+
             <div className="bg-card p-6 md:p-8 rounded-lg border border-border shadow-sm max-w-4xl">
-              <h2 className="text-xl font-bold text-foreground mb-6">Background / Overview</h2>
+              <h2 className="text-xl font-bold text-foreground mb-6">Briefing</h2>
               <div className="whitespace-pre-wrap text-[15px] leading-relaxed text-foreground/90 font-sans">
-                {project.description || <span className="text-muted-foreground italic">No description provided for this project.</span>}
+                {project.description || <span className="text-muted-foreground italic">No briefing description provided for this project.</span>}
               </div>
             </div>
           </div>
