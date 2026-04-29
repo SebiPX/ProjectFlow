@@ -442,6 +442,29 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
   };
   const texts = t[effectiveLang as 'de' | 'en'];
 
+  const [scheduleFilter, setScheduleFilter] = useState<string>('');
+
+  const allAssignedPersons = useMemo(() => {
+    const personsSet = new Set<string>();
+    schedule.forEach(item => {
+      if (item.persons) {
+        item.persons.split(',').forEach(p => {
+          const trimmed = p.trim();
+          if (trimmed) personsSet.add(trimmed);
+        });
+      }
+    });
+    return Array.from(personsSet).sort();
+  }, [schedule]);
+
+  const filteredSchedule = useMemo(() => {
+    if (!scheduleFilter) return schedule;
+    return schedule.filter(item => {
+      if (!item.persons) return false;
+      const itemPersons = item.persons.split(',').map(p => p.trim());
+      return itemPersons.includes(scheduleFilter);
+    });
+  }, [schedule, scheduleFilter]);
 
   return (
     <div className="flex flex-col h-full bg-background relative print:bg-white print:text-black print:h-auto print:block">
@@ -1280,6 +1303,19 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                              placeholder="e.g. CET"
                            />
                          </div>
+                         <div className="flex items-center gap-2 ml-4 print:hidden">
+                           <span className="text-xs text-muted-foreground uppercase font-bold">Filter:</span>
+                           <select 
+                             value={scheduleFilter}
+                             onChange={(e) => setScheduleFilter(e.target.value)}
+                             className="bg-muted/50 border border-transparent hover:border-border focus:border-primary rounded px-2 py-0.5 text-xs font-bold text-foreground outline-none cursor-pointer max-w-[150px]"
+                           >
+                             <option value="">All / Alle</option>
+                             {allAssignedPersons.map(p => (
+                               <option key={p} value={p}>{p}</option>
+                             ))}
+                           </select>
+                         </div>
                        </div>
                        {isAdminOrPJM && (
                          <button onClick={() => {
@@ -1319,7 +1355,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                   </tr>
                </thead>
                <tbody className="divide-y divide-border/50 print:table-row-group">
-                 {schedule.map(item => (
+                 {filteredSchedule.map(item => (
                    <tr key={item.id} className="group print:break-inside-avoid">
                         <>
                           <td className="py-2 align-middle font-mono">
@@ -1383,7 +1419,7 @@ export const CallSheetEditor: React.FC<CallSheetEditorProps> = ({ documentId, pj
                         </>
                    </tr>
                  ))}
-                 {schedule.length === 0 && (
+                 {filteredSchedule.length === 0 && (
                    <tr>
                      <td colSpan={6} className="py-4 text-muted-foreground italic text-center">
                         Keine Einträge geplant.
