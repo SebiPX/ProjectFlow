@@ -1,19 +1,12 @@
 import React, { useState } from 'react';
 import { useAuth } from '../lib/AuthContext';
 import { toast } from 'react-toastify';
-import { Signup } from './Signup';
 
 export const Login: React.FC = () => {
-  const [showSignup, setShowSignup] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const { signIn } = useAuth();
-
-  // Show signup component if user wants to register
-  if (showSignup) {
-    return <Signup onSwitchToLogin={() => setShowSignup(false)} />;
-  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,26 +90,6 @@ export const Login: React.FC = () => {
               ) : (
                 'Sign In'
               )}
-            </button>
-          </div>
-
-          {/* Demo Credentials Info */}
-          <div className="mt-4 p-4 bg-muted rounded-lg border border-input">
-            <p className="text-xs text-muted-foreground text-center mb-2">Demo Credentials:</p>
-            <p className="text-sm text-muted-foreground text-center">
-              <strong>Email:</strong> alex@agency.com<br />
-              <strong>Password:</strong> Admin123!
-            </p>
-          </div>
-
-          {/* Switch to Signup */}
-          <div className="text-center mt-4">
-            <button
-              type="button"
-              onClick={() => setShowSignup(true)}
-              className="text-sm text-primary hover:text-blue-300 transition-colors"
-            >
-              Don't have an account? Create one
             </button>
           </div>
         </form>

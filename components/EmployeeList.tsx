@@ -4,7 +4,9 @@ import { useAuth } from '../lib/AuthContext';
 import { useQuery } from '@tanstack/react-query';
 import { getInternalProfiles, getTeamDirectory } from '../services/api/profiles';
 import { EmployeeEditModal } from './EmployeeEditModal';
+import { EmployeeCreateModal } from './EmployeeCreateModal';
 import { EmployeeTasksModal } from './EmployeeTasksModal';
+import { queryClient } from '../lib/queryClient';
 import type { Profile } from '../types/supabase';
 import { Card } from './ui/Card';
 import { Icon } from './ui/Icon';
@@ -17,6 +19,7 @@ interface EmployeeListProps {
 export const EmployeeList: React.FC<EmployeeListProps> = ({ searchQuery = '' }) => {
   const [editingEmployee, setEditingEmployee] = useState<Profile | null>(null);
   const [selectedEmployeeForTasks, setSelectedEmployeeForTasks] = useState<Profile | null>(null);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [showOnlineOnly, setShowOnlineOnly] = useState(false);
   const { onlineUsers } = usePresence();
   const { profile } = useAuth();
@@ -77,16 +80,28 @@ export const EmployeeList: React.FC<EmployeeListProps> = ({ searchQuery = '' }) 
           <p className="text-muted-foreground mt-1">{filteredEmployees.length} {showOnlineOnly ? 'online' : ''} employees</p>
         </div>
 
-        <button
-          onClick={() => setShowOnlineOnly(!showOnlineOnly)}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors ${showOnlineOnly
-              ? 'bg-green-500/20 border-green-500 text-green-400'
-              : 'bg-card border-border text-muted-foreground hover:border-input'
-            }`}
-        >
-          <div className={`w-2.5 h-2.5 rounded-full ${showOnlineOnly ? 'bg-green-400' : 'bg-gray-500'}`} />
-          <span className="text-sm font-medium">Online Only</span>
-        </button>
+        <div className="flex gap-4">
+          <button
+            onClick={() => setShowOnlineOnly(!showOnlineOnly)}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors ${showOnlineOnly
+                ? 'bg-green-500/20 border-green-500 text-green-400'
+                : 'bg-card border-border text-muted-foreground hover:border-input'
+              }`}
+          >
+            <div className={`w-2.5 h-2.5 rounded-full ${showOnlineOnly ? 'bg-green-400' : 'bg-gray-500'}`} />
+            <span className="text-sm font-medium">Online Only</span>
+          </button>
+          
+          {isAdmin && (
+            <button
+              onClick={() => setIsCreateModalOpen(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-colors font-medium text-sm shadow-sm"
+            >
+              <Icon path="M12 4v16m8-8H4" className="w-4 h-4" />
+              Neuen Nutzer anlegen
+            </button>
+          )}
+        </div>
       </div>
 
       {filteredEmployees.length === 0 ? (
@@ -160,6 +175,16 @@ export const EmployeeList: React.FC<EmployeeListProps> = ({ searchQuery = '' }) 
           isOpen={!!editingEmployee}
           onClose={() => setEditingEmployee(null)}
           employee={editingEmployee}
+        />
+      )}
+
+      {isCreateModalOpen && (
+        <EmployeeCreateModal
+          isOpen={isCreateModalOpen}
+          onClose={() => setIsCreateModalOpen(false)}
+          onSuccess={() => {
+            queryClient.invalidateQueries({ queryKey: ['employees'] });
+          }}
         />
       )}
 

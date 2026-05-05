@@ -610,3 +610,12 @@ export const timeEntries = {
         request<ApiTimeEntry>(`/api/time-entries/${id}`, { method: 'PUT', body: JSON.stringify(updates) }),
     delete: (id: string) => request<void>(`/api/time-entries/${id}`, { method: 'DELETE' }),
 };
+
+// ── Admin ──────────────────────────────────────────────────────────
+export const admin = {
+    createUser: (data: { email: string; password: string; full_name: string; role: string }) =>
+        request<{ success: boolean; user: any }>('/auth/admin/users', {
+            method: 'POST',
+            body: JSON.stringify(data)
+        })
+};
