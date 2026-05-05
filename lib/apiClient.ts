@@ -44,6 +44,11 @@ async function request<T>(
     if (token) headers['Authorization'] = `Bearer ${token}`;
 
     const res = await fetch(`${API_URL}${path}`, { ...options, headers });
+    
+    if (res.status === 204) {
+        return null as unknown as T;
+    }
+    
     const data = await res.json() as any;
 
     if (!res.ok) {
@@ -192,6 +197,20 @@ export const uploadFile = async (file: File, folder: string = 'uploads'): Promis
     const data = await res.json() as any;
     if (!res.ok) throw new Error(data?.error || 'Upload failed');
     return data.url as string;
+};
+
+export const uploadFileWithKey = async (file: File, folder: string = 'uploads'): Promise<{url: string, key: string}> => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const res = await fetch(`${API_URL}/api/upload?folder=${folder}`, {
+        method: 'POST',
+        headers: getToken() ? { Authorization: `Bearer ${getToken()}` } : {},
+        body: formData,
+    });
+    const data = await res.json() as any;
+    if (!res.ok) throw new Error(data?.error || 'Upload failed');
+    return { url: data.url, key: data.key };
 };
 
 // ── Gemini Proxy ──────────────────────────────────────────────────

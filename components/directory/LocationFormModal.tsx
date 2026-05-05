@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { ApiLocation, ApiLocationAsset, directory, uploadFile, downloadAsset } from '../../lib/apiClient';
+import { ApiLocation, ApiLocationAsset, directory, uploadFileWithKey, downloadAsset } from '../../lib/apiClient';
 import { useAuth } from '../../lib/AuthContext';
 import { X, Save, Trash2, Upload, File as FileIconLucide, Image as ImageIconLucide, Download, Eye } from 'lucide-react';
 import { AssetPreviewModal } from '../AssetPreviewModal';
@@ -106,11 +106,11 @@ export const LocationFormModal: React.FC<LocationFormModalProps> = ({ isOpen, on
         try {
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
-                const storage_path = await uploadFile(file, 'directory_locations');
+                const uploadRes = await uploadFileWithKey(file, 'directory_locations');
                 
                 await directory.locations.assets.create(location.id, {
                     name: file.name,
-                    storage_path,
+                    storage_path: uploadRes.key, // Store the relative key so signed URLs work
                     file_type: file.type || 'application/octet-stream',
                     file_size: file.size,
                 });
