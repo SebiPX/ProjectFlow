@@ -19,7 +19,7 @@ export const PublicAssetReview: React.FC<PublicAssetReviewProps> = ({ assetId })
     getPublicAsset(assetId)
       .then(data => {
         setAsset(data);
-        setFeedback(data.feedback_note || '');
+        setFeedback('');
         setLoading(false);
       })
       .catch(err => {
@@ -37,7 +37,8 @@ export const PublicAssetReview: React.FC<PublicAssetReviewProps> = ({ assetId })
     setSubmitting(true);
     try {
       await submitAssetReview(assetId, status, feedback);
-      setAsset({ ...asset, status, feedback_note: feedback });
+      // Don't overwrite the full asset feedback note on frontend to avoid appending twice if they hit buttons rapidly,
+      // but to show it immediately we could append locally. Let's just setSuccess(true).
       setSuccess(true);
     } catch (err: any) {
       alert('Failed to submit review: ' + err.message);
@@ -180,6 +181,21 @@ export const PublicAssetReview: React.FC<PublicAssetReviewProps> = ({ assetId })
                     <Icon path="M5 13l4 4L19 7" className="w-6 h-6 mb-2" />
                     <span className="font-semibold text-sm text-center">Approve<br/>Asset</span>
                   </button>
+                </div>
+              </div>
+            )}
+
+            {/* Existing Feedback History */}
+            {asset.feedback_note && (
+              <div className="mt-8 border-t border-gray-200 pt-6">
+                <h3 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
+                  <Icon path="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" className="w-4 h-4 text-gray-400" />
+                  Feedback History
+                </h3>
+                <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 max-h-60 overflow-y-auto">
+                  <pre className="whitespace-pre-wrap text-sm text-gray-600 font-sans leading-relaxed">
+                    {asset.feedback_note}
+                  </pre>
                 </div>
               </div>
             )}

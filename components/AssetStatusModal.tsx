@@ -59,14 +59,14 @@ export const AssetStatusModal: React.FC<AssetStatusModalProps> = ({
   const [selectedStatus, setSelectedStatus] = useState<AssetStatus | null>(
     asset?.status || null
   );
-  const [feedbackNote, setFeedbackNote] = useState(asset?.feedback_note || '');
+  const [feedbackNote, setFeedbackNote] = useState('');
   const [loading, setLoading] = useState(false);
 
   // Update selected status when asset changes
   React.useEffect(() => {
     if (asset) {
       setSelectedStatus(asset.status || null);
-      setFeedbackNote(asset.feedback_note || '');
+      setFeedbackNote('');
     }
   }, [asset]);
 
@@ -103,7 +103,7 @@ export const AssetStatusModal: React.FC<AssetStatusModalProps> = ({
 
   const handleClose = () => {
     setSelectedStatus(asset?.status || null);
-    setFeedbackNote(asset?.feedback_note || '');
+    setFeedbackNote('');
     setLoading(false);
     onClose();
   };
@@ -206,6 +206,21 @@ export const AssetStatusModal: React.FC<AssetStatusModalProps> = ({
                 Optional: Add context about this status change (visible to team and client if applicable)
               </p>
             </div>
+
+            {/* Existing Feedback History */}
+            {asset.feedback_note && (
+              <div className="mt-6 border-t border-border pt-4">
+                <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+                  <Icon path="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" className="w-4 h-4 text-muted-foreground" />
+                  Feedback History
+                </h3>
+                <div className="bg-muted/30 border border-border rounded-lg p-4 max-h-40 overflow-y-auto">
+                  <pre className="whitespace-pre-wrap text-sm text-muted-foreground font-sans leading-relaxed">
+                    {asset.feedback_note}
+                  </pre>
+                </div>
+              </div>
+            )}
 
             {/* Action Buttons */}
             <div className="flex justify-end space-x-3 pt-4">
