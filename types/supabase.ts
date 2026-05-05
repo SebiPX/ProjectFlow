@@ -4,6 +4,7 @@ export enum UserRole {
   PJM = 'pjm',
   Creative = 'creative',
   Client = 'client',
+  Freelancer = 'freelancer',
   Guest = 'guest',
 }
 

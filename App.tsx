@@ -63,6 +63,10 @@ const MainApp: React.FC = () => {
   };
 
   const renderContent = () => {
+    if (view === 'finances' && profile?.role === 'freelancer') {
+      return <Dashboard onSelectProject={handleSelectProject} />;
+    }
+
     switch (view) {
       case 'dashboard':
         return profile?.role === 'client'

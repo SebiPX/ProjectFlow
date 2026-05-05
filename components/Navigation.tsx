@@ -126,6 +126,11 @@ export const Navigation: React.FC<NavigationProps> = ({ currentView, onNavigate,
           const allowedClientViews: View[] = ['dashboard', 'projects', 'tasks', 'assets'];
           return allowedClientViews.includes(item.view);
         }
+        if (profile?.role === 'freelancer') {
+          // Hide finances and admin stuff completely, hide clients, etc.
+          const allowedFreelancerViews: View[] = ['dashboard', 'chat', 'projects', 'tasks', 'assets', 'resources', 'cases', 'planning', 'directory-freelancers', 'directory-locations'];
+          return allowedFreelancerViews.includes(item.view);
+        }
         return true;
       })
     };

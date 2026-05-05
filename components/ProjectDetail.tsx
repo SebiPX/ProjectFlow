@@ -58,9 +58,14 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
   const isClient = profile?.role === 'client';
   const isAdminOrPJM = profile?.role === 'admin' || profile?.role === 'pjm';
 
+  const isFreelancer = profile?.role === 'freelancer';
+
   const visibleTabs = tabs.filter(tab => {
     if (isClient) {
       return ['overview', 'tasks', 'assets'].includes(tab.id);
+    }
+    if (isFreelancer) {
+      return ['overview', 'tasks', 'assets', 'team', 'services', 'cases'].includes(tab.id); // hide finances, documents
     }
     return true;
   });
