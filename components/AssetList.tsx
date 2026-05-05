@@ -59,6 +59,16 @@ const AssetCard: React.FC<{
   onPreview: (asset: Asset) => void;
   onChangeStatus: (asset: Asset) => void;
 }> = ({ asset, project, onDownload, onDelete, onSelectProject, onPreview, onChangeStatus }) => {
+  const handleShare = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const url = `${window.location.origin}/?review_asset=${asset.id}`;
+    navigator.clipboard.writeText(url).then(() => {
+      import('react-toastify').then(({ toast }) => {
+        toast.success('Review link copied to clipboard!');
+      });
+    });
+  };
+
   return (
     <Card
       className="hover:border-primary transition-all duration-200 flex flex-col h-full cursor-pointer"
@@ -157,6 +167,15 @@ const AssetCard: React.FC<{
           <Icon path="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" className="w-5 h-5" />
           <span className="text-sm font-medium">Status</span>
         </button>
+        {asset.status === AssetStatus.ClientReview && (
+          <button
+            onClick={handleShare}
+            className="p-2 text-blue-400 hover:text-blue-300 hover:bg-muted rounded-lg transition-colors"
+            title="Copy Review Link"
+          >
+            <Icon path="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" className="w-5 h-5" />
+          </button>
+        )}
         {asset.storage_path && (
           <button
             onClick={(e) => {

@@ -30,6 +30,7 @@ import { ChatView } from './components/chat/ChatView';
 import { ContactsList } from './components/directory/ContactsList';
 import { LocationsList } from './components/directory/LocationsList';
 import { CasesList } from './components/CasesList';
+import { PublicAssetReview } from './components/PublicAssetReview';
 
 export type View = 'dashboard' | 'projects' | 'project-detail' | 'tasks' | 'planning' | 'assets' | 'clients' | 'employees' | 'service-catalog' | 'finances' | 'reports' | 'resources' | 'settings' | 'inventar' | 'verleih' | 'verleih-formular' | 'kalender' | 'logins' | 'handyvertraege' | 'kreditkarten' | 'firmendaten' | 'links' | 'chat' | 'directory-freelancers' | 'directory-locations' | 'cases';
 
@@ -128,6 +129,14 @@ const MainApp: React.FC = () => {
         </div>
       </div>
     );
+  }
+
+  // Check for public review route first
+  const urlParams = new URLSearchParams(window.location.search);
+  const reviewAssetId = urlParams.get('review_asset');
+  
+  if (reviewAssetId) {
+    return <PublicAssetReview assetId={reviewAssetId} />;
   }
 
   // Show login if not authenticated

@@ -127,3 +127,19 @@ export async function downloadAsset(storagePath: string, fileName: string): Prom
   }
 }
 
+/**
+ * Get a public asset by ID (no auth required)
+ */
+export async function getPublicAsset(id: string): Promise<any> {
+  return await fetchApi(`/api/public/assets/${id}`);
+}
+
+/**
+ * Submit an asset review publicly
+ */
+export async function submitAssetReview(id: string, status: string, feedback_note: string): Promise<any> {
+  return await fetchApi(`/api/public/assets/${id}/review`, {
+    method: 'PATCH',
+    body: JSON.stringify({ status, feedback_note }),
+  });
+}
