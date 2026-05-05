@@ -9,6 +9,7 @@ export const LocationsList: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
     const [categoryFilter, setCategoryFilter] = useState('Alle');
+    const [ratingFilter, setRatingFilter] = useState<number>(0);
     
     const [isModalOpen, setModalOpen] = useState(false);
     const [selectedLocation, setSelectedLocation] = useState<ApiLocation | null>(null);
@@ -40,9 +41,10 @@ export const LocationsList: React.FC = () => {
                 [l.name, l.city, l.category, l.notes, l.address]
                 .some(field => field?.toLowerCase().includes(search.toLowerCase()));
             const matchKat = categoryFilter === 'Alle' || l.category === categoryFilter;
-            return matchSearch && matchKat;
+            const matchRating = ratingFilter === 0 || ((l.average_rating || 0) >= ratingFilter);
+            return matchSearch && matchKat && matchRating;
         });
-    }, [locations, search, categoryFilter]);
+    }, [locations, search, categoryFilter, ratingFilter]);
 
     if (loading) {
         return (
@@ -96,6 +98,21 @@ export const LocationsList: React.FC = () => {
                             {cat}
                         </button>
                     ))}
+                </div>
+                <div className="relative">
+                    <select
+                        value={ratingFilter}
+                        onChange={(e) => setRatingFilter(Number(e.target.value))}
+                        className="appearance-none bg-card border border-border rounded-xl pl-4 pr-10 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 text-foreground"
+                    >
+                        <option value={0}>Alle Bewertungen</option>
+                        <option value={5}>⭐⭐⭐⭐⭐ (5 Sterne)</option>
+                        <option value={4}>⭐⭐⭐⭐ und mehr</option>
+                        <option value={3}>⭐⭐⭐ und mehr</option>
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-muted-foreground">
+                        <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                    </div>
                 </div>
             </div>
 
