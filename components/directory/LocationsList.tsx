@@ -2,6 +2,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { directory, ApiLocation } from '../../lib/apiClient';
 import { Building2, Search, MapPin, ExternalLink, Euro, Maximize, Users, Plus, Pencil } from 'lucide-react';
 import { LocationFormModal } from './LocationFormModal';
+import { StarRating } from '../ui/StarRating';
 
 export const LocationsList: React.FC = () => {
     const [locations, setLocations] = useState<ApiLocation[]>([]);
@@ -120,6 +121,18 @@ export const LocationsList: React.FC = () => {
                                 )}
                             </div>
                             
+                            {(loc.average_rating !== undefined && loc.average_rating > 0) && (
+                                <div className="mt-2">
+                                    <StarRating 
+                                        rating={loc.average_rating} 
+                                        readOnly 
+                                        size={14} 
+                                        showCount 
+                                        count={loc.rating_count} 
+                                    />
+                                </div>
+                            )}
+
                             {(loc.city || loc.address) && (
                                 <div className="flex items-start gap-1.5 text-sm text-muted-foreground mt-3">
                                     <MapPin size={15} className="mt-0.5 shrink-0 text-primary/70" />

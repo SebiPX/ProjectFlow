@@ -301,6 +301,8 @@ export interface ApiLocation {
     city?: string;
     country?: string;
     category?: string;
+    average_rating?: number;
+    rating_count?: number;
     created_at: string;
 }
 
@@ -341,6 +343,12 @@ export const directory = {
                 request<ApiLocationAsset>(`/api/directory-locations/${locationId}/assets`, { method: 'POST', body: JSON.stringify(data) }),
             delete: (assetId: string) => 
                 request<void>(`/api/directory-locations/assets/${assetId}`, { method: 'DELETE' })
+        },
+        rate: {
+            get: (locationId: string) =>
+                request<{rating: number | null}>(`/api/directory-locations/${locationId}/rate`),
+            set: (locationId: string, rating: number) =>
+                request<{rating: number}>(`/api/directory-locations/${locationId}/rate`, { method: 'POST', body: JSON.stringify({ rating }) })
         }
     }
 };

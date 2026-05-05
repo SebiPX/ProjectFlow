@@ -3,6 +3,7 @@ import { ApiLocation, ApiLocationAsset, directory, uploadFileWithKey, downloadAs
 import { useAuth } from '../../lib/AuthContext';
 import { X, Save, Trash2, Upload, File as FileIconLucide, Image as ImageIconLucide, Download, Eye } from 'lucide-react';
 import { AssetPreviewModal } from '../AssetPreviewModal';
+import { StarRating } from '../ui/StarRating';
 
 interface LocationFormModalProps {
     isOpen: boolean;
@@ -21,6 +22,10 @@ export const LocationFormModal: React.FC<LocationFormModalProps> = ({ isOpen, on
     const [isSaving, setIsSaving] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
 
+    // Rating state
+    const [userRating, setUserRating] = useState<number>(0);
+    const [isRating, setIsRating] = useState(false);
+
     // Assets state
     const [assets, setAssets] = useState<ApiLocationAsset[]>([]);
     const [isLoadingAssets, setIsLoadingAssets] = useState(false);
@@ -33,16 +38,42 @@ export const LocationFormModal: React.FC<LocationFormModalProps> = ({ isOpen, on
             setFormData({ ...location });
             if (isOpen) {
                 fetchAssets(location.id);
+                fetchRating(location.id);
             }
         } else {
             setFormData({});
             setAssets([]);
+            setUserRating(0);
         }
         if (!isOpen) {
             setActiveTab('details');
             setPreviewAsset(null);
+            setUserRating(0);
         }
     }, [location, isOpen]);
+
+    const fetchRating = async (locationId: string) => {
+        try {
+            const data = await directory.locations.rate.get(locationId);
+            setUserRating(data.rating || 0);
+        } catch (error) {
+            console.error('Failed to fetch user rating:', error);
+        }
+    };
+
+    const handleRate = async (rating: number) => {
+        if (!location?.id) return;
+        setIsRating(true);
+        try {
+            const data = await directory.locations.rate.set(location.id, rating);
+            setUserRating(data.rating);
+            onSave(); // Trigger a refresh in parent list to update average
+        } catch (error) {
+            console.error('Failed to set rating:', error);
+        } finally {
+            setIsRating(false);
+        }
+    };
 
     const fetchAssets = async (locationId: string) => {
         setIsLoadingAssets(true);
@@ -154,7 +185,20 @@ export const LocationFormModal: React.FC<LocationFormModalProps> = ({ isOpen, on
                 <div className="bg-card w-full max-w-2xl rounded-2xl shadow-xl border border-border flex flex-col max-h-[90vh]">
                     <div className="flex flex-col px-6 pt-4 border-b border-border">
                         <div className="flex items-center justify-between mb-4">
-                            <h2 className="text-xl font-bold">{location ? 'Location bearbeiten' : 'Neue Location'}</h2>
+                            <div className="flex items-center gap-4">
+                                <h2 className="text-xl font-bold">{location ? 'Location bearbeiten' : 'Neue Location'}</h2>
+                                {location && (
+                                    <div className="flex flex-col">
+                                        <span className="text-[10px] text-muted-foreground uppercase font-semibold mb-0.5">Ihre Bewertung</span>
+                                        <StarRating 
+                                            rating={userRating} 
+                                            onChange={handleRate} 
+                                            size={18}
+                                            className={isRating ? "opacity-50 pointer-events-none" : ""}
+                                        />
+                                    </div>
+                                )}
+                            </div>
                             <button onClick={onClose} className="p-2 -mr-2 text-muted-foreground hover:text-foreground rounded-full hover:bg-muted transition-colors">
                                 <X size={20} />
                             </button>
