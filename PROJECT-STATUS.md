@@ -493,6 +493,12 @@ Don't try to create RLS policies for admin access to all profiles - use service 
 - ✅ **Manual Contact Sorting**: Project managers and Admins can now arbitrarily reorder contacts using Up/Down arrow indicators, persisting sorting dynamically per contact category natively within PostgreSQL.
 - ✅ **Print-Ready Lists**: Refactored the `MultiPersonSelect` arrays to forcefully re-inject trailing commas when preparing output specifically for PDF Print Modes.
 
+### Completed in v2.8.0 ✅ (May 2026) - PUBLIC ASSET REVIEW & FREELANCER RESTRICTIONS
+
+- ✅ **Public Asset Review**: Clients can now review and approve/reject assets via secure, unauthenticated public UUID links (`?review_asset=id`).
+- ✅ **Asset Feedback History**: Feedback is no longer overwritten. Both internal and client feedback are appended chronologically with timestamps and authors to `feedback_note` to track full review loops.
+- ✅ **Freelancer Hardening**: The `freelancer` profile has been strictly locked down. Freelancers now only see explicitly assigned projects, and all financial data/routes are strictly hidden/blocked (403 Forbidden).
+
 1. **Integrations & Export (Phase 2)**
    - [x] Automation email notifications (Edge Functions)
    - [ ] API for external tool integration
