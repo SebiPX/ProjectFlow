@@ -21,7 +21,8 @@ export const AssetUploadModal: React.FC<AssetUploadModalProps> = ({
   const queryClient = useQueryClient();
   const { profile } = useAuth();
 
-  const [file, setFile] = useState<File | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
+  const [bundleLink, setBundleLink] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -43,29 +44,47 @@ export const AssetUploadModal: React.FC<AssetUploadModalProps> = ({
   // Upload mutation
   const uploadMutation = useMutation({
     mutationFn: async () => {
-      if (!file) throw new Error('No file selected');
+      if (files.length === 0) throw new Error('No files selected');
       if (!profile) throw new Error('User not authenticated');
 
-      return uploadAsset(file, {
-        name: formData.name || file.name,
-        description: formData.description || null,
-        category: formData.category,
-        status: formData.status,
-        project_id: formData.project_id,
-        uploaded_by: profile.id,
-        is_visible_to_client: formData.is_visible_to_client,
-        is_physical: formData.is_physical,
-        location: formData.location || null,
-        feedback_note: null,
-      });
+      const uploadedAssets = await Promise.all(
+        files.map((fileItem, index) => {
+          let assetName = fileItem.name;
+          if (formData.name) {
+            assetName = files.length > 1 ? `${formData.name} - ${index + 1}` : formData.name;
+          }
+
+          return uploadAsset(fileItem, {
+            name: assetName,
+            description: formData.description || null,
+            category: formData.category,
+            status: formData.status,
+            project_id: formData.project_id,
+            uploaded_by: profile.id,
+            is_visible_to_client: formData.is_visible_to_client,
+            is_physical: formData.is_physical,
+            location: formData.location || null,
+            feedback_note: null,
+          });
+        })
+      );
+      return uploadedAssets;
     },
-    onSuccess: () => {
+    onSuccess: (uploadedAssets) => {
       queryClient.invalidateQueries({ queryKey: ['assets'] });
       if (formData.project_id) {
         queryClient.invalidateQueries({ queryKey: ['assets', formData.project_id] });
       }
-      toast.success('Asset uploaded successfully!');
-      handleClose();
+      
+      if (uploadedAssets.length > 1) {
+        const bundleIds = uploadedAssets.map(a => a.id).join(',');
+        const link = `${window.location.origin}/?review_assets=${bundleIds}`;
+        setBundleLink(link);
+        toast.success(`${uploadedAssets.length} assets uploaded successfully!`);
+      } else {
+        toast.success('Asset uploaded successfully!');
+        handleClose();
+      }
     },
     onError: (error: any) => {
       toast.error(`Failed to upload asset: ${error.message}`);
@@ -73,7 +92,8 @@ export const AssetUploadModal: React.FC<AssetUploadModalProps> = ({
   });
 
   const handleClose = () => {
-    setFile(null);
+    setFiles([]);
+    setBundleLink(null);
     setFormData({
       name: '',
       description: '',
@@ -88,12 +108,14 @@ export const AssetUploadModal: React.FC<AssetUploadModalProps> = ({
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0];
-    if (selectedFile) {
-      setFile(selectedFile);
-      // Auto-fill name if empty
-      if (!formData.name) {
-        setFormData({ ...formData, name: selectedFile.name });
+    if (e.target.files && e.target.files.length > 0) {
+      const selectedFiles = Array.from(e.target.files);
+      setFiles(selectedFiles);
+      // Auto-fill name if empty and only one file
+      if (!formData.name && selectedFiles.length === 1) {
+        setFormData({ ...formData, name: selectedFiles[0].name });
+      } else if (!formData.name && selectedFiles.length > 1) {
+        setFormData({ ...formData, name: 'Bundle Upload' });
       }
     }
   };
@@ -101,8 +123,8 @@ export const AssetUploadModal: React.FC<AssetUploadModalProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!file) {
-      toast.error('Please select a file to upload');
+    if (files.length === 0) {
+      toast.error('Please select at least one file to upload');
       return;
     }
 
@@ -121,7 +143,9 @@ export const AssetUploadModal: React.FC<AssetUploadModalProps> = ({
       <div className="bg-card rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex justify-between items-center p-6 border-b border-border">
-          <h2 className="text-2xl font-bold text-foreground">Upload Asset</h2>
+          <h2 className="text-2xl font-bold text-foreground">
+            {bundleLink ? 'Upload Complete' : 'Upload Asset'}
+          </h2>
           <button
             onClick={handleClose}
             className="text-muted-foreground hover:text-foreground transition-colors"
@@ -131,8 +155,41 @@ export const AssetUploadModal: React.FC<AssetUploadModalProps> = ({
           </button>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        {bundleLink ? (
+          <div className="p-6 space-y-6 text-center">
+            <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Icon path="M5 13l4 4L19 7" className="w-8 h-8 text-green-400" />
+            </div>
+            <h3 className="text-xl font-bold text-foreground">Bundle Link Ready!</h3>
+            <p className="text-muted-foreground">Your assets have been grouped into a bundle. You can share this link for review.</p>
+            
+            <div className="flex items-center gap-2 mt-4 bg-muted p-2 rounded-lg border border-border">
+              <input 
+                type="text" 
+                readOnly 
+                value={bundleLink} 
+                className="bg-transparent flex-1 outline-none text-sm text-foreground px-2"
+              />
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(bundleLink);
+                  toast.success('Bundle link copied to clipboard!');
+                }}
+                className="bg-primary text-primary-foreground px-4 py-2 rounded font-medium hover:bg-primary/90 transition"
+              >
+                Copy Link
+              </button>
+            </div>
+            
+            <button
+              onClick={handleClose}
+              className="mt-6 px-6 py-2 bg-muted hover:bg-muted/80 text-foreground rounded-lg transition-colors w-full"
+            >
+              Done
+            </button>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {/* File Input */}
           <div>
             <label className="block text-sm font-medium text-muted-foreground mb-2">
@@ -148,11 +205,13 @@ export const AssetUploadModal: React.FC<AssetUploadModalProps> = ({
                     path="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
                     className="w-10 h-10 mb-3 text-muted-foreground"
                   />
-                  {file ? (
+                  {files.length > 0 ? (
                     <div className="text-center">
-                      <p className="text-sm text-green-400 font-medium">{file.name}</p>
+                      <p className="text-sm text-green-400 font-medium">
+                        {files.length === 1 ? files[0].name : `${files.length} files selected`}
+                      </p>
                       <p className="text-xs text-muted-foreground mt-1">
-                        {(file.size / 1024 / 1024).toFixed(2)} MB
+                        {(files.reduce((acc, f) => acc + f.size, 0) / 1024 / 1024).toFixed(2)} MB total
                       </p>
                     </div>
                   ) : (
@@ -169,6 +228,7 @@ export const AssetUploadModal: React.FC<AssetUploadModalProps> = ({
                 <input
                   id="file-upload"
                   type="file"
+                  multiple
                   className="hidden"
                   onChange={handleFileChange}
                   disabled={uploadMutation.isPending}
@@ -204,12 +264,12 @@ export const AssetUploadModal: React.FC<AssetUploadModalProps> = ({
           {/* Asset Name */}
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-muted-foreground mb-2">
-              Asset Name *
+              Asset Name {files.length <= 1 && '*'}
             </label>
             <input
               type="text"
               id="name"
-              required
+              required={files.length <= 1}
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
@@ -368,12 +428,13 @@ export const AssetUploadModal: React.FC<AssetUploadModalProps> = ({
               ) : (
                 <>
                   <Icon path="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" className="w-5 h-5" />
-                  Upload Asset
+                  Upload {files.length > 1 ? 'Assets' : 'Asset'}
                 </>
               )}
             </button>
           </div>
         </form>
+        )}
       </div>
     </div>
   );

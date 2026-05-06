@@ -138,8 +138,11 @@ const MainApp: React.FC = () => {
   // Check for public review route first
   const urlParams = new URLSearchParams(window.location.search);
   const reviewAssetId = urlParams.get('review_asset');
+  const reviewAssetIds = urlParams.get('review_assets');
   
-  if (reviewAssetId) {
+  if (reviewAssetIds) {
+    return <PublicAssetReview assetIds={reviewAssetIds.split(',')} />;
+  } else if (reviewAssetId) {
     return <PublicAssetReview assetId={reviewAssetId} />;
   }
 

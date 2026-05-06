@@ -4,29 +4,53 @@ import { Icon } from './ui/Icon';
 import { FileIcon } from './ui/FileIcon';
 
 interface PublicAssetReviewProps {
-  assetId: string;
+  assetId?: string;
+  assetIds?: string[];
 }
 
-export const PublicAssetReview: React.FC<PublicAssetReviewProps> = ({ assetId }) => {
-  const [asset, setAsset] = useState<any>(null);
+export const PublicAssetReview: React.FC<PublicAssetReviewProps> = ({ assetId, assetIds }) => {
+  const [assets, setAssets] = useState<any[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [feedback, setFeedback] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const [success, setSuccess] = useState(false);
+  const [successStatus, setSuccessStatus] = useState<Record<string, boolean>>({});
+
+  const idsToFetch = assetIds || (assetId ? [assetId] : []);
 
   useEffect(() => {
-    getPublicAsset(assetId)
-      .then(data => {
-        setAsset(data);
+    if (idsToFetch.length === 0) {
+      setError('No assets specified');
+      setLoading(false);
+      return;
+    }
+
+    Promise.all(idsToFetch.map(id => getPublicAsset(id)))
+      .then(dataArray => {
+        setAssets(dataArray.filter(Boolean));
         setFeedback('');
         setLoading(false);
       })
       .catch(err => {
-        setError(err.message || 'Failed to load asset');
+        setError(err.message || 'Failed to load assets');
         setLoading(false);
       });
-  }, [assetId]);
+  }, [idsToFetch.join(',')]);
+
+  const handleNext = () => {
+    if (currentIndex < assets.length - 1) {
+      setCurrentIndex(prev => prev + 1);
+      setFeedback('');
+    }
+  };
+
+  const handlePrev = () => {
+    if (currentIndex > 0) {
+      setCurrentIndex(prev => prev - 1);
+      setFeedback('');
+    }
+  };
 
   const handleSubmit = async (status: string) => {
     if (!feedback.trim() && status === 'changes_requested') {
@@ -34,12 +58,13 @@ export const PublicAssetReview: React.FC<PublicAssetReviewProps> = ({ assetId })
       return;
     }
 
+    const currentAsset = assets[currentIndex];
+    if (!currentAsset) return;
+
     setSubmitting(true);
     try {
-      await submitAssetReview(assetId, status, feedback);
-      // Don't overwrite the full asset feedback note on frontend to avoid appending twice if they hit buttons rapidly,
-      // but to show it immediately we could append locally. Let's just setSuccess(true).
-      setSuccess(true);
+      await submitAssetReview(currentAsset.id, status, feedback);
+      setSuccessStatus(prev => ({ ...prev, [currentAsset.id]: true }));
     } catch (err: any) {
       alert('Failed to submit review: ' + err.message);
     } finally {
@@ -55,7 +80,7 @@ export const PublicAssetReview: React.FC<PublicAssetReviewProps> = ({ assetId })
     );
   }
 
-  if (error || !asset) {
+  if (error || assets.length === 0) {
     return (
       <div className="min-h-screen bg-[#f3f4f6] flex items-center justify-center p-4">
         <div className="bg-white p-8 rounded-2xl shadow-sm text-center max-w-md w-full">
@@ -69,11 +94,16 @@ export const PublicAssetReview: React.FC<PublicAssetReviewProps> = ({ assetId })
     );
   }
 
+  const asset = assets[currentIndex];
+  const isSuccess = asset ? successStatus[asset.id] : false;
+
   // Use file_url from our new backend endpoint which fetches a presigned url if possible
-  const previewUrl = asset.file_url || asset.storage_path;
-  const isImage = asset.file_type?.startsWith('image/') || asset.name?.match(/\.(jpg|jpeg|png|gif|webp)$/i);
-  const isVideo = asset.file_type?.startsWith('video/') || asset.name?.match(/\.(mp4|webm|mov)$/i);
-  const isPdf = asset.file_type === 'application/pdf' || asset.name?.endsWith('.pdf');
+  const previewUrl = asset?.file_url || asset?.storage_path;
+  const isImage = asset?.file_type?.startsWith('image/') || asset?.name?.match(/\.(jpg|jpeg|png|gif|webp)$/i);
+  const isVideo = asset?.file_type?.startsWith('video/') || asset?.name?.match(/\.(mp4|webm|mov)$/i);
+  const isPdf = asset?.file_type === 'application/pdf' || asset?.name?.endsWith('.pdf');
+
+  if (!asset) return null;
 
   return (
     <div className="min-h-screen bg-[#f3f4f6] flex flex-col items-center">
@@ -115,6 +145,33 @@ export const PublicAssetReview: React.FC<PublicAssetReviewProps> = ({ assetId })
             )}
           </div>
           
+          {/* Navigation for multiple assets */}
+          {assets.length > 1 && (
+            <div className="flex items-center justify-between p-3 bg-white border-b border-gray-100">
+              <button 
+                onClick={handlePrev} 
+                disabled={currentIndex === 0}
+                className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium rounded-lg hover:bg-gray-100 disabled:opacity-50 transition"
+              >
+                <Icon path="M15 19l-7-7 7-7" className="w-4 h-4" />
+                Previous
+              </button>
+              <div className="flex items-center gap-1">
+                {assets.map((_, idx) => (
+                  <div key={idx} className={`w-2 h-2 rounded-full ${idx === currentIndex ? 'bg-primary' : 'bg-gray-300'}`} />
+                ))}
+              </div>
+              <button 
+                onClick={handleNext} 
+                disabled={currentIndex === assets.length - 1}
+                className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium rounded-lg hover:bg-gray-100 disabled:opacity-50 transition"
+              >
+                Next
+                <Icon path="M9 5l7 7-7 7" className="w-4 h-4" />
+              </button>
+            </div>
+          )}
+
           <div className="flex-1 bg-[#f8fafc] flex items-center justify-center p-4 relative min-h-[500px]">
             {isImage ? (
               <img src={previewUrl} alt={asset.name} className="max-w-full max-h-[700px] object-contain rounded shadow-sm" />
@@ -142,13 +199,21 @@ export const PublicAssetReview: React.FC<PublicAssetReviewProps> = ({ assetId })
               Please review the asset and let us know if it's approved or if you need changes.
             </p>
 
-            {success ? (
+            {isSuccess ? (
               <div className="bg-green-50 border border-green-200 rounded-xl p-6 text-center">
                 <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
                   <Icon path="M5 13l4 4L19 7" className="w-6 h-6 text-green-600" />
                 </div>
                 <h4 className="font-bold text-green-900 mb-1">Feedback Submitted</h4>
-                <p className="text-green-700 text-sm">Thank you! Your feedback has been sent to the team.</p>
+                <p className="text-green-700 text-sm">Thank you! Your feedback for this asset has been sent.</p>
+                {assets.length > 1 && currentIndex < assets.length - 1 && (
+                  <button
+                    onClick={handleNext}
+                    className="mt-4 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition"
+                  >
+                    Review Next Asset
+                  </button>
+                )}
               </div>
             ) : (
               <div className="space-y-4">
