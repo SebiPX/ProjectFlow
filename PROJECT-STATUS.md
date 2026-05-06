@@ -1,8 +1,8 @@
 # AgencyFlow - Project Status Report
 
-**Last Updated:** March 6, 2026 (Evening)
+**Last Updated:** May 06, 2026
 **Status:** ✅ Production Ready (Self-Hosted PSQL + Express.js)
-**Version:** 2.1.0
+**Version:** 2.9.0
 
 ---
 
@@ -499,6 +499,13 @@ Don't try to create RLS policies for admin access to all profiles - use service 
 - ✅ **Asset Feedback History**: Feedback is no longer overwritten. Both internal and client feedback are appended chronologically with timestamps and authors to `feedback_note` to track full review loops.
 - ✅ **Freelancer Hardening**: The `freelancer` profile has been strictly locked down. Freelancers now only see explicitly assigned projects, and all financial data/routes are strictly hidden/blocked (403 Forbidden).
 
+### Completed in v2.9.0 ✅ (May 2026) - BUNDLE UPLOADS & ASSET MANAGEMENT
+
+- ✅ **Bundle Uploads**: Users can now select and upload multiple files simultaneously via the `AssetUploadModal`.
+- ✅ **Bundle Review Links**: Immediately after a multi-upload, the system generates a consolidated public review link (`?review_assets=id1,id2`) allowing clients to review all files within a single gallery view.
+- ✅ **Unrestricted Public Access**: The backend API (`labs-api`) was updated to allow public access to assets regardless of their current status, making the Share Link universally functional.
+- ✅ **Inline Asset Renaming**: Double-clicking an asset name or clicking the edit icon in the AssetCard now allows for rapid inline renaming, persisted directly to the database.
+
 1. **Integrations & Export (Phase 2)**
    - [x] Automation email notifications (Edge Functions)
    - [ ] API for external tool integration
@@ -542,6 +549,7 @@ Don't try to create RLS policies for admin access to all profiles - use service 
 - ✅ **NEW: Real-time Notifications Feedback Loop**
 - ✅ **NEW: Client Portal with restricted asset/finance visibility**
 - ✅ **NEW: Functional Drag-and-Drop Kanban for Assets**
+- ✅ **NEW: Multi-Asset Bundle Uploads & Review Gallery**
 - ✅ **NEW: Complete Docker/VPS Deployment Setup**
 - ✅ All core features implemented (CRUD, uploads, previews)
 - ✅ Finance management with cost tracking & billable hours

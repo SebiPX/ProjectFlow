@@ -318,6 +318,23 @@ This app aims to increase efficiency, improve transparency for internal teams an
 | Live Time Tracking  | ✅ 100% | PX-Flow timesheet submissions push directly to MOCO billing     |
 | Resource & Absences | ✅ 100% | MOCO Vacations and Sick Days accurately render in Planner       |
 
+### New in v2.8.0
+
+| Feature                | Status  | Notes                                                           |
+| ---------------------- | ------- | --------------------------------------------------------------- |
+| Public Asset Review    | ✅ 100% | Review assets securely via public URLs without authentication   |
+| Asset Feedback History | ✅ 100% | Chronological history of internal and client feedback logs      |
+| Freelancer Hardening   | ✅ 100% | Strict restrictions on financial and project data visibility    |
+
+### New in v2.9.0
+
+| Feature                 | Status  | Notes                                                           |
+| ----------------------- | ------- | --------------------------------------------------------------- |
+| Bundle Asset Uploads    | ✅ 100% | Select and upload multiple files simultaneously                 |
+| Bundle Review Links     | ✅ 100% | Unified gallery review link for multi-uploaded assets           |
+| Unrestricted Previews   | ✅ 100% | Public link accessible independent of internal status           |
+| Inline Asset Renaming   | ✅ 100% | Rapid editing of asset names directly in the card or list       |
+
 ---
 
 ## 🚀 Quick Start
