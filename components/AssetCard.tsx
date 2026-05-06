@@ -26,6 +26,16 @@ export const AssetCard: React.FC<AssetCardProps> = ({
 }) => {
     const [imageUrl, setImageUrl] = useState<string | null>(null);
 
+    const handleShare = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        const url = `${window.location.origin}/?review_asset=${asset.id}`;
+        navigator.clipboard.writeText(url).then(() => {
+            import('react-toastify').then(({ toast }) => {
+                toast.success('Review link copied to clipboard!');
+            });
+        });
+    };
+
     useEffect(() => {
         if (asset.storage_path && asset.file_type?.startsWith('image/')) {
             getAssetSignedUrl(asset.storage_path)
@@ -97,6 +107,13 @@ export const AssetCard: React.FC<AssetCardProps> = ({
                                 <Icon path="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" className="w-4 h-4" />
                             </button>
                         )}
+                        <button
+                            onClick={handleShare}
+                            className="p-1.5 text-blue-400 hover:text-blue-300 hover:bg-muted rounded transition-colors"
+                            title="Copy Review Link"
+                        >
+                            <Icon path="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" className="w-4 h-4" />
+                        </button>
                         <button
                             onClick={(e) => {
                                 e.stopPropagation();
