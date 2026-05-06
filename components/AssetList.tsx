@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import type { Project, Asset } from '../types/supabase';
 import { AssetStatus, AssetType } from '../types/supabase';
-import { getAssets, downloadAsset, deleteAsset } from '../services/api/assets';
+import { getAssets, downloadAsset, deleteAsset, updateAsset } from '../services/api/assets';
 import { getProjects } from '../services/api/projects';
 import { useAuth } from '../lib/AuthContext';
 import { AssetUploadModal } from './AssetUploadModal';
@@ -58,7 +58,14 @@ const AssetCard: React.FC<{
   onSelectProject: (project: Project) => void;
   onPreview: (asset: Asset) => void;
   onChangeStatus: (asset: Asset) => void;
-}> = ({ asset, project, onDownload, onDelete, onSelectProject, onPreview, onChangeStatus }) => {
+  onRename: (id: string, newName: string) => void;
+}> = ({ asset, project, onDownload, onDelete, onSelectProject, onPreview, onChangeStatus, onRename }) => {
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [editName, setEditName] = useState(asset.name || '');
+
+  useEffect(() => {
+    setEditName(asset.name || '');
+  }, [asset.name]);
   const handleShare = (e: React.MouseEvent) => {
     e.stopPropagation();
     const url = `${window.location.origin}/?review_asset=${asset.id}`;
@@ -82,10 +89,50 @@ const AssetCard: React.FC<{
             fileName={asset.name}
             className="w-12 h-12 flex-shrink-0"
           />
-          <div className="flex-1 min-w-0">
-            <h3 className="text-lg font-bold text-foreground mb-1 line-clamp-2 break-words">
-              {asset.name}
-            </h3>
+          <div className="flex-1 min-w-0 group/name">
+            {isEditingName ? (
+              <div className="flex items-center gap-2 mb-1" onClick={e => e.stopPropagation()}>
+                <input
+                  type="text"
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  className="bg-background text-foreground border border-input rounded px-2 py-1 text-sm w-full focus:outline-none focus:ring-1 focus:ring-primary"
+                  autoFocus
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      if (editName.trim() && editName !== asset.name) {
+                        onRename(asset.id, editName.trim());
+                      }
+                      setIsEditingName(false);
+                    } else if (e.key === 'Escape') {
+                      setIsEditingName(false);
+                      setEditName(asset.name || '');
+                    }
+                  }}
+                  onBlur={() => {
+                    if (editName.trim() && editName !== asset.name) {
+                      onRename(asset.id, editName.trim());
+                    }
+                    setIsEditingName(false);
+                  }}
+                />
+              </div>
+            ) : (
+              <h3 
+                className="text-lg font-bold text-foreground mb-1 line-clamp-2 break-words flex items-center gap-2"
+                onDoubleClick={(e) => { e.stopPropagation(); setIsEditingName(true); }}
+                title="Double-click to rename"
+              >
+                {asset.name}
+                <button
+                  onClick={(e) => { e.stopPropagation(); setIsEditingName(true); }}
+                  className="opacity-0 group-hover/name:opacity-100 text-muted-foreground hover:text-foreground transition-opacity"
+                  title="Rename Asset"
+                >
+                  <Icon path="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" className="w-4 h-4" />
+                </button>
+              </h3>
+            )}
             {asset.file_size && (
               <span className="text-xs text-muted-foreground">
                 {formatFileSize(asset.file_size)}
@@ -238,6 +285,18 @@ export const AssetList: React.FC<AssetListProps> = ({ onSelectProject, searchQue
     },
     onError: (error: any) => {
       toast.error(`Failed to delete asset: ${error.message}`);
+    },
+  });
+
+  // Rename mutation
+  const renameMutation = useMutation({
+    mutationFn: ({ id, name }: { id: string; name: string }) => updateAsset(id, { name }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['assets'] });
+      toast.success('Asset renamed successfully!');
+    },
+    onError: (error: any) => {
+      toast.error(`Failed to rename asset: ${error.message}`);
     },
   });
 
@@ -552,6 +611,7 @@ export const AssetList: React.FC<AssetListProps> = ({ onSelectProject, searchQue
                 onSelectProject={onSelectProject}
                 onPreview={setPreviewAsset}
                 onChangeStatus={setStatusModalAsset}
+                onRename={(id, name) => renameMutation.mutate({ id, name })}
               />
             );
           })}

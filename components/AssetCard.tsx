@@ -11,6 +11,7 @@ interface AssetCardProps {
     onDelete: (id: string, name: string) => void;
     onClick: () => void;
     onChangeStatus: (asset: Asset) => void;
+    onRename?: (id: string, newName: string) => void;
     className?: string;
     style?: React.CSSProperties;
 }
@@ -21,10 +22,17 @@ export const AssetCard: React.FC<AssetCardProps> = ({
     onDelete,
     onClick,
     onChangeStatus,
+    onRename,
     className = '',
     style
 }) => {
     const [imageUrl, setImageUrl] = useState<string | null>(null);
+    const [isEditingName, setIsEditingName] = useState(false);
+    const [editName, setEditName] = useState(asset.name || '');
+
+    useEffect(() => {
+        setEditName(asset.name || '');
+    }, [asset.name]);
 
     const handleShare = (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -46,7 +54,7 @@ export const AssetCard: React.FC<AssetCardProps> = ({
 
     return (
         <div
-            className={`bg-card rounded-lg overflow-hidden hover:bg-gray-750 transition-colors cursor-pointer ${className}`}
+            className={`bg-card rounded-lg overflow-hidden hover:bg-gray-750 transition-colors cursor-pointer group/card ${className}`}
             onClick={onClick}
             style={style}
         >
@@ -77,9 +85,51 @@ export const AssetCard: React.FC<AssetCardProps> = ({
 
             {/* Content Area */}
             <div className="p-4">
-                <h3 className="font-semibold text-foreground text-base mb-1 truncate" title={asset.name}>
-                    {asset.name}
-                </h3>
+                {isEditingName ? (
+                    <div className="flex items-center gap-2 mb-1" onClick={e => e.stopPropagation()}>
+                        <input
+                            type="text"
+                            value={editName}
+                            onChange={(e) => setEditName(e.target.value)}
+                            className="bg-background text-foreground border border-input rounded px-2 py-1 text-sm w-full focus:outline-none focus:ring-1 focus:ring-primary"
+                            autoFocus
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    if (editName.trim() && editName !== asset.name && onRename) {
+                                        onRename(asset.id, editName.trim());
+                                    }
+                                    setIsEditingName(false);
+                                } else if (e.key === 'Escape') {
+                                    setIsEditingName(false);
+                                    setEditName(asset.name || '');
+                                }
+                            }}
+                            onBlur={() => {
+                                if (editName.trim() && editName !== asset.name && onRename) {
+                                    onRename(asset.id, editName.trim());
+                                }
+                                setIsEditingName(false);
+                            }}
+                        />
+                    </div>
+                ) : (
+                    <h3 
+                        className="font-semibold text-foreground text-base mb-1 truncate flex items-center justify-between group-hover/card:text-primary transition-colors" 
+                        onDoubleClick={(e) => { e.stopPropagation(); setIsEditingName(true); }}
+                        title="Double-click to rename"
+                    >
+                        <span className="truncate">{asset.name}</span>
+                        {onRename && (
+                            <button
+                                onClick={(e) => { e.stopPropagation(); setIsEditingName(true); }}
+                                className="opacity-0 group-hover/card:opacity-100 text-muted-foreground hover:text-foreground transition-opacity ml-2 flex-shrink-0"
+                                title="Rename Asset"
+                            >
+                                <Icon path="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" className="w-4 h-4" />
+                            </button>
+                        )}
+                    </h3>
+                )}
                 <p className="text-xs text-muted-foreground mb-2">
                     {asset.category} • {((asset.file_size || 0) / 1024).toFixed(1)} KB
                 </p>

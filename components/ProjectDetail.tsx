@@ -153,6 +153,23 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
     updateAssetStatusMutation.mutate({ id: assetId, status: newStatus });
   };
 
+  // Asset Rename Mutation
+  const renameAssetMutation = useMutation({
+    mutationFn: ({ id, name }: { id: string; name: string }) =>
+      updateAsset(id, { name }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['assets', project.id] });
+      toast.success('Asset renamed successfully!');
+    },
+    onError: (error: any) => {
+      toast.error(`Failed to rename asset: ${error.message}`);
+    }
+  });
+
+  const handleRenameAsset = (assetId: string, newName: string) => {
+    renameAssetMutation.mutate({ id: assetId, name: newName });
+  };
+
   // Task Status Update Mutation
   const updateTaskStatusMutation = useMutation({
     mutationFn: ({ id, status }: { id: string; status: any }) =>
@@ -347,6 +364,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
                 onDelete={handleDeleteAsset}
                 onPreview={(asset) => setPreviewAsset(asset)}
                 onChangeStatus={setStatusModalAsset}
+                onRename={handleRenameAsset}
               />
             </div>
           </div>

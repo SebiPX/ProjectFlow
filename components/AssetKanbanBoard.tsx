@@ -33,6 +33,7 @@ interface AssetKanbanBoardProps {
     onDelete: (id: string) => void;
     onPreview: (asset: Asset) => void;
     onChangeStatus: (asset: Asset) => void;
+    onRename?: (id: string, newName: string) => void;
 }
 
 const SortableAssetItem = ({ asset, ...props }: { asset: Asset } & any) => {
@@ -110,6 +111,7 @@ export const AssetKanbanBoard: React.FC<AssetKanbanBoardProps> = ({
     onDelete,
     onPreview,
     onChangeStatus,
+    onRename,
 }) => {
     const { profile } = useAuth();
     const isClient = profile?.role === 'client';
@@ -191,7 +193,7 @@ export const AssetKanbanBoard: React.FC<AssetKanbanBoardProps> = ({
                         id={col.id}
                         title={col.title}
                         assets={assets.filter(a => a.status === col.id)}
-                        assetCardProps={{ onDownload, onDelete, onPreview, onChangeStatus }}
+                        assetCardProps={{ onDownload, onDelete, onPreview, onChangeStatus, onRename }}
                         isClient={isClient}
                     />
                 ))}
@@ -227,6 +229,7 @@ const KanbanDroppableColumn = ({ id, items, assetCardProps, isClient }: any) => 
                         onDelete={assetCardProps.onDelete}
                         onClick={() => assetCardProps.onPreview(asset)}
                         onChangeStatus={assetCardProps.onChangeStatus}
+                        onRename={assetCardProps.onRename}
                         disabled={isClient} // optional prop if we want to visualize disabled state
                     />
                 ))}
