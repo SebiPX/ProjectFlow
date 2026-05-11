@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
-import { updateClient, uploadClientLogo, updateClientLogo, deleteClientLogo, getClientLogoSignedUrl } from '../services/api/clients';
+import { updateClient, uploadClientLogo, updateClientLogo, deleteClientLogo, getClientLogoSignedUrl, manageClientLogin, revokeClientLogin } from '../services/api/clients';
 import {
   getClientContacts,
   createClientContact,
@@ -10,7 +10,6 @@ import {
 } from '../services/api/clientContacts';
 import type { Client, ClientContact } from '../types/supabase';
 import { Icon } from './ui/Icon';
-import { createClientLogin } from '../services/api/clients';
 import CreatableSelect from 'react-select/creatable';
 
 interface ClientEditModalProps {
@@ -27,6 +26,9 @@ interface ContactFormData {
   phone: string;
   is_primary: boolean;
   notes: string;
+  has_login?: boolean;
+  original_has_login?: boolean;
+  password?: string;
   isNew?: boolean;
   isDeleted?: boolean;
 }
@@ -47,9 +49,6 @@ export const ClientEditModal: React.FC<ClientEditModalProps> = ({ isOpen, onClos
 
   const [contacts, setContacts] = useState<ContactFormData[]>([]);
   
-  const [generatedCredentials, setGeneratedCredentials] = useState<{email: string, password: string} | null>(null);
-  const [isGeneratingLogin, setIsGeneratingLogin] = useState<string | null>(null);
-
   // Logo state
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
@@ -88,6 +87,9 @@ export const ClientEditModal: React.FC<ClientEditModalProps> = ({ isOpen, onClos
           phone: c.phone || '',
           is_primary: c.is_primary || false,
           notes: c.notes || '',
+          has_login: (c as any).has_login || false,
+          original_has_login: (c as any).has_login || false,
+          password: '',
           isNew: false,
         })));
       } else {
@@ -99,6 +101,8 @@ export const ClientEditModal: React.FC<ClientEditModalProps> = ({ isOpen, onClos
           phone: '',
           is_primary: true,
           notes: '',
+          has_login: false,
+          password: '',
           isNew: true,
         }]);
       }
@@ -212,15 +216,29 @@ export const ClientEditModal: React.FC<ClientEditModalProps> = ({ isOpen, onClos
           notes: contact.notes.trim() || null,
         };
 
+        let currentContactId = contact.id;
+
         if (contact.isNew) {
           // Create new contact
-          await createClientContact({
+          const newContact = await createClientContact({
             client_id: client.id,
             ...contactData,
           });
+          currentContactId = newContact.id;
         } else if (contact.id) {
           // Update existing contact
           await updateClientContact(contact.id, contactData);
+        }
+
+        // Manage Login
+        if (currentContactId && contact.email) {
+          if (contact.has_login && contact.password) {
+            // Needs to create or update password
+            await manageClientLogin(currentContactId, contact.password);
+          } else if (!contact.has_login && contact.original_has_login) {
+            // Access was revoked
+            await revokeClientLogin(currentContactId);
+          }
         }
       }
 
@@ -243,6 +261,8 @@ export const ClientEditModal: React.FC<ClientEditModalProps> = ({ isOpen, onClos
         phone: '',
         is_primary: false,
         notes: '',
+        has_login: false,
+        password: '',
         isNew: true,
       },
     ]);
@@ -273,31 +293,6 @@ export const ClientEditModal: React.FC<ClientEditModalProps> = ({ isOpen, onClos
     }
 
     setContacts(updated);
-  };
-
-  const handleCreateLogin = async (contactId: string | undefined, contactEmail: string) => {
-    if (!contactId || !contactEmail) return;
-    setIsGeneratingLogin(contactId);
-    try {
-      const res = await createClientLogin(contactId);
-      if (res.success && res.credentials) {
-        setGeneratedCredentials(res.credentials);
-        toast.success('Client login generated successfully!');
-      } else {
-        toast.error('Failed to generate login.');
-      }
-    } catch (err: any) {
-      toast.error(err.message || 'Error generating login');
-    } finally {
-      setIsGeneratingLogin(null);
-    }
-  };
-
-  const copyCredentials = () => {
-    if (!generatedCredentials) return;
-    const text = `Guten Tag,\n\nhier ist Ihr Zugang für das PX-Flow Kundenportal:\n\nLink: ${window.location.origin}/login\nEmail: ${generatedCredentials.email}\nPasswort: ${generatedCredentials.password}\n\nBitte bewahren Sie diese Zugangsdaten sicher auf.`;
-    navigator.clipboard.writeText(text);
-    toast.success('Zugangsdaten kopiert!');
   };
 
   if (!isOpen) return null;
@@ -586,21 +581,6 @@ export const ClientEditModal: React.FC<ClientEditModalProps> = ({ isOpen, onClos
                           <span className="ml-2 text-xs text-primary">(Existing)</span>
                         )}
                       </h4>
-                      {!contact.isNew && contact.id && contact.email && (
-                        <button
-                          type="button"
-                          onClick={() => handleCreateLogin(contact.id, contact.email)}
-                          disabled={isGeneratingLogin === contact.id}
-                          className="mt-2 flex items-center gap-1 text-xs text-[#E5FF00] hover:text-[#cce600] transition-colors disabled:opacity-50"
-                        >
-                          {isGeneratingLogin === contact.id ? (
-                            <Icon path="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" className="w-3 h-3 animate-spin inline" />
-                          ) : (
-                            <Icon path="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4v-3.832l8.485-8.485A6 6 0 0115 7z" className="w-3 h-3 inline" />
-                          )}
-                          Create Client Login
-                        </button>
-                      )}
                     </div>
                     <button
                       type="button"
@@ -691,6 +671,43 @@ export const ClientEditModal: React.FC<ClientEditModalProps> = ({ isOpen, onClos
                       Primary Contact
                     </label>
                   </div>
+
+                  {/* Login Management */}
+                  <div className="bg-background/50 p-3 rounded border border-border space-y-3">
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id={`access-${index}`}
+                        checked={contact.has_login || false}
+                        onChange={(e) => updateContact(index, 'has_login', e.target.checked)}
+                        className="w-4 h-4 bg-muted border-input rounded focus:ring-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled={!contact.email}
+                      />
+                      <label htmlFor={`access-${index}`} className={`ml-2 text-sm font-medium ${contact.email ? 'text-foreground' : 'text-muted-foreground'}`}>
+                        Zugang gewährt (Client Portal)
+                      </label>
+                      {!contact.email && (
+                        <span className="ml-2 text-xs text-muted-foreground">(Email required)</span>
+                      )}
+                    </div>
+                    
+                    {contact.has_login && (
+                      <div>
+                        <label className="block text-xs font-medium text-muted-foreground mb-1">
+                          Passwort {contact.original_has_login ? '(Optional: Neues Passwort setzen)' : '*'}
+                        </label>
+                        <input
+                          type="text"
+                          value={contact.password || ''}
+                          onChange={(e) => updateContact(index, 'password', e.target.value)}
+                          className="w-full px-3 py-2 bg-muted border border-input rounded text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                          placeholder="Min. 6 characters"
+                          required={!contact.original_has_login}
+                          minLength={6}
+                        />
+                      </div>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
@@ -726,53 +743,6 @@ export const ClientEditModal: React.FC<ClientEditModalProps> = ({ isOpen, onClos
           </div>
         </form>
       </div>
-
-      {generatedCredentials && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[60] p-4">
-          <div className="bg-card rounded-lg shadow-xl w-full max-w-md p-6">
-            <div className="flex items-center gap-4 mb-4">
-              <div className="w-12 h-12 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center flex-shrink-0">
-                <Icon path="M5 13l4 4L19 7" className="w-6 h-6" />
-              </div>
-              <div>
-                <h3 className="text-xl font-bold text-foreground">Login Generated!</h3>
-                <p className="text-sm text-muted-foreground">Please copy these credentials and store them securely. You won't see this password again.</p>
-              </div>
-            </div>
-
-            <div className="bg-muted p-4 rounded-lg font-mono text-sm space-y-2 mb-6">
-               <div className="flex justify-between">
-                 <span className="text-muted-foreground">Email:</span>
-                 <span className="text-foreground">{generatedCredentials.email}</span>
-               </div>
-               <div className="flex justify-between">
-                 <span className="text-muted-foreground">Password:</span>
-                 <span className="text-foreground tracking-wider">{generatedCredentials.password}</span>
-               </div>
-               <div className="flex justify-between">
-                 <span className="text-muted-foreground">Login Link:</span>
-                 <span className="text-foreground">{window.location.origin}/login</span>
-               </div>
-            </div>
-
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={() => setGeneratedCredentials(null)}
-                className="px-4 py-2 bg-muted hover:bg-muted/80 text-foreground rounded-lg transition-colors"
-              >
-                Close
-              </button>
-              <button
-                onClick={copyCredentials}
-                className="px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-colors flex items-center gap-2"
-              >
-                <Icon path="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" className="w-5 h-5" />
-                Copy Access Info
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

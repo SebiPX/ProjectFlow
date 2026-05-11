@@ -62,7 +62,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
 
   const visibleTabs = tabs.filter(tab => {
     if (isClient) {
-      return ['overview', 'tasks', 'assets'].includes(tab.id);
+      return ['overview', 'assets', 'documents'].includes(tab.id);
     }
     if (isFreelancer) {
       return ['overview', 'tasks', 'assets', 'team', 'services', 'cases'].includes(tab.id); // hide finances, documents

@@ -50,11 +50,21 @@ export async function deleteClient(id: string): Promise<void> {
 }
 
 /**
- * Generate a client login for a contact via the backend
+ * Manage a client login for a contact via the backend
  */
-export async function createClientLogin(contactId: string): Promise<{ success: boolean; message: string; credentials?: { email: string; password: string } }> {
-  return await fetchApi(`/api/client-contacts/${contactId}/create-login`, {
+export async function manageClientLogin(contactId: string, password: string): Promise<{ success: boolean; message: string; user?: any }> {
+  return await fetchApi(`/api/client-contacts/${contactId}/manage-login`, {
     method: 'POST',
+    body: JSON.stringify({ password })
+  });
+}
+
+/**
+ * Revoke a client login for a contact via the backend
+ */
+export async function revokeClientLogin(contactId: string): Promise<void> {
+  await fetchApi(`/api/client-contacts/${contactId}/revoke-login`, {
+    method: 'DELETE',
   });
 }
 
