@@ -31,8 +31,15 @@ export const TaskCard: React.FC<TaskCardProps> = ({
   onDelete
 }) => {
   const { profile } = useAuth();
-  const canEdit = profile?.role === 'admin' || profile?.role === 'pjm' || task.created_by === profile?.id;
+  const isClient = profile?.role === 'client';
+  
+  // Clients can never edit tasks once created. The PJM takes over.
+  const canEdit = !isClient && (profile?.role === 'admin' || profile?.role === 'pjm' || task.created_by === profile?.id);
   const canDelete = canEdit;
+
+  // Check if client is assigned
+  const isAssignedToTask = task.assignee_ids?.includes(profile?.id || '') || task.assignee?.id === profile?.id;
+  const canSeeFinancesAndTeam = !isClient || isAssignedToTask;
 
   const getAllDates = () => {
     const dates: { label: string, date: string, isOverdue: boolean }[] = [];
@@ -102,7 +109,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
 
         {/* Service Badge & Materials */}
         <div className="flex flex-wrap gap-2 mb-3">
-          {task.service_module && (
+          {canSeeFinancesAndTeam && task.service_module && (
             <div className="flex items-center gap-1 text-xs px-2 py-1 bg-primary/10 border border-primary/30 rounded text-primary">
               <Icon path="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" className="w-3 h-3" />
               <span>{(task.service_module as any).service_module}</span>
@@ -161,37 +168,39 @@ export const TaskCard: React.FC<TaskCardProps> = ({
         )}
 
         {/* Assignees */}
-        <div className="flex items-center gap-2 mb-3">
-          <Icon path="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" className="w-4 h-4 text-muted-foreground" />
-          {task.assignees && task.assignees.length > 0 ? (
-            <div className="flex items-center -space-x-2">
-              {task.assignees.map((assignee, index) => (
-                <div key={assignee.id || index} className="relative group" style={{ zIndex: 10 - index }}>
-                  <Avatar
-                    avatarPath={assignee.avatar_url}
-                    alt={assignee.full_name || ''}
-                    className="w-6 h-6 rounded-full border-2 border-card relative"
-                  />
-                  {/* Tooltip on hover */}
-                  <div className="absolute opacity-0 group-hover:opacity-100 transition-opacity bg-popover text-popover-foreground text-xs rounded px-2 py-1 -top-8 left-1/2 -translate-x-1/2 pointer-events-none whitespace-nowrap z-50 shadow-md border border-border">
-                    {assignee.full_name || assignee.email}
+        {canSeeFinancesAndTeam && (
+          <div className="flex items-center gap-2 mb-3">
+            <Icon path="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" className="w-4 h-4 text-muted-foreground" />
+            {task.assignees && task.assignees.length > 0 ? (
+              <div className="flex items-center -space-x-2">
+                {task.assignees.map((assignee, index) => (
+                  <div key={assignee.id || index} className="relative group" style={{ zIndex: 10 - index }}>
+                    <Avatar
+                      avatarPath={assignee.avatar_url}
+                      alt={assignee.full_name || ''}
+                      className="w-6 h-6 rounded-full border-2 border-card relative"
+                    />
+                    {/* Tooltip on hover */}
+                    <div className="absolute opacity-0 group-hover:opacity-100 transition-opacity bg-popover text-popover-foreground text-xs rounded px-2 py-1 -top-8 left-1/2 -translate-x-1/2 pointer-events-none whitespace-nowrap z-50 shadow-md border border-border">
+                      {assignee.full_name || assignee.email}
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          ) : task.assignee ? (
-            <div className="flex items-center gap-2">
-              <Avatar
-                avatarPath={task.assignee.avatar_url}
-                alt={task.assignee.full_name || ''}
-                className="w-6 h-6 rounded-full"
-              />
-              <span className="text-sm text-foreground">{task.assignee.full_name}</span>
-            </div>
-          ) : (
-            <span className="text-sm text-muted-foreground">Unassigned</span>
-          )}
-        </div>
+                ))}
+              </div>
+            ) : task.assignee ? (
+              <div className="flex items-center gap-2">
+                <Avatar
+                  avatarPath={task.assignee.avatar_url}
+                  alt={task.assignee.full_name || ''}
+                  className="w-6 h-6 rounded-full"
+                />
+                <span className="text-sm text-foreground">{task.assignee.full_name}</span>
+              </div>
+            ) : (
+              <span className="text-sm text-muted-foreground">Unassigned</span>
+            )}
+          </div>
+        )}
 
         {/* All Dates */}
         {datesList.length > 0 ? (

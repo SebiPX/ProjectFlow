@@ -62,7 +62,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
 
   const visibleTabs = tabs.filter(tab => {
     if (isClient) {
-      return ['overview', 'assets', 'documents'].includes(tab.id);
+      return ['overview', 'tasks', 'assets', 'documents'].includes(tab.id);
     }
     if (isFreelancer) {
       return ['overview', 'tasks', 'assets', 'team', 'services', 'cases'].includes(tab.id); // hide finances, documents
@@ -326,7 +326,11 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
               )}
             </div>
             <div className="flex-grow overflow-hidden">
-              <KanbanBoard tasks={tasks} onStatusChange={handleUpdateTaskStatus} onDeleteTask={handleDeleteTask} />
+              <KanbanBoard 
+                tasks={tasks} 
+                onStatusChange={isClient ? undefined : handleUpdateTaskStatus} 
+                onDeleteTask={isClient ? undefined : handleDeleteTask} 
+              />
             </div>
           </div>
         );

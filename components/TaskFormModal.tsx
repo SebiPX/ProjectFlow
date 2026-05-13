@@ -8,6 +8,7 @@ import type { Task } from '../types/supabase';
 import { Icon } from './ui/Icon';
 import { Avatar } from './ui/Avatar';
 import CreatableSelect from 'react-select/creatable';
+import { useAuth } from '../lib/AuthContext';
 
 interface TaskFormModalProps {
   isOpen: boolean;
@@ -17,6 +18,9 @@ interface TaskFormModalProps {
 
 export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, preSelectedProjectId }) => {
   const queryClient = useQueryClient();
+  const { profile } = useAuth();
+  const isClient = profile?.role === 'client';
+  
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -164,7 +168,7 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
       materials: materials.filter(m => m.trim() !== ''),
       depends_on_task_ids: dependsOnTaskIds,
       planned_minutes: estimatedHours ? Math.round(parseFloat(estimatedHours) * 60) : undefined,
-      is_visible_to_client: formData.is_visible_to_client,
+      is_visible_to_client: isClient ? true : formData.is_visible_to_client,
       // Service tracking fields (optional)
       project_service_id: projectServiceId || null,
       estimated_hours: estimatedHours ? parseFloat(estimatedHours) : null,
@@ -431,35 +435,37 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
               </select>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-muted-foreground mb-2">
-                Assignees
-              </label>
-              <div className="w-full max-h-48 overflow-y-auto bg-muted border border-input rounded-lg p-2 space-y-1">
-                {profiles.map((profile) => (
-                  <label key={profile.id} className="flex items-center p-2 hover:bg-background rounded cursor-pointer transition-colors">
-                    <input
-                      type="checkbox"
-                      checked={formData.assignee_ids.includes(profile.id)}
-                      onChange={(e) => {
-                        const newIds = e.target.checked 
-                          ? [...formData.assignee_ids, profile.id]
-                          : formData.assignee_ids.filter(id => id !== profile.id);
-                        setFormData({ ...formData, assignee_ids: newIds });
-                      }}
-                      className="w-4 h-4 bg-background border-input rounded focus:ring-2 focus:ring-primary flex-shrink-0"
-                    />
-                    <div className="ml-3 flex items-center gap-2 overflow-hidden">
-                      <Avatar avatarPath={profile.avatar_url} alt={profile.full_name || ''} size="sm" />
-                      <span className="text-sm text-foreground truncate">{profile.full_name || profile.email}</span>
-                    </div>
-                  </label>
-                ))}
-                {profiles.length === 0 && (
-                  <div className="text-sm text-muted-foreground p-2">No profiles found</div>
-                )}
+            {!isClient && (
+              <div>
+                <label className="block text-sm font-medium text-muted-foreground mb-2">
+                  Assignees
+                </label>
+                <div className="w-full max-h-48 overflow-y-auto bg-muted border border-input rounded-lg p-2 space-y-1">
+                  {profiles.map((profile) => (
+                    <label key={profile.id} className="flex items-center p-2 hover:bg-background rounded cursor-pointer transition-colors">
+                      <input
+                        type="checkbox"
+                        checked={formData.assignee_ids.includes(profile.id)}
+                        onChange={(e) => {
+                          const newIds = e.target.checked 
+                            ? [...formData.assignee_ids, profile.id]
+                            : formData.assignee_ids.filter(id => id !== profile.id);
+                          setFormData({ ...formData, assignee_ids: newIds });
+                        }}
+                        className="w-4 h-4 bg-background border-input rounded focus:ring-2 focus:ring-primary flex-shrink-0"
+                      />
+                      <div className="ml-3 flex items-center gap-2 overflow-hidden">
+                        <Avatar avatarPath={profile.avatar_url} alt={profile.full_name || ''} size="sm" />
+                        <span className="text-sm text-foreground truncate">{profile.full_name || profile.email}</span>
+                      </div>
+                    </label>
+                  ))}
+                  {profiles.length === 0 && (
+                    <div className="text-sm text-muted-foreground p-2">No profiles found</div>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* Dependencies / Blocked By */}
@@ -637,14 +643,15 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
           </div>
 
           {/* Service-Based Estimation (Optional) */}
-          <div className="border-t border-border pt-4 mt-4">
-            <h3 className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
-              <Icon path="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" className="w-5 h-5 text-primary" />
-              Service-Based Estimation (Optional)
-            </h3>
-            <p className="text-xs text-muted-foreground mb-3">
-              Link this task to a service from the catalog to enable Plan vs Actual tracking.
-            </p>
+          {!isClient && (
+            <div className="border-t border-border pt-4 mt-4">
+              <h3 className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
+                <Icon path="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" className="w-5 h-5 text-primary" />
+                Service-Based Estimation (Optional)
+              </h3>
+              <p className="text-xs text-muted-foreground mb-3">
+                Link this task to a service from the catalog to enable Plan vs Actual tracking.
+              </p>
 
             {/* Service Module */}
             <div className="grid grid-cols-1 gap-4 mb-4">
@@ -725,20 +732,23 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
               </div>
             )}
           </div>
+          )}
 
           {/* Client Visibility Checkbox */}
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              id="is_visible_to_client"
-              checked={formData.is_visible_to_client}
-              onChange={(e) => setFormData({ ...formData, is_visible_to_client: e.target.checked })}
-              className="w-4 h-4 bg-muted border-input rounded focus:ring-2 focus:ring-primary"
-            />
-            <label htmlFor="is_visible_to_client" className="ml-2 text-sm text-muted-foreground">
-              Visible to client
-            </label>
-          </div>
+          {!isClient && (
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                id="is_visible_to_client"
+                checked={formData.is_visible_to_client}
+                onChange={(e) => setFormData({ ...formData, is_visible_to_client: e.target.checked })}
+                className="w-4 h-4 bg-muted border-input rounded focus:ring-2 focus:ring-primary"
+              />
+              <label htmlFor="is_visible_to_client" className="ml-2 text-sm text-muted-foreground">
+                Visible to client
+              </label>
+            </div>
+          )}
 
           {/* Form Actions */}
           <div className="flex justify-end gap-3 pt-4 border-t border-border">
