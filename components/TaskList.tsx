@@ -106,7 +106,10 @@ export const TaskList: React.FC<TaskListProps> = ({ onSelectProject, searchQuery
       };
 
       // Only Me filter
-      if (onlyMe && user?.id && !isAssignedToUser(user.id)) return false;
+      if (onlyMe) {
+        if (user?.id && !isAssignedToUser(user.id)) return false;
+        if (task.status === TaskStatus.Done) return false;
+      }
 
       // Search Query Filter
       if (searchQuery) {
