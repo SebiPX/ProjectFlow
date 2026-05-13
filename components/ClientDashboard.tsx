@@ -27,7 +27,10 @@ export const ClientDashboard: React.FC<ClientDashboardProps> = ({ onSelectProjec
     // In a real app with many projects, we'd want a dedicated RPC or API endpoint.
     // For now, client project count is likely low, so we can fetch per project.
 
-    const activeProjects = projects.filter(p => p.status === ProjectStatus.Active);
+    const activeProjects = projects.filter(p => 
+        p.status === ProjectStatus.Active && 
+        !p.title?.toUpperCase().includes('ADMIN')
+    );
 
     // Calculate total budget (sum of projects) - Optional, maybe nice for client to see total spend?
     // Let's stick to "Pending Approvals" as the main call to action.

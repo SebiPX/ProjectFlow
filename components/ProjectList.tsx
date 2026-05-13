@@ -179,6 +179,10 @@ export const ProjectList: React.FC<{ onSelectProject: (project: Project) => void
       if (project.status === ProjectStatus.Completed) return false;
     }
 
+    if (profile?.role === 'client' && project.title?.toUpperCase().includes('ADMIN')) {
+      return false;
+    }
+
     if (onlyMe) {
       const isTeamMember = project.project_members?.some(member => 
         member.profile_id === user?.id || 
