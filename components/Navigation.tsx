@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import type { View } from '../App';
 import { useAuth } from '../lib/AuthContext';
 import { Avatar } from './ui/Avatar';
@@ -94,6 +94,58 @@ export const Navigation: React.FC<NavigationProps> = ({ currentView, onNavigate,
   });
 
   const unreadCount = notifications?.filter(n => !n.is_read).length || 0;
+  const prevUnreadCountRef = useRef(unreadCount);
+
+  useEffect(() => {
+    // Request notification permission if not already granted or denied
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (unreadCount > prevUnreadCountRef.current) {
+      // Play a synthesized "ping" sound
+      try {
+        const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+        if (AudioContextClass) {
+          const audioCtx = new AudioContextClass();
+          const oscillator = audioCtx.createOscillator();
+          const gainNode = audioCtx.createGain();
+          
+          oscillator.connect(gainNode);
+          gainNode.connect(audioCtx.destination);
+          
+          oscillator.type = 'sine';
+          oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // A5 note
+          oscillator.frequency.exponentialRampToValueAtTime(1760, audioCtx.currentTime + 0.1); // Pitch bend up
+          
+          gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+          gainNode.gain.linearRampToValueAtTime(0.5, audioCtx.currentTime + 0.05); // Attack
+          gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5); // Decay
+          
+          oscillator.start(audioCtx.currentTime);
+          oscillator.stop(audioCtx.currentTime + 0.5);
+        }
+      } catch (e) {
+        console.error('Audio play prevented or unsupported', e);
+      }
+
+      // Show browser push notification
+      if ('Notification' in window && Notification.permission === 'granted') {
+        const newNotifs = notifications?.filter(n => !n.is_read) || [];
+        const latest = newNotifs[0];
+        
+        if (latest) {
+          new Notification('PX Flow', {
+            body: latest.title,
+            icon: '/favicon.ico' // Ensure you have a favicon or logo available here
+          });
+        }
+      }
+    }
+    prevUnreadCountRef.current = unreadCount;
+  }, [unreadCount, notifications]);
 
   const handleLogout = async () => {
     try {
