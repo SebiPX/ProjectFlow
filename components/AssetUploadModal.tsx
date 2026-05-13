@@ -22,6 +22,7 @@ export const AssetUploadModal: React.FC<AssetUploadModalProps> = ({
   const { profile } = useAuth();
 
   const [files, setFiles] = useState<File[]>([]);
+  const [isDragging, setIsDragging] = useState(false);
   const [bundleLink, setBundleLink] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: '',
@@ -120,6 +121,31 @@ export const AssetUploadModal: React.FC<AssetUploadModalProps> = ({
     }
   };
 
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      const selectedFiles = Array.from(e.dataTransfer.files);
+      setFiles(selectedFiles);
+      if (!formData.name && selectedFiles.length === 1) {
+        setFormData({ ...formData, name: selectedFiles[0].name });
+      } else if (!formData.name && selectedFiles.length > 1) {
+        setFormData({ ...formData, name: 'Bundle Upload' });
+      }
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -198,7 +224,14 @@ export const AssetUploadModal: React.FC<AssetUploadModalProps> = ({
             <div className="flex items-center justify-center w-full">
               <label
                 htmlFor="file-upload"
-                className="flex flex-col items-center justify-center w-full h-32 border-2 border-input border-dashed rounded-lg cursor-pointer bg-muted hover:bg-muted/80 transition-colors"
+                className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${
+                  isDragging 
+                    ? 'border-primary bg-primary/10' 
+                    : 'border-input bg-muted hover:bg-muted/80'
+                }`}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
               >
                 <div className="flex flex-col items-center justify-center pt-5 pb-6">
                   <Icon
