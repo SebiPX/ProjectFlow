@@ -170,22 +170,22 @@ export const DocumentList: React.FC<DocumentListProps> = ({ projectId, projectTi
           <h2 className="text-xl font-bold text-foreground">Project Documents</h2>
           <p className="text-sm text-muted-foreground">Manage your Dispos, Shotlists, and more.</p>
         </div>
-        {!isClient && (
-          <div className="flex items-center gap-3">
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleFileUpload}
-              className="hidden"
-            />
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              disabled={isUploading}
-              className="px-4 py-2 bg-secondary hover:bg-secondary/90 text-secondary-foreground rounded-lg transition-colors flex items-center gap-2"
-            >
-              <Icon path="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" className="w-5 h-5" />
-              {isUploading ? 'Uploading...' : 'Upload File'}
-            </button>
+        <div className="flex items-center gap-3">
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileUpload}
+            className="hidden"
+          />
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isUploading}
+            className="px-4 py-2 bg-secondary hover:bg-secondary/90 text-secondary-foreground rounded-lg transition-colors flex items-center gap-2"
+          >
+            <Icon path="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" className="w-5 h-5" />
+            {isUploading ? 'Uploading...' : 'Upload File'}
+          </button>
+          {!isClient && (
             <div className="relative">
               <button
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -245,8 +245,8 @@ export const DocumentList: React.FC<DocumentListProps> = ({ projectId, projectTi
                 </div>
               )}
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       {documents.length === 0 ? (
