@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
+import { useAuth } from '../lib/AuthContext';
 import { updateClient, uploadClientLogo, updateClientLogo, deleteClientLogo, getClientLogoSignedUrl, manageClientLogin, revokeClientLogin } from '../services/api/clients';
 import {
   getClientContacts,
@@ -35,6 +36,7 @@ interface ContactFormData {
 
 export const ClientEditModal: React.FC<ClientEditModalProps> = ({ isOpen, onClose, client }) => {
   const queryClient = useQueryClient();
+  const { profile } = useAuth();
   const [formData, setFormData] = useState({
     company_name: client.company_name,
     address_line1: client.address_line1 || '',
@@ -673,41 +675,43 @@ export const ClientEditModal: React.FC<ClientEditModalProps> = ({ isOpen, onClos
                   </div>
 
                   {/* Login Management */}
-                  <div className="bg-background/50 p-3 rounded border border-border space-y-3">
-                    <div className="flex items-center">
-                      <input
-                        type="checkbox"
-                        id={`access-${index}`}
-                        checked={contact.has_login || false}
-                        onChange={(e) => updateContact(index, 'has_login', e.target.checked)}
-                        className="w-4 h-4 bg-muted border-input rounded focus:ring-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
-                        disabled={!contact.email}
-                      />
-                      <label htmlFor={`access-${index}`} className={`ml-2 text-sm font-medium ${contact.email ? 'text-foreground' : 'text-muted-foreground'}`}>
-                        Zugang gewährt (Client Portal)
-                      </label>
-                      {!contact.email && (
-                        <span className="ml-2 text-xs text-muted-foreground">(Email required)</span>
+                  {profile?.role === 'superadmin' && (
+                    <div className="bg-background/50 p-3 rounded border border-border space-y-3">
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id={`access-${index}`}
+                          checked={contact.has_login || false}
+                          onChange={(e) => updateContact(index, 'has_login', e.target.checked)}
+                          className="w-4 h-4 bg-muted border-input rounded focus:ring-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                          disabled={!contact.email}
+                        />
+                        <label htmlFor={`access-${index}`} className={`ml-2 text-sm font-medium ${contact.email ? 'text-foreground' : 'text-muted-foreground'}`}>
+                          Zugang gewährt (Client Portal)
+                        </label>
+                        {!contact.email && (
+                          <span className="ml-2 text-xs text-muted-foreground">(Email required)</span>
+                        )}
+                      </div>
+                      
+                      {contact.has_login && (
+                        <div>
+                          <label className="block text-xs font-medium text-muted-foreground mb-1">
+                            Passwort {contact.original_has_login ? '(Optional: Neues Passwort setzen)' : '*'}
+                          </label>
+                          <input
+                            type="text"
+                            value={contact.password || ''}
+                            onChange={(e) => updateContact(index, 'password', e.target.value)}
+                            className="w-full px-3 py-2 bg-muted border border-input rounded text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                            placeholder="Min. 6 characters"
+                            required={!contact.original_has_login}
+                            minLength={6}
+                          />
+                        </div>
                       )}
                     </div>
-                    
-                    {contact.has_login && (
-                      <div>
-                        <label className="block text-xs font-medium text-muted-foreground mb-1">
-                          Passwort {contact.original_has_login ? '(Optional: Neues Passwort setzen)' : '*'}
-                        </label>
-                        <input
-                          type="text"
-                          value={contact.password || ''}
-                          onChange={(e) => updateContact(index, 'password', e.target.value)}
-                          className="w-full px-3 py-2 bg-muted border border-input rounded text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                          placeholder="Min. 6 characters"
-                          required={!contact.original_has_login}
-                          minLength={6}
-                        />
-                      </div>
-                    )}
-                  </div>
+                  )}
                 </div>
               ))}
             </div>
