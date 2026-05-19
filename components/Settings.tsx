@@ -42,7 +42,7 @@ export const Settings: React.FC = () => {
   const { data: profiles } = useQuery({
     queryKey: ['profiles-for-admin-settings'],
     queryFn: getProfiles,
-    enabled: profile?.role === 'admin',
+    enabled: profile?.role === 'superadmin',
   });
 
   // Load avatar signed URL when profile changes
@@ -445,7 +445,7 @@ export const Settings: React.FC = () => {
         </div>
 
         {/* Administrative Actions (Admin Only) */}
-        {profile?.role === 'admin' && (
+        {profile?.role === 'superadmin' && (
           <div className="bg-red-900 bg-opacity-20 rounded-lg p-6 border border-red-800">
             <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
               <Icon path="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" className="w-5 h-5 text-red-500" />
