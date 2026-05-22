@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import type { Task, Project } from '../types/supabase';
 import { TaskStatus } from '../types/supabase';
 import { Icon } from './ui/Icon';
@@ -34,6 +34,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
 }) => {
   const { profile } = useAuth();
   const isClient = profile?.role === 'client';
+  const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
   
   // Clients can never edit tasks once created. The PJM takes over.
   const isAdminPJM = profile?.role === 'admin' || profile?.role === 'pjm' || profile?.role === 'superadmin';
@@ -139,9 +140,40 @@ export const TaskCard: React.FC<TaskCardProps> = ({
 
         {/* Description Preview */}
         {task.description && (
-          <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-            {task.description}
-          </p>
+          <>
+            <p 
+              className="text-sm text-muted-foreground mb-3 line-clamp-2 cursor-pointer hover:text-foreground transition-colors"
+              onClick={(e) => { e.stopPropagation(); setIsDescriptionOpen(true); }}
+              title="Click to read full description"
+            >
+              {task.description}
+            </p>
+
+            {isDescriptionOpen && (
+              <div 
+                className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+                onClick={(e) => { e.stopPropagation(); setIsDescriptionOpen(false); }}
+              >
+                <div 
+                  className="bg-card p-6 rounded-xl border border-border shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-y-auto"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-xl font-bold text-foreground">Task Description</h3>
+                    <button 
+                      onClick={() => setIsDescriptionOpen(false)}
+                      className="text-muted-foreground hover:text-foreground transition-colors p-1"
+                    >
+                      <Icon path="M6 18L18 6M6 6l12 12" className="w-6 h-6" />
+                    </button>
+                  </div>
+                  <div className="text-foreground whitespace-pre-wrap">
+                    {task.description}
+                  </div>
+                </div>
+              </div>
+            )}
+          </>
         )}
 
         {/* Brand & Show / Freigabelink */}

@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import type { Project, Task } from '../types/supabase';
 import { TaskStatus } from '../types/supabase';
 import { KanbanBoard } from './KanbanBoard';
+import { TaskCard } from './TaskCard';
 import { ProjectEditModal } from './ProjectEditModal';
 import { AssetUploadModal } from './AssetUploadModal';
 import { AssetPreviewModal } from './AssetPreviewModal';
@@ -14,6 +15,8 @@ import { AddTeamMemberModal } from './AddTeamMemberModal';
 import { CostFormModal } from './CostFormModal';
 import { CostEditModal } from './CostEditModal';
 import { TaskFormModal } from './TaskFormModal';
+import { TaskEditModal } from './TaskEditModal';
+import { TimeTrackingModal } from './TimeTrackingModal';
 import { AssetKanbanBoard } from './AssetKanbanBoard';
 import { getTasksByProject, updateTaskStatus, deleteTask, createTask } from '../services/api/tasks';
 import { getAssetsByProject, downloadAsset, deleteAsset, getAssetSignedUrl, updateAsset } from '../services/api/assets';
@@ -100,6 +103,9 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
   // Financial Documents State
   const [isFinancialDocModalOpen, setIsFinancialDocModalOpen] = useState(false);
   const [editingDocument, setEditingDocument] = useState<(FinancialDocument & { items: FinancialItem[] }) | undefined>(undefined);
+  const [viewMode, setViewMode] = useState<'board' | 'grid'>('board');
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [trackingTask, setTrackingTask] = useState<Task | null>(null);
 
   // Fetch real tasks for this project
   const { data: tasks = [], isLoading: tasksLoading } = useQuery({
@@ -350,23 +356,65 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
           <div className="flex flex-col h-full">
             <div className="flex justify-between items-center px-6 py-4 border-b border-border">
               <h2 className="text-xl font-bold text-foreground">Project Tasks</h2>
-              {true && (
-                <button
-                  onClick={() => setIsTaskFormModalOpen(true)}
-                  className="px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-colors flex items-center gap-2"
-                >
-                  <Icon path="M12 4v16m8-8H4" className="w-5 h-5" />
-                  Create Task
-                </button>
-              )}
+              <div className="flex items-center gap-4">
+                <div className="bg-secondary p-1 rounded-lg border border-border flex">
+                  <button
+                    onClick={() => setViewMode('grid')}
+                    className={`p-2 rounded transition-colors ${viewMode === 'grid'
+                      ? 'bg-primary text-primary-foreground shadow-sm'
+                      : 'text-secondary-foreground hover:text-foreground hover:bg-muted'
+                      }`}
+                    title="Grid View"
+                  >
+                    <Icon path="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() => setViewMode('board')}
+                    className={`p-2 rounded transition-colors ${viewMode === 'board'
+                      ? 'bg-primary text-primary-foreground shadow-sm'
+                      : 'text-secondary-foreground hover:text-foreground hover:bg-muted'
+                      }`}
+                    title="Board View (Kanban)"
+                  >
+                    <Icon path="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" className="w-5 h-5" />
+                  </button>
+                </div>
+                {true && (
+                  <button
+                    onClick={() => setIsTaskFormModalOpen(true)}
+                    className="px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-colors flex items-center gap-2"
+                  >
+                    <Icon path="M12 4v16m8-8H4" className="w-5 h-5" />
+                    Create Task
+                  </button>
+                )}
+              </div>
             </div>
             <div className="flex-grow overflow-hidden">
-              <KanbanBoard 
-                tasks={tasks} 
-                onStatusChange={isClient ? undefined : handleUpdateTaskStatus} 
-                onDeleteTask={isClient ? undefined : handleDeleteTask} 
-                onDuplicateTask={isClient ? undefined : handleDuplicateTask}
-              />
+              {viewMode === 'grid' ? (
+                <div className="p-6 overflow-y-auto h-full">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {tasks.map((task) => (
+                      <TaskCard
+                        key={task.id}
+                        task={task}
+                        project={project}
+                        onEdit={setEditingTask}
+                        onTimeTrack={setTrackingTask}
+                        onDelete={isClient ? undefined : handleDeleteTask}
+                        onDuplicate={isClient ? undefined : handleDuplicateTask}
+                      />
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <KanbanBoard 
+                  tasks={tasks} 
+                  onStatusChange={isClient ? undefined : handleUpdateTaskStatus} 
+                  onDeleteTask={isClient ? undefined : handleDeleteTask} 
+                  onDuplicateTask={isClient ? undefined : handleDuplicateTask}
+                />
+              )}
             </div>
           </div>
         );
@@ -911,6 +959,23 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
         onClose={() => setIsTaskFormModalOpen(false)}
         preSelectedProjectId={project.id}
       />
+
+      {editingTask && (
+        <TaskEditModal
+          isOpen={!!editingTask}
+          onClose={() => setEditingTask(null)}
+          task={editingTask}
+          onTimeTrack={setTrackingTask}
+        />
+      )}
+
+      {trackingTask && (
+        <TimeTrackingModal
+          isOpen={!!trackingTask}
+          onClose={() => setTrackingTask(null)}
+          task={trackingTask}
+        />
+      )}
     </div>
   );
 };
