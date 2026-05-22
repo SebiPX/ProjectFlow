@@ -20,6 +20,7 @@ interface TaskCardProps {
   onTimeTrack: (task: Task) => void;
   onSelectProject?: (project: Project) => void;
   onDelete?: (task: Task) => void;
+  onDuplicate?: (task: Task) => void;
 }
 
 export const TaskCard: React.FC<TaskCardProps> = ({
@@ -28,13 +29,15 @@ export const TaskCard: React.FC<TaskCardProps> = ({
   onEdit,
   onTimeTrack,
   onSelectProject,
-  onDelete
+  onDelete,
+  onDuplicate
 }) => {
   const { profile } = useAuth();
   const isClient = profile?.role === 'client';
   
   // Clients can never edit tasks once created. The PJM takes over.
-  const canEdit = !isClient && (profile?.role === 'admin' || profile?.role === 'pjm' || task.created_by === profile?.id);
+  const isAdminPJM = profile?.role === 'admin' || profile?.role === 'pjm' || profile?.role === 'superadmin';
+  const canEdit = !isClient && (isAdminPJM || task.created_by === profile?.id);
   const canDelete = canEdit;
 
   // Check if client is assigned
@@ -247,6 +250,18 @@ export const TaskCard: React.FC<TaskCardProps> = ({
             title="Edit task"
           >
             <Icon path="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" className="w-5 h-5" />
+          </button>
+        )}
+        {canEdit && onDuplicate && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onDuplicate(task);
+            }}
+            className="p-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-lg transition-colors"
+            title="Duplicate task"
+          >
+            <Icon path="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" className="w-5 h-5" />
           </button>
         )}
         {canDelete && onDelete && (

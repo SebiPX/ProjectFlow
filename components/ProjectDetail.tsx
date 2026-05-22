@@ -3,7 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../lib/AuthContext';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
-import type { Project } from '../types/supabase';
+import type { Project, Task } from '../types/supabase';
+import { TaskStatus } from '../types/supabase';
 import { KanbanBoard } from './KanbanBoard';
 import { ProjectEditModal } from './ProjectEditModal';
 import { AssetUploadModal } from './AssetUploadModal';
@@ -14,7 +15,7 @@ import { CostFormModal } from './CostFormModal';
 import { CostEditModal } from './CostEditModal';
 import { TaskFormModal } from './TaskFormModal';
 import { AssetKanbanBoard } from './AssetKanbanBoard';
-import { getTasksByProject, updateTaskStatus, deleteTask } from '../services/api/tasks';
+import { getTasksByProject, updateTaskStatus, deleteTask, createTask } from '../services/api/tasks';
 import { getAssetsByProject, downloadAsset, deleteAsset, getAssetSignedUrl, updateAsset } from '../services/api/assets';
 import { getProjectMembers, removeProjectMember } from '../services/api/projectMembers';
 import { getCostsByProject, deleteCost, getCostDocumentSignedUrl } from '../services/api/costs';
@@ -202,6 +203,40 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
     deleteTaskMutation.mutate(task.id);
   };
 
+  const duplicateTaskMutation = useMutation({
+    mutationFn: (task: Task) => {
+      const { 
+        id, 
+        created_at, 
+        created_by,
+        assignee,
+        assignees,
+        service_module,
+        seniority_level,
+        ...rest 
+      } = task;
+      
+      const duplicateData = {
+        ...rest,
+        title: `${task.title} (Copy)`,
+        status: TaskStatus.Todo,
+      };
+      
+      return createTask(duplicateData as any);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks', project.id] });
+      toast.success('Task successfully duplicated');
+    },
+    onError: (error: any) => {
+      toast.error(`Failed to duplicate task: ${error.message}`);
+    },
+  });
+
+  const handleDuplicateTask = (task: Task) => {
+    duplicateTaskMutation.mutate(task);
+  };
+
   // Delete asset mutation
   const deleteAssetMutation = useMutation({
     mutationFn: deleteAsset,
@@ -330,6 +365,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
                 tasks={tasks} 
                 onStatusChange={isClient ? undefined : handleUpdateTaskStatus} 
                 onDeleteTask={isClient ? undefined : handleDeleteTask} 
+                onDuplicateTask={isClient ? undefined : handleDuplicateTask}
               />
             </div>
           </div>

@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import type { Project, Task } from '../types/supabase';
 import { TaskStatus } from '../types/supabase';
-import { getTasks, updateTaskStatus, deleteTask } from '../services/api/tasks';
+import { getTasks, updateTaskStatus, deleteTask, createTask } from '../services/api/tasks';
 import { getProjects } from '../services/api/projects';
 import { useAuth } from '../lib/AuthContext';
 import { Card } from './ui/Card';
@@ -89,6 +89,40 @@ export const TaskList: React.FC<TaskListProps> = ({ onSelectProject, searchQuery
 
   const handleDeleteTask = (task: Task) => {
     deleteTaskMutation.mutate(task.id);
+  };
+
+  const duplicateTaskMutation = useMutation({
+    mutationFn: (task: Task) => {
+      const { 
+        id, 
+        created_at, 
+        created_by,
+        assignee,
+        assignees,
+        service_module,
+        seniority_level,
+        ...rest 
+      } = task;
+      
+      const duplicateData = {
+        ...rest,
+        title: `${task.title} (Copy)`,
+        status: TaskStatus.Todo,
+      };
+      
+      return createTask(duplicateData as any);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      toast.success('Task successfully duplicated');
+    },
+    onError: (error: any) => {
+      toast.error(`Failed to duplicate task: ${error.message}`);
+    },
+  });
+
+  const handleDuplicateTask = (task: Task) => {
+    duplicateTaskMutation.mutate(task);
   };
 
   // Filter Logic
@@ -417,6 +451,7 @@ export const TaskList: React.FC<TaskListProps> = ({ onSelectProject, searchQuery
                     onTimeTrack={setTrackingTask}
                     onSelectProject={onSelectProject}
                     onDelete={handleDeleteTask}
+                    onDuplicate={handleDuplicateTask}
                   />
                 );
               })}
@@ -429,6 +464,7 @@ export const TaskList: React.FC<TaskListProps> = ({ onSelectProject, searchQuery
                 onSelectProject={onSelectProject}
                 onStatusChange={handleUpdateTaskStatus}
                 onDeleteTask={handleDeleteTask}
+                onDuplicateTask={handleDuplicateTask}
               />
             </div>
           )}
