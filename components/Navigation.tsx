@@ -16,10 +16,11 @@ interface NavigationProps {
 }
 
 interface NavItem {
-  view: View;
-  icon: string; // Using SVG paths from Sidebar or material icons if we switch? Sidebar uses SVG paths mostly. Wait, PX Studio uses Material Icons (`material-icons-round`). ProjectFlow uses a custom `<Icon>` component with SVG paths. I will keep the custom `<Icon>` with SVG paths for now, or maybe use Material Icons since ProjectFlow already supports `material-icons-round`? Let me check `index.html` of ProjectFlow.
+  view?: View;
+  icon: string;
   label: string;
   adminOnly?: boolean;
+  subItems?: { view: View; label: string; icon: string; adminOnly?: boolean }[];
 }
 
 interface NavCategory {
@@ -34,15 +35,26 @@ const navCategories: NavCategory[] = [
     icon: 'M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z', // grid
     items: [
       { view: 'dashboard', label: 'Dashboard', icon: 'M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z' },
-      { view: 'chat', label: 'Chat', icon: 'M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z' },
-      { view: 'inventar', label: 'Inventar', icon: 'inventory_2' },
-      { view: 'verleih-formular', label: 'Verleih', icon: 'calendar_month' },
-      { view: 'kalender', label: 'Kalender', icon: 'event' },
-      { view: 'logins', label: 'Logins', icon: 'password' },
+      { 
+        label: 'Equipment', 
+        icon: 'inventory_2',
+        subItems: [
+          { view: 'inventar', label: 'Inventar', icon: 'inventory_2' },
+          { view: 'verleih-formular', label: 'Verleih', icon: 'calendar_month' },
+          { view: 'kalender', label: 'Kalender', icon: 'event' },
+        ]
+      },
+      { 
+        label: 'Links & Logins', 
+        icon: 'password',
+        subItems: [
+          { view: 'logins', label: 'Logins', icon: 'password' },
+          { view: 'links', label: 'Links', icon: 'link' },
+        ]
+      },
       { view: 'handyvertraege', label: 'Verträge', icon: 'smartphone', adminOnly: true },
       { view: 'kreditkarten', label: 'Karten', icon: 'credit_card', adminOnly: true },
       { view: 'firmendaten', label: 'Firma', icon: 'business', adminOnly: true },
-      { view: 'links', label: 'Links', icon: 'link' },
     ],
   },
   {
@@ -85,6 +97,7 @@ export const Navigation: React.FC<NavigationProps> = ({ currentView, onNavigate,
 
   const [showDropdown, setShowDropdown] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [openSubMenu, setOpenSubMenu] = useState<string | null>(null);
 
   const { data: notifications } = useQuery({
     queryKey: ['notifications'],
@@ -174,14 +187,33 @@ export const Navigation: React.FC<NavigationProps> = ({ currentView, onNavigate,
       ...cat,
       items: cat.items.filter(item => {
         if (item.adminOnly && !isAdmin) return false;
+        
+        // Handle subItems filtering
+        if (item.subItems) {
+          item.subItems = item.subItems.filter(sub => {
+            if (sub.adminOnly && !isAdmin) return false;
+            if (isClient) {
+              const allowedClientViews: View[] = ['dashboard', 'projects'];
+              return allowedClientViews.includes(sub.view);
+            }
+            if (profile?.role === 'freelancer') {
+              const allowedFreelancerViews: View[] = ['dashboard', 'chat', 'projects', 'tasks', 'assets', 'resources', 'cases', 'planning', 'directory-freelancers', 'directory-locations'];
+              return allowedFreelancerViews.includes(sub.view);
+            }
+            return true;
+          });
+          // If all subItems are filtered out, filter out the parent item
+          if (item.subItems.length === 0) return false;
+        }
+
         if (isClient) {
           const allowedClientViews: View[] = ['dashboard', 'projects'];
-          return allowedClientViews.includes(item.view);
+          if (item.view) return allowedClientViews.includes(item.view);
         }
         if (profile?.role === 'freelancer') {
           // Hide finances and admin stuff completely, hide clients, etc.
           const allowedFreelancerViews: View[] = ['dashboard', 'chat', 'projects', 'tasks', 'assets', 'resources', 'cases', 'planning', 'directory-freelancers', 'directory-locations'];
-          return allowedFreelancerViews.includes(item.view);
+          if (item.view) return allowedFreelancerViews.includes(item.view);
         }
         return true;
       })
@@ -189,7 +221,9 @@ export const Navigation: React.FC<NavigationProps> = ({ currentView, onNavigate,
   }).filter(cat => cat.items.length > 0);
 
   // Find the active category based on current view
-  let activeCategory = visibleCategories.find(cat => cat.items.some(i => i.view === currentView)) || visibleCategories[0];
+  let activeCategory = visibleCategories.find(cat => 
+    cat.items.some(i => i.view === currentView || (i.subItems && i.subItems.some(sub => sub.view === currentView)))
+  ) || visibleCategories[0];
 
   // If view is 'project-detail', set active category to 'Projekte', for 'settings' keep 'PX Desk'
   if (currentView === 'project-detail') {
@@ -198,7 +232,14 @@ export const Navigation: React.FC<NavigationProps> = ({ currentView, onNavigate,
      activeCategory = visibleCategories.find(cat => cat.label === 'PX Desk') || visibleCategories[0];
   }
 
-  const allNavItems = visibleCategories.flatMap(cat => cat.items);
+  const allNavItems = visibleCategories.flatMap(cat => 
+    cat.items.flatMap(item => {
+      if (item.subItems) {
+        return item.subItems;
+      }
+      return [{ view: item.view!, label: item.label, icon: item.icon, adminOnly: item.adminOnly }];
+    })
+  );
 
   return (
     <div className="flex-shrink-0 flex flex-col z-50 print:hidden">
@@ -254,7 +295,10 @@ export const Navigation: React.FC<NavigationProps> = ({ currentView, onNavigate,
               return (
                 <button
                   key={category.label}
-                  onClick={() => onNavigate(category.items[0].view)}
+                  onClick={() => {
+                    const firstView = category.items[0].subItems ? category.items[0].subItems[0].view : category.items[0].view;
+                    onNavigate(firstView!);
+                  }}
                   className={`flex items-center justify-center h-full px-4 border-b-2 transition-colors ${
                     isActive 
                       ? 'border-primary text-foreground' 
@@ -359,12 +403,50 @@ export const Navigation: React.FC<NavigationProps> = ({ currentView, onNavigate,
       {activeCategory && activeCategory.items.length > 1 && (
         <div className="hidden lg:flex items-center justify-center bg-muted/30 border-b border-border h-12 gap-1 px-4">
           {activeCategory.items.map((item) => {
+            if (item.subItems) {
+              const isActive = item.subItems.some(sub => currentView === sub.view);
+              return (
+                <div key={item.label} className="relative" onMouseLeave={() => setOpenSubMenu(null)}>
+                  <button
+                    onMouseEnter={() => setOpenSubMenu(item.label)}
+                    onClick={() => setOpenSubMenu(openSubMenu === item.label ? null : item.label)}
+                    className={`px-4 py-1.5 rounded-full text-xs font-medium transition-all duration-300 flex items-center gap-2 ${
+                      isActive || openSubMenu === item.label
+                        ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/25'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                    }`}
+                  >
+                    <Icon path={item.icon} className="w-4 h-4" />
+                    {item.label}
+                    <Icon path="M19 9l-7 7-7-7" className="w-3 h-3 ml-1" />
+                  </button>
+                  {openSubMenu === item.label && (
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 min-w-[160px] bg-card rounded-xl shadow-xl border border-border py-1 z-50">
+                      {item.subItems.map(sub => (
+                        <button
+                          key={sub.view}
+                          onClick={() => {
+                            setOpenSubMenu(null);
+                            onNavigate(sub.view);
+                          }}
+                          className={`w-full text-left px-4 py-2 text-sm flex items-center gap-2 transition-colors ${currentView === sub.view ? 'text-primary bg-primary/5' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}
+                        >
+                          <Icon path={sub.icon} className="w-4 h-4" />
+                          {sub.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            }
+
             const isActive = currentView === item.view || (currentView === 'project-detail' && item.view === 'projects');
             
             return (
               <button
                 key={item.label}
-                onClick={() => onNavigate(item.view)}
+                onClick={() => onNavigate(item.view!)}
                 className={`px-4 py-1.5 rounded-full text-xs font-medium transition-all duration-300 flex items-center gap-2 ${
                   isActive
                     ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/25'
