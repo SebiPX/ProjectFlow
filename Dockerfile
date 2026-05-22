@@ -20,6 +20,9 @@ ARG VITE_SUPABASE_ANON_KEY
 ENV VITE_SUPABASE_URL=$VITE_SUPABASE_URL
 ENV VITE_SUPABASE_ANON_KEY=$VITE_SUPABASE_ANON_KEY
 
+# Increase Node memory limit to prevent Vite build from hanging
+ENV NODE_OPTIONS="--max-old-space-size=4096"
+
 # Build the project
 RUN npm run build
 
