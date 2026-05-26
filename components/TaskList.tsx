@@ -38,7 +38,7 @@ export const TaskList: React.FC<TaskListProps> = ({ onSelectProject, searchQuery
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [trackingTask, setTrackingTask] = useState<Task | null>(null);
   const [onlyMe, setOnlyMe] = useState(false);
-  const [viewMode, setViewMode] = useState<'grid' | 'board'>('grid');
+  const [viewMode, setViewMode] = useState<'grid' | 'board' | 'list'>('grid');
 
   const [filters, setFilters] = useState<TaskFilters>({
     status: 'all',
@@ -155,7 +155,7 @@ export const TaskList: React.FC<TaskListProps> = ({ onSelectProject, searchQuery
 
       if (filters.status !== 'all') {
         if (task.status !== filters.status) return false;
-      } else if (viewMode === 'grid' && task.status === TaskStatus.Done) {
+      } else if ((viewMode === 'grid' || viewMode === 'list') && task.status === TaskStatus.Done) {
         return false;
       }
       if (filters.projectId !== 'all' && task.project_id !== filters.projectId) return false;
@@ -292,6 +292,16 @@ export const TaskList: React.FC<TaskListProps> = ({ onSelectProject, searchQuery
               <Icon path="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" className="w-5 h-5" />
             </button>
             <button
+              onClick={() => setViewMode('list')}
+              className={`p-2 rounded transition-colors ${viewMode === 'list'
+                ? 'bg-primary text-primary-foreground shadow-sm'
+                : 'text-secondary-foreground hover:text-foreground hover:bg-muted'
+                }`}
+              title="List View"
+            >
+              <Icon path="M4 6h16M4 12h16M4 18h16" className="w-5 h-5" />
+            </button>
+            <button
               onClick={() => setViewMode('board')}
               className={`p-2 rounded transition-colors ${viewMode === 'board'
                 ? 'bg-primary text-primary-foreground shadow-sm'
@@ -320,7 +330,7 @@ export const TaskList: React.FC<TaskListProps> = ({ onSelectProject, searchQuery
       <div className="mb-6 bg-card border border-border rounded-lg p-4">
         <div className="flex flex-wrap gap-4 items-end">
           {/* Status Filter - Hide in Board View as it filters redundant columns */}
-          {viewMode === 'grid' && (
+          {viewMode !== 'board' && (
             <div className="flex-1 min-w-[150px]">
               <label className="block text-sm font-medium text-muted-foreground mb-1">
                 Status
@@ -379,7 +389,7 @@ export const TaskList: React.FC<TaskListProps> = ({ onSelectProject, searchQuery
           </div>
 
           {/* Sort Dropdown - Grid Only */}
-          {viewMode === 'grid' && (
+          {viewMode !== 'board' && (
             <div className="flex-1 min-w-[200px]">
               <label className="block text-sm font-medium text-muted-foreground mb-1">
                 Sort By
@@ -442,7 +452,7 @@ export const TaskList: React.FC<TaskListProps> = ({ onSelectProject, searchQuery
         </div>
       ) : (
         <>
-          {viewMode === 'grid' ? (
+          {viewMode === 'grid' && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 overflow-y-auto pb-6">
               {filteredAndSortedTasks.map(task => {
                 const project = projects.find(p => p.id === task.project_id);
@@ -460,7 +470,28 @@ export const TaskList: React.FC<TaskListProps> = ({ onSelectProject, searchQuery
                 );
               })}
             </div>
-          ) : (
+          )}
+          {viewMode === 'list' && (
+            <div className="flex flex-col gap-2 overflow-y-auto pb-6">
+              {filteredAndSortedTasks.map(task => {
+                const project = projects.find(p => p.id === task.project_id);
+                return (
+                  <TaskCard
+                    key={task.id}
+                    task={task}
+                    project={project}
+                    onEdit={setEditingTask}
+                    onTimeTrack={setTrackingTask}
+                    onSelectProject={onSelectProject}
+                    onDelete={handleDeleteTask}
+                    onDuplicate={handleDuplicateTask}
+                    layout="row"
+                  />
+                );
+              })}
+            </div>
+          )}
+          {viewMode === 'board' && (
             <div className="flex-grow overflow-hidden pb-4">
               <KanbanBoard
                 tasks={filteredAndSortedTasks}

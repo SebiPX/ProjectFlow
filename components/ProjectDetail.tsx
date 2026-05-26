@@ -103,7 +103,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
   // Financial Documents State
   const [isFinancialDocModalOpen, setIsFinancialDocModalOpen] = useState(false);
   const [editingDocument, setEditingDocument] = useState<(FinancialDocument & { items: FinancialItem[] }) | undefined>(undefined);
-  const [viewMode, setViewMode] = useState<'board' | 'grid'>('board');
+  const [viewMode, setViewMode] = useState<'board' | 'grid' | 'list'>('board');
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [trackingTask, setTrackingTask] = useState<Task | null>(null);
 
@@ -366,6 +366,19 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
             <div className="flex justify-between items-center px-6 py-4 border-b border-border">
               <h2 className="text-xl font-bold text-foreground">Project Tasks</h2>
               <div className="flex items-center gap-4">
+                {teamMembers && teamMembers.length > 0 && (
+                  <div className="hidden sm:flex items-center -space-x-2 mr-2">
+                    {teamMembers.map((member, i) => (
+                      <div key={member.profile?.id || i} title={member.profile?.full_name || 'Team Member'} className="relative group" style={{ zIndex: 10 - i }}>
+                        <Avatar
+                          avatarPath={member.profile?.avatar_url}
+                          alt={member.profile?.full_name || ''}
+                          className="w-8 h-8 rounded-full border-2 border-card"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
                 <div className="bg-secondary p-1 rounded-lg border border-border flex">
                   <button
                     onClick={() => setViewMode('grid')}
@@ -377,8 +390,18 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
                   >
                     <Icon path="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" className="w-5 h-5" />
                   </button>
-                  <button
-                    onClick={() => setViewMode('board')}
+                    <button
+                      onClick={() => setViewMode('list')}
+                      className={`p-2 rounded transition-colors ${viewMode === 'list'
+                        ? 'bg-primary text-primary-foreground shadow-sm'
+                        : 'text-secondary-foreground hover:text-foreground hover:bg-muted'
+                        }`}
+                      title="List View"
+                    >
+                      <Icon path="M4 6h16M4 12h16M4 18h16" className="w-5 h-5" />
+                    </button>
+                    <button
+                      onClick={() => setViewMode('board')}
                     className={`p-2 rounded transition-colors ${viewMode === 'board'
                       ? 'bg-primary text-primary-foreground shadow-sm'
                       : 'text-secondary-foreground hover:text-foreground hover:bg-muted'
@@ -388,7 +411,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
                     <Icon path="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" className="w-5 h-5" />
                   </button>
                 </div>
-                {true && (
+                {!isClient && (
                   <button
                     onClick={() => setIsTaskFormModalOpen(true)}
                     className="px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-colors flex items-center gap-2"
@@ -400,30 +423,49 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
               </div>
             </div>
             <div className="flex-grow overflow-hidden">
-              {viewMode === 'grid' ? (
-                <div className="p-6 overflow-y-auto h-full">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {sortedTasks.filter(t => t.status !== TaskStatus.Done).map((task) => (
-                      <TaskCard
-                        key={task.id}
-                        task={task}
-                        project={project}
-                        onEdit={setEditingTask}
-                        onTimeTrack={setTrackingTask}
-                        onDelete={isClient ? undefined : handleDeleteTask}
-                        onDuplicate={isClient ? undefined : handleDuplicateTask}
-                      />
-                    ))}
+                {viewMode === 'grid' && (
+                  <div className="p-6 overflow-y-auto h-full">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                      {sortedTasks.filter(t => t.status !== TaskStatus.Done).map((task) => (
+                        <TaskCard
+                          key={task.id}
+                          task={task}
+                          project={project}
+                          onEdit={setEditingTask}
+                          onTimeTrack={setTrackingTask}
+                          onDelete={isClient ? undefined : handleDeleteTask}
+                          onDuplicate={isClient ? undefined : handleDuplicateTask}
+                        />
+                      ))}
+                    </div>
                   </div>
-                </div>
-              ) : (
-                <KanbanBoard 
-                  tasks={sortedTasks} 
-                  onStatusChange={isClient ? undefined : handleUpdateTaskStatus} 
-                  onDeleteTask={isClient ? undefined : handleDeleteTask} 
-                  onDuplicateTask={isClient ? undefined : handleDuplicateTask}
-                />
-              )}
+                )}
+                {viewMode === 'list' && (
+                  <div className="p-6 overflow-y-auto h-full">
+                    <div className="flex flex-col gap-2">
+                      {sortedTasks.filter(t => t.status !== TaskStatus.Done).map((task) => (
+                        <TaskCard
+                          key={task.id}
+                          task={task}
+                          project={project}
+                          onEdit={setEditingTask}
+                          onTimeTrack={setTrackingTask}
+                          onDelete={isClient ? undefined : handleDeleteTask}
+                          onDuplicate={isClient ? undefined : handleDuplicateTask}
+                          layout="row"
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {viewMode === 'board' && (
+                  <KanbanBoard 
+                    tasks={sortedTasks} 
+                    onStatusChange={isClient ? undefined : handleUpdateTaskStatus} 
+                    onDeleteTask={isClient ? undefined : handleDeleteTask} 
+                    onDuplicateTask={isClient ? undefined : handleDuplicateTask}
+                  />
+                )}
             </div>
           </div>
         );

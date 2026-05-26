@@ -21,6 +21,7 @@ interface TaskCardProps {
   onSelectProject?: (project: Project) => void;
   onDelete?: (task: Task) => void;
   onDuplicate?: (task: Task) => void;
+  layout?: 'card' | 'row';
 }
 
 export const TaskCard: React.FC<TaskCardProps> = ({
@@ -30,7 +31,8 @@ export const TaskCard: React.FC<TaskCardProps> = ({
   onTimeTrack,
   onSelectProject,
   onDelete,
-  onDuplicate
+  onDuplicate,
+  layout = 'card'
 }) => {
   const { profile } = useAuth();
   const isClient = profile?.role === 'client';
@@ -73,6 +75,104 @@ export const TaskCard: React.FC<TaskCardProps> = ({
   };
 
   const datesList = getAllDates();
+
+  if (layout === 'row') {
+    return (
+      <Card className="hover:border-primary transition-all duration-200 flex items-center justify-between p-3 bg-card border-border shadow-sm hover:shadow-md mb-2">
+        <div className="flex items-center gap-4 flex-1 overflow-hidden">
+          {/* Status Badge */}
+          <span className={`px-2.5 py-1 text-xs font-semibold rounded-full whitespace-nowrap ${taskStatusStyles[task.status!] || 'bg-muted text-muted-foreground'}`}>
+            {task.status?.replace('_', ' ')}
+          </span>
+          
+          {/* Title and Project */}
+          <div className="flex flex-col overflow-hidden w-1/3">
+            <h3 className="text-base font-bold text-foreground truncate" title={task.title}>
+              {task.title}
+            </h3>
+            {project && (
+              <span className="text-xs text-muted-foreground truncate" style={{ color: project.color_code || undefined }}>
+                {project.title}
+              </span>
+            )}
+          </div>
+          
+          {/* Service Module */}
+          <div className="hidden md:flex flex-col overflow-hidden w-1/4">
+            {canSeeFinancesAndTeam && task.service_module && (
+              <span className="text-xs text-primary truncate bg-primary/10 px-2 py-0.5 rounded w-fit">
+                {(task.service_module as any).service_module}
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Info (Assignees, Dates, Actions) */}
+        <div className="flex items-center gap-4 ml-4">
+          {/* Assignees */}
+          {canSeeFinancesAndTeam && (
+            <div className="flex items-center -space-x-2 min-w-[60px] justify-end">
+              {task.assignees && task.assignees.length > 0 ? (
+                task.assignees.map((assignee, index) => (
+                  <div key={assignee.id || index} className="relative group" style={{ zIndex: 10 - index }}>
+                    <Avatar
+                      avatarPath={assignee.avatar_url}
+                      alt={assignee.full_name || ''}
+                      className="w-8 h-8 rounded-full border-2 border-card relative"
+                    />
+                  </div>
+                ))
+              ) : task.assignee ? (
+                <Avatar
+                  avatarPath={task.assignee.avatar_url}
+                  alt={task.assignee.full_name || ''}
+                  className="w-8 h-8 rounded-full"
+                />
+              ) : (
+                <span className="text-xs text-muted-foreground">Unassigned</span>
+              )}
+            </div>
+          )}
+
+          {/* Dates */}
+          <div className="min-w-[110px] flex justify-end">
+            {datesList.length > 0 ? (
+               <div className="flex items-center gap-1">
+                 <Icon path="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" className="w-4 h-4 text-muted-foreground" />
+                 <span className={`text-xs ${datesList[0].isOverdue ? 'text-destructive font-bold' : 'text-foreground'}`}>
+                   {new Date(datesList[0].date).toLocaleDateString('de-DE')}
+                 </span>
+               </div>
+            ) : (
+               <span className="text-xs text-muted-foreground">-</span>
+            )}
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex items-center gap-1 border-l border-border pl-4">
+            <button onClick={(e) => { e.stopPropagation(); onTimeTrack(task); }} className="p-1.5 text-emerald-600 hover:bg-muted rounded transition-colors" title="Track Time">
+              <Icon path="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" className="w-4 h-4" />
+            </button>
+            {canEdit && (
+              <button onClick={(e) => { e.stopPropagation(); onEdit(task); }} className="p-1.5 text-muted-foreground hover:text-primary hover:bg-muted rounded transition-colors" title="Edit">
+                <Icon path="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" className="w-4 h-4" />
+              </button>
+            )}
+            {canEdit && onDuplicate && (
+              <button onClick={(e) => { e.stopPropagation(); onDuplicate(task); }} className="p-1.5 text-muted-foreground hover:text-primary hover:bg-muted rounded transition-colors" title="Duplicate">
+                <Icon path="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" className="w-4 h-4" />
+              </button>
+            )}
+            {canDelete && onDelete && (
+              <button onClick={(e) => { e.stopPropagation(); if (window.confirm('Möchtest du diesen Task wirklich löschen?')) onDelete(task); }} className="p-1.5 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 rounded transition-colors" title="Delete">
+                <Icon path="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+        </div>
+      </Card>
+    );
+  }
 
   return (
     <Card className="hover:border-primary transition-all duration-200 flex flex-col h-full bg-card border-border shadow-sm hover:shadow-md">
