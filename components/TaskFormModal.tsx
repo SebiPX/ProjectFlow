@@ -184,7 +184,6 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
   };
 
   if (!isOpen) return null;
-  if (!preSelectedProjectId) return null; // Force project context
 
 
   return (
@@ -399,7 +398,26 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
              </label>
           </div>
 
-          {/* Project Blocked - Removed Project Selection since it's forced */}
+          {/* Project Selection */}
+          <div>
+            <label htmlFor="project_id" className="block text-sm font-medium text-muted-foreground mb-2">
+              Project *
+            </label>
+            <select
+              id="project_id"
+              required
+              value={formData.project_id}
+              onChange={(e) => setFormData({ ...formData, project_id: e.target.value })}
+              className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+            >
+              <option value="">Select a project...</option>
+              {projects.map((p: any) => (
+                <option key={p.id} value={p.id}>
+                  {p.title}
+                </option>
+              ))}
+            </select>
+          </div>
 
           {/* Description */}
           <div>
