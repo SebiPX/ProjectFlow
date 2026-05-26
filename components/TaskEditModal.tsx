@@ -145,10 +145,15 @@ export const TaskEditModal: React.FC<TaskEditModalProps> = ({ isOpen, onClose, t
   // Update task mutation
   const updateMutation = useMutation({
     mutationFn: (updates: Partial<Task>) => updateTask(task.id, updates),
-    onSuccess: () => {
+    onSuccess: (_result, variables) => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       queryClient.invalidateQueries({ queryKey: ['tasks', task.project_id] });
       queryClient.invalidateQueries({ queryKey: ['project-service-breakdown', task.project_id] });
+      // If task was moved to another project, also invalidate that project's queries
+      if (variables.project_id && variables.project_id !== task.project_id) {
+        queryClient.invalidateQueries({ queryKey: ['tasks', variables.project_id] });
+        queryClient.invalidateQueries({ queryKey: ['project-service-breakdown', variables.project_id] });
+      }
       toast.success('Task updated successfully!');
       onClose();
     },
