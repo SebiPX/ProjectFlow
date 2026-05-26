@@ -153,7 +153,11 @@ export const TaskList: React.FC<TaskListProps> = ({ onSelectProject, searchQuery
         if (!matchesTitle && !matchesDesc) return false;
       }
 
-      if (filters.status !== 'all' && task.status !== filters.status) return false;
+      if (filters.status !== 'all') {
+        if (task.status !== filters.status) return false;
+      } else if (viewMode === 'grid' && task.status === TaskStatus.Done) {
+        return false;
+      }
       if (filters.projectId !== 'all' && task.project_id !== filters.projectId) return false;
       
       if (filters.assigneeId === 'unassigned' && !isUnassigned) return false;

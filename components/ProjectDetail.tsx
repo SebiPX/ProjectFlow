@@ -403,7 +403,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
               {viewMode === 'grid' ? (
                 <div className="p-6 overflow-y-auto h-full">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {sortedTasks.map((task) => (
+                    {sortedTasks.filter(t => t.status !== TaskStatus.Done).map((task) => (
                       <TaskCard
                         key={task.id}
                         task={task}
