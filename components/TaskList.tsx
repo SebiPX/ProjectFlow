@@ -46,8 +46,8 @@ export const TaskList: React.FC<TaskListProps> = ({ onSelectProject, searchQuery
     assigneeId: 'all',
   });
   const [sort, setSort] = useState<TaskSort>({
-    field: 'created_at',
-    direction: 'desc',
+    field: 'due_date',
+    direction: 'asc',
   });
 
   const { data: tasks = [], isLoading: tasksLoading, error: tasksError } = useQuery({

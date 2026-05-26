@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../lib/AuthContext';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
@@ -112,6 +112,15 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
     queryKey: ['tasks', project.id],
     queryFn: () => getTasksByProject(project.id),
   });
+
+  const sortedTasks = useMemo(() => {
+    return [...tasks].sort((a, b) => {
+      if (!a.due_date && !b.due_date) return 0;
+      if (!a.due_date) return 1;
+      if (!b.due_date) return -1;
+      return new Date(a.due_date).getTime() - new Date(b.due_date).getTime();
+    });
+  }, [tasks]);
 
   // Fetch real assets for this project
   const { data: assets = [], isLoading: assetsLoading } = useQuery({
@@ -394,7 +403,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
               {viewMode === 'grid' ? (
                 <div className="p-6 overflow-y-auto h-full">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {tasks.map((task) => (
+                    {sortedTasks.map((task) => (
                       <TaskCard
                         key={task.id}
                         task={task}
@@ -409,7 +418,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
                 </div>
               ) : (
                 <KanbanBoard 
-                  tasks={tasks} 
+                  tasks={sortedTasks} 
                   onStatusChange={isClient ? undefined : handleUpdateTaskStatus} 
                   onDeleteTask={isClient ? undefined : handleDeleteTask} 
                   onDuplicateTask={isClient ? undefined : handleDuplicateTask}
