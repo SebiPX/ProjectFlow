@@ -107,10 +107,24 @@ export async function getAssetSignedUrl(storagePath: string): Promise<string> {
  * Download an asset file
  */
 export async function downloadAsset(storagePath: string, fileName: string): Promise<void> {
+  let url = '';
   try {
-    const url = await getAssetSignedUrl(storagePath);
-    const response = await fetch(url);
-    if (!response.ok) throw new Error('Download failed');
+    url = await getAssetSignedUrl(storagePath);
+    
+    // Use the proxy to avoid CORS
+    const proxyUrl = `${import.meta.env.VITE_API_URL}/api/proxy/download?url=${encodeURIComponent(url)}&filename=${encodeURIComponent(fileName)}`;
+    
+    const sessionStr = localStorage.getItem('agency_session');
+    const headers: Record<string, string> = {};
+    if (sessionStr) {
+      try {
+        const session = JSON.parse(sessionStr);
+        headers['Authorization'] = `Bearer ${session.access_token}`;
+      } catch (e) {}
+    }
+
+    const response = await fetch(proxyUrl, { headers });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const blob = await response.blob();
     
     // Create download link
@@ -123,7 +137,12 @@ export async function downloadAsset(storagePath: string, fileName: string): Prom
     document.body.removeChild(a);
     window.URL.revokeObjectURL(objectUrl);
   } catch (error: any) {
-    throw new Error(`Failed to download asset: ${error.message}`);
+    console.error('[downloadAsset] Proxy failed, falling back to direct open:', error);
+    if (url) {
+      window.open(url, '_blank');
+    } else {
+      throw new Error(`Failed to download asset: ${error.message}`);
+    }
   }
 }
 
