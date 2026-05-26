@@ -3,6 +3,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { createTask, getTasksByProject } from '../services/api/tasks';
 import { getProjects, getProjectServices } from '../services/api/projects';
+import { getAssetsByProject } from '../services/api/assets';
+import { getProjectDocuments } from '../services/api/documents';
 import { getProfiles } from '../services/api/profiles';
 import type { Task } from '../types/supabase';
 import { Icon } from './ui/Icon';
@@ -49,6 +51,19 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
     queryKey: ['projects'],
     queryFn: getProjects,
     enabled: isOpen,
+  });
+
+  // Fetch assets and documents for materials dropdown
+  const { data: projectAssets = [] } = useQuery({
+    queryKey: ['assets', formData.project_id],
+    queryFn: () => getAssetsByProject(formData.project_id || ''),
+    enabled: isOpen && !!formData.project_id,
+  });
+
+  const { data: projectDocuments = [] } = useQuery({
+    queryKey: ['documents', formData.project_id],
+    queryFn: () => getProjectDocuments(formData.project_id || ''),
+    enabled: isOpen && !!formData.project_id,
   });
 
   // Fetch tasks for dependency dropdown
@@ -615,14 +630,43 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
                 <h3 className="text-sm font-medium text-foreground">Materials / Equipment</h3>
                 <p className="text-xs text-muted-foreground">List external materials or items required.</p>
               </div>
-              <button
-                type="button"
-                onClick={() => setMaterials([...materials, ''])}
-                className="text-primary hover:text-primary/80 transition-colors flex items-center gap-1 text-sm font-medium"
-              >
-                <Icon path="M12 4v16m8-8H4" className="w-4 h-4" />
-                Add Material
-              </button>
+              <div className="flex items-center gap-3">
+                {(projectAssets.length > 0 || projectDocuments.length > 0) && (
+                  <select
+                    value=""
+                    onChange={(e) => {
+                      if (e.target.value) {
+                        setMaterials([...materials, e.target.value]);
+                      }
+                    }}
+                    className="px-2 py-1 bg-muted border border-input rounded text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary max-w-[150px] overflow-hidden text-ellipsis whitespace-nowrap"
+                  >
+                    <option value="">+ From Project</option>
+                    {projectAssets.length > 0 && (
+                      <optgroup label="Assets">
+                        {projectAssets.map((a: any) => (
+                          <option key={`asset-${a.id}`} value={`Asset: ${a.name}`}>{a.name}</option>
+                        ))}
+                      </optgroup>
+                    )}
+                    {projectDocuments.length > 0 && (
+                      <optgroup label="Documents">
+                        {projectDocuments.map((d: any) => (
+                          <option key={`doc-${d.id}`} value={`Doc: ${d.title}`}>{d.title}</option>
+                        ))}
+                      </optgroup>
+                    )}
+                  </select>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setMaterials([...materials, ''])}
+                  className="text-primary hover:text-primary/80 transition-colors flex items-center gap-1 text-sm font-medium"
+                >
+                  <Icon path="M12 4v16m8-8H4" className="w-4 h-4" />
+                  Custom
+                </button>
+              </div>
             </div>
             
             <div className="space-y-2">
