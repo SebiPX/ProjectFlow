@@ -32,35 +32,23 @@ import { LocationsList } from './components/directory/LocationsList';
 import { CasesList } from './components/CasesList';
 import { PublicAssetReview } from './components/PublicAssetReview';
 
-export type View = 'dashboard' | 'projects' | 'project-detail' | 'tasks' | 'planning' | 'assets' | 'clients' | 'employees' | 'service-catalog' | 'finances' | 'reports' | 'resources' | 'settings' | 'inventar' | 'verleih' | 'verleih-formular' | 'kalender' | 'logins' | 'handyvertraege' | 'kreditkarten' | 'firmendaten' | 'links' | 'chat' | 'directory-freelancers' | 'directory-locations' | 'cases';
+export type { View } from './lib/useFlowHashRouter';
+import { useFlowHashRouter, View } from './lib/useFlowHashRouter';
 
 const MainApp: React.FC = () => {
-  const [view, setView] = useState<View>('dashboard');
-  const [activeProject, setActiveProject] = useState<Project | null>(MOCK_PROJECTS[0]);
-  const [searchQuery, setSearchQuery] = useState('');
+  const {
+    view,
+    activeProject,
+    activeProjectTab,
+    searchQuery,
+    setSearchQuery,
+    handleNavigate,
+    handleSelectProject
+  } = useFlowHashRouter();
   const { user, profile, loading } = useAuth();
 
   // Initialize Realtime subscriptions
   useRealtime();
-
-  const [activeProjectTab, setActiveProjectTab] = useState<string>('tasks');
-
-  const handleNavigate = (newView: View, entityId?: string, tab?: string) => {
-    setView(newView);
-    setSearchQuery(''); // Clear search when changing view
-
-    if (newView === 'project-detail' && entityId) {
-      setActiveProject({ id: entityId } as Project);
-      if (tab) setActiveProjectTab(tab);
-    }
-  };
-
-  const handleSelectProject = (project: Project) => {
-    setActiveProject(project);
-    setActiveProjectTab('overview');
-    setView('project-detail');
-    setSearchQuery('');
-  };
 
   const renderContent = () => {
     if (view === 'finances' && profile?.role === 'freelancer') {
