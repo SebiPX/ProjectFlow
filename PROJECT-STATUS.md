@@ -506,6 +506,12 @@ Don't try to create RLS policies for admin access to all profiles - use service 
 - ✅ **Unrestricted Public Access**: The backend API (`labs-api`) was updated to allow public access to assets regardless of their current status, making the Share Link universally functional.
 - ✅ **Inline Asset Renaming**: Double-clicking an asset name or clicking the edit icon in the AssetCard now allows for rapid inline renaming, persisted directly to the database.
 
+### Completed in v2.10.0 ✅ (May 2026) - SHARED NOTES & ARCHIVE SYNC
+
+- ✅ **Shared ToDo / Notes Module**: Integrated the "ToDo / Notizen" module from PX-Studio directly into PX-Flow's sidebar ("PX Desk"). Both apps now share the exact same `public.notes` PostgreSQL table and `/api/notes` backend route, offering seamless real-time syncing of user-specific markdown notes across both platforms.
+- ✅ **Superadmin Visibility Fixes**: Fixed permission checks in PX-Flow's Navigation, Project Detail, and Employee List components to correctly acknowledge the `superadmin` role, restoring full access and edit capabilities for inventory tabs (Karten, Verträge) that were unintentionally hidden.
+- ✅ **Moco Auto-Archiving Sync**: Fixed a major bug in `mocoDbSync.ts` where projects archived in MOCO App were indefinitely left as "Active" in PX-Flow. The sync cronjob now strictly detects missing active Moco IDs and automatically force-updates stale internal projects to `status = 'completed'` to respect the `agency_projects_status_check` constraint, instantly hiding them from Kanban and List views.
+
 1. **Integrations & Export (Phase 2)**
    - [x] Automation email notifications (Edge Functions)
    - [ ] API for external tool integration
