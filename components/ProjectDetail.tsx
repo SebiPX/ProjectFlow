@@ -60,7 +60,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
   const queryClient = useQueryClient();
   const { profile } = useAuth(); // Add this hook call
   const isClient = profile?.role === 'client';
-  const isAdminOrPJM = profile?.role === 'admin' || profile?.role === 'pjm';
+  const isAdminOrPJM = profile?.role === 'admin' || profile?.role === 'superadmin' || profile?.role === 'pjm';
 
   const isFreelancer = profile?.role === 'freelancer';
 

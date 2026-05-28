@@ -24,7 +24,7 @@ export const EmployeeList: React.FC<EmployeeListProps> = ({ searchQuery = '' }) 
   const { onlineUsers } = usePresence();
   const { profile } = useAuth();
 
-  const isAdmin = profile?.role === 'admin';
+  const isAdmin = profile?.role === 'admin' || profile?.role === 'superadmin';
 
   const { data: employees = [], isLoading, error } = useQuery({
     queryKey: ['employees', isAdmin ? 'admin' : 'public'],
@@ -135,10 +135,11 @@ export const EmployeeList: React.FC<EmployeeListProps> = ({ searchQuery = '' }) 
 
                 {/* Role Badge */}
                 <span
-                  className={`px-3 py-1 text-xs font-semibold rounded-full mb-4 ${employee.role === 'admin'
-                    ? 'bg-purple-500/20 text-purple-400'
-                    : employee.role === 'pjm'
-                      ? 'bg-green-500/20 text-green-400'
+                  className={`px-3 py-1 text-xs font-semibold rounded-full mb-4 ${
+                    (employee.role === 'admin' || employee.role === 'superadmin')
+                      ? 'bg-purple-100/10 text-purple-400 border border-purple-500/20'
+                      : employee.role === 'pjm'
+                      ? 'bg-blue-100/10 text-blue-400 border border-blue-500/20'
                       : employee.role === 'creative'
                         ? 'bg-primary/20 text-primary'
                         : employee.role === 'client'

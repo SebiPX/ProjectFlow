@@ -52,6 +52,7 @@ const navCategories: NavCategory[] = [
           { view: 'links', label: 'Links', icon: 'link' },
         ]
       },
+      { view: 'notes', label: 'ToDo / Notizen', icon: 'M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z' },
       { view: 'handyvertraege', label: 'Verträge', icon: 'smartphone', adminOnly: true },
       { view: 'kreditkarten', label: 'Karten', icon: 'credit_card', adminOnly: true },
       { view: 'firmendaten', label: 'Firma', icon: 'business', adminOnly: true },
@@ -92,7 +93,7 @@ const navCategories: NavCategory[] = [
 
 export const Navigation: React.FC<NavigationProps> = ({ currentView, onNavigate, searchQuery, onSearch }) => {
   const { profile, signOut } = useAuth();
-  const isAdmin = profile?.role === 'admin';
+  const isAdmin = profile?.role === 'admin' || profile?.role === 'superadmin';
   const isClient = profile?.role === 'client';
 
   const [showDropdown, setShowDropdown] = useState(false);
