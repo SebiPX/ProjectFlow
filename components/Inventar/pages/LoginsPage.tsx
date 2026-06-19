@@ -159,8 +159,20 @@ export function LoginsPage({ logins, isAdmin, isGF, onCreate, onUpdate, onDelete
                 <tr className="bg-brand-500/5">
                   {(['name','website','login_name','passwort','anmerkung','kategorie','department'] as const).map(f => (
                     <td key={f} className="px-2 py-1.5">
-                      <input value={(newData[f] as string) || ''} onChange={e => setNewData(p => ({ ...p, [f]: e.target.value }))}
-                        placeholder={f} className={inputCls} />
+                      {f === 'kategorie' ? (
+                        <select
+                          value={newData.kategorie || 'Interne Logins'}
+                          onChange={e => setNewData(p => ({ ...p, kategorie: e.target.value }))}
+                          className={inputCls + ' cursor-pointer'}
+                        >
+                          <option value="Interne Logins">Interne Logins</option>
+                          <option value="Externe Logins">Externe Logins</option>
+                          <option value="Social Media">Social Media</option>
+                        </select>
+                      ) : (
+                        <input value={(newData[f] as string) || ''} onChange={e => setNewData(p => ({ ...p, [f]: e.target.value }))}
+                          placeholder={f} className={inputCls} />
+                      )}
                     </td>
                   ))}
                   <td className="px-2 py-1.5 sticky right-0 bg-background/95 backdrop-blur z-10 shadow-[-10px_0_15px_-10px_rgba(0,0,0,0.3)] border-l border-border/50">
@@ -184,8 +196,20 @@ export function LoginsPage({ logins, isAdmin, isGF, onCreate, onUpdate, onDelete
                     <>
                       {(['name','website','login_name','passwort','anmerkung','kategorie','department'] as const).map(f => (
                         <td key={f} className="px-2 py-1.5">
-                          <input value={(editData[f] as string) || ''} onChange={e => setEditData(p => ({ ...p, [f]: e.target.value }))}
-                            className={inputCls} />
+                          {f === 'kategorie' ? (
+                            <select
+                              value={editData.kategorie || 'Interne Logins'}
+                              onChange={e => setEditData(p => ({ ...p, kategorie: e.target.value }))}
+                              className={inputCls + ' cursor-pointer'}
+                            >
+                              <option value="Interne Logins">Interne Logins</option>
+                              <option value="Externe Logins">Externe Logins</option>
+                              <option value="Social Media">Social Media</option>
+                            </select>
+                          ) : (
+                            <input value={(editData[f] as string) || ''} onChange={e => setEditData(p => ({ ...p, [f]: e.target.value }))}
+                              className={inputCls} />
+                          )}
                         </td>
                       ))}
                       <td className="px-2 py-1.5 sticky right-0 bg-background/95 backdrop-blur z-10 shadow-[-10px_0_15px_-10px_rgba(0,0,0,0.3)] border-l border-border/50">
