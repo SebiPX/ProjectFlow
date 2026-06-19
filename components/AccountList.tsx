@@ -2,7 +2,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { accounts, Account } from '../lib/apiClient';
 import { 
     Search, Copy, Check, Plus, Pencil, Trash2, Eye, EyeOff, 
-    ExternalLink, ShieldAlert, KeyRound, Building, Mail, Phone, MapPin, Tag, FileText
+    ExternalLink, ShieldAlert, KeyRound, Building, Mail, Phone, MapPin, Tag, FileText, X
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 
