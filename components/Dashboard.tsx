@@ -157,6 +157,32 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProject }) => {
     .sort((a, b) => b.count - a.count)
     .slice(0, 3);
 
+  // Top 3 Users (All roles) with tasks todo
+  const usersTodo = profiles.map(profile => {
+    const count = tasks.filter(t => t.status === 'todo' && isAssigned(t, profile.id)).length;
+    return {
+      id: profile.id,
+      name: profile.full_name || 'Unknown User',
+      avatarUrl: profile.avatar_url || '',
+      count,
+    };
+  })
+  .sort((a, b) => b.count - a.count)
+  .slice(0, 3);
+
+  // Top 3 Users (All roles) with tasks in progress
+  const usersInProgress = profiles.map(profile => {
+    const count = tasks.filter(t => t.status === 'in_progress' && isAssigned(t, profile.id)).length;
+    return {
+      id: profile.id,
+      name: profile.full_name || 'Unknown User',
+      avatarUrl: profile.avatar_url || '',
+      count,
+    };
+  })
+  .sort((a, b) => b.count - a.count)
+  .slice(0, 3);
+
   // Kitchen Duty calculations
   const today = new Date();
   const currentWeekNum = getWeekNumber(today);
@@ -339,6 +365,66 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProject }) => {
               ))
             ) : (
               <p className="text-sm text-muted-foreground text-center py-6">No PJMs assigned.</p>
+            )}
+          </div>
+        </Card>
+
+        {/* Top 3 Users (All) ToDo */}
+        <Card className="flex flex-col h-full bg-card border-border">
+          <div className="flex items-center space-x-3 mb-4 pb-2 border-b border-border">
+            <span className="p-2 rounded-lg bg-rose-500/10 text-rose-500">
+              <Icon path="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" className="w-5 h-5" />
+            </span>
+            <h3 className="text-lg font-bold text-foreground">Top 3 Users (ToDo)</h3>
+          </div>
+          <div className="space-y-4 flex-1">
+            {usersTodo.length > 0 ? (
+              usersTodo.map((user, index) => (
+                <div key={user.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
+                  <div className="flex items-center space-x-3">
+                    <span className="text-xl font-bold w-6 text-center">
+                      {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}`}
+                    </span>
+                    <Avatar avatarPath={user.avatarUrl} alt={user.name} size="sm" />
+                    <span className="font-semibold text-foreground text-sm">{user.name}</span>
+                  </div>
+                  <span className="text-xs font-bold bg-rose-500/10 text-rose-500 px-2.5 py-1 rounded-full">
+                    {user.count} Tasks
+                  </span>
+                </div>
+              ))
+            ) : (
+              <p className="text-sm text-muted-foreground text-center py-6">No tasks in ToDo.</p>
+            )}
+          </div>
+        </Card>
+
+        {/* Top 3 Users (All) In Progress */}
+        <Card className="flex flex-col h-full bg-card border-border">
+          <div className="flex items-center space-x-3 mb-4 pb-2 border-b border-border">
+            <span className="p-2 rounded-lg bg-indigo-500/10 text-indigo-500">
+              <Icon path="M9.663 17h4.673M12 3v1m6.364.364l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" className="w-5 h-5" />
+            </span>
+            <h3 className="text-lg font-bold text-foreground">Top 3 Users (In Progress)</h3>
+          </div>
+          <div className="space-y-4 flex-1">
+            {usersInProgress.length > 0 ? (
+              usersInProgress.map((user, index) => (
+                <div key={user.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
+                  <div className="flex items-center space-x-3">
+                    <span className="text-xl font-bold w-6 text-center">
+                      {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}`}
+                    </span>
+                    <Avatar avatarPath={user.avatarUrl} alt={user.name} size="sm" />
+                    <span className="font-semibold text-foreground text-sm">{user.name}</span>
+                  </div>
+                  <span className="text-xs font-bold bg-indigo-500/10 text-indigo-500 px-2.5 py-1 rounded-full">
+                    {user.count} Tasks
+                  </span>
+                </div>
+              ))
+            ) : (
+              <p className="text-sm text-muted-foreground text-center py-6">No tasks in progress.</p>
             )}
           </div>
         </Card>
