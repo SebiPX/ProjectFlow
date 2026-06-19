@@ -12,7 +12,7 @@ interface Props {
 
 const inputCls = 'w-full px-2 py-1.5 bg-background border border-input rounded-lg text-xs text-foreground placeholder-slate-500 focus:outline-none focus:border-brand-500'
 
-type Kat = 'Bankverbindung' | 'Handelsregister'
+type Kat = 'Bankverbindung' | 'Handelsregister' | 'DUNS'
 
 function emptyEintrag(kat: Kat): Omit<Firmendatum, 'id' | 'created_at' | 'updated_at'> {
   return { kategorie: kat, bezeichner: '', wert: '', anmerkung: '', datei_name: '', sort_order: 99 }
@@ -101,6 +101,54 @@ function RegisterSection({ rows, onEdit, onDelete, onAdd }: {
   )
 }
 
+// ── DUNS section ─────────────────────────────────────────────
+function DunsSection({ rows, onEdit, onDelete, onAdd }: {
+  rows: Firmendatum[]
+  onEdit: (f: Firmendatum) => void
+  onDelete: (id: string, label: string | null) => void
+  onAdd: () => void
+}) {
+  return (
+    <div className="bg-card/60 border border-border rounded-2xl overflow-hidden">
+      <div className="flex items-center justify-between px-5 py-3.5 border-b border-border bg-background/40">
+        <div className="flex items-center gap-2.5">
+          <Building2 size={18} className="text-brand-400" />
+          <h2 className="font-semibold text-foreground">D-U-N-S Nummer</h2>
+          <span className="text-xs text-muted-foreground">{rows.length} Einträge</span>
+        </div>
+        {rows.length === 0 && (
+          <button onClick={onAdd} className="flex items-center gap-1.5 px-3 py-1.5 bg-brand-600 hover:bg-brand-500 text-foreground text-xs font-semibold rounded-lg transition-colors">
+            <Plus size={13} /> Neu
+          </button>
+        )}
+      </div>
+      <div className="divide-y divide-slate-700/50">
+        {rows.length === 0 ? (
+          <div className="p-6 text-center text-xs text-muted-foreground">
+            Keine D-U-N-S Nummer hinterlegt.
+          </div>
+        ) : (
+          rows.map(f => (
+            <div key={f.id} className="flex items-start gap-4 px-5 py-3.5 hover:bg-muted/20 transition-colors group">
+              <span className="w-40 shrink-0 text-xs font-semibold text-muted-foreground uppercase tracking-wider pt-0.5">{f.bezeichner || 'D-U-N-S'}</span>
+              <div className="flex-1 min-w-0">
+                <span className="font-mono text-sm text-foreground break-all select-all font-semibold">{f.wert || '–'}</span>
+                {f.anmerkung && (
+                  <p className="text-xs text-muted-foreground mt-0.5 whitespace-pre-wrap">{f.anmerkung}</p>
+                )}
+              </div>
+              <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                <button onClick={() => onEdit(f)} className="p-1.5 text-muted-foreground hover:text-brand-400 transition-colors"><Pencil size={13} /></button>
+                <button onClick={() => onDelete(f.id, f.bezeichner)} className="p-1.5 text-muted-foreground hover:text-red-400 transition-colors"><Trash2 size={13} /></button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  )
+}
+
 // ── Edit / Add Modal ────────────────────────────────────────
 function EditModal({ entry, onSave, onClose, saving }: {
   entry: Omit<Firmendatum, 'id' | 'created_at' | 'updated_at'>
@@ -123,10 +171,11 @@ function EditModal({ entry, onSave, onClose, saving }: {
         <div className="p-5 space-y-3">
           <label className="block">
             <span className="text-xs text-muted-foreground uppercase tracking-wider mb-1 block">Kategorie</span>
-            <select value={data.kategorie} onChange={e => set('kategorie', e.target.value)}
+            <select value={data.kategorie} onChange={e => set('kategorie', e.target.value as Kat)}
               className={inputCls + ' cursor-pointer'}>
               <option value="Bankverbindung">Bankverbindung</option>
               <option value="Handelsregister">Handelsregister</option>
+              <option value="DUNS">D-U-N-S Nummer</option>
             </select>
           </label>
           <label className="block">
@@ -172,6 +221,7 @@ export function FirmendatenPage({ firmendaten, onCreate, onUpdate, onDelete }: P
 
   const bankRows = firmendaten.filter(f => f.kategorie === 'Bankverbindung')
   const registerRows = firmendaten.filter(f => f.kategorie === 'Handelsregister')
+  const dunsRows = firmendaten.filter(f => f.kategorie === 'DUNS')
 
   function openEdit(f: Firmendatum) {
     setModal({ mode: 'edit', id: f.id, data: { kategorie: f.kategorie, bezeichner: f.bezeichner, wert: f.wert, anmerkung: f.anmerkung, datei_name: f.datei_name, sort_order: f.sort_order } })
@@ -226,6 +276,13 @@ export function FirmendatenPage({ firmendaten, onCreate, onUpdate, onDelete }: P
         onEdit={openEdit}
         onDelete={handleDelete}
         onAdd={() => openAdd('Handelsregister')}
+      />
+
+      <DunsSection
+        rows={dunsRows}
+        onEdit={openEdit}
+        onDelete={handleDelete}
+        onAdd={() => openAdd('DUNS')}
       />
 
       {/* Edit/Add Modal */}

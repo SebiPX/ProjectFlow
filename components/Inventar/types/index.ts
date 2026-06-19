@@ -148,7 +148,7 @@ export interface Firmendatum {
   id: string
   created_at: string
   updated_at: string
-  kategorie: 'Bankverbindung' | 'Handelsregister'
+  kategorie: 'Bankverbindung' | 'Handelsregister' | 'DUNS'
   bezeichner: string | null
   wert: string | null
   anmerkung: string | null
