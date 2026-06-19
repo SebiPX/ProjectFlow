@@ -1,27 +1,20 @@
 
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { ResponsiveContainer, Tooltip, Legend, PieChart, Pie, Cell } from 'recharts';
 import { Card } from './ui/Card';
 import { Icon } from './ui/Icon';
+import { Avatar } from './ui/Avatar';
 import type { Project } from '../types/supabase';
 import { ProjectStatus } from '../types/supabase';
 import { getTasks } from '../services/api/tasks';
 import { getProjects, getProjectsFinancialOverview } from '../services/api/projects';
 import { getTimeEntries } from '../services/api/timeEntries';
+import { getProfiles } from '../services/api/profiles';
 import { NewsWidget } from './NewsWidget';
 
 interface DashboardProps {
   onSelectProject: (project: Project) => void;
 }
-
-const statusColors: { [key in ProjectStatus]: string } = {
-  [ProjectStatus.Active]: '#3b82f6',
-  [ProjectStatus.Completed]: '#10b981',
-  [ProjectStatus.Planned]: '#f97316',
-  [ProjectStatus.OnHold]: '#f59e0b',
-  [ProjectStatus.Cancelled]: '#ef4444',
-};
 
 export const Dashboard: React.FC<DashboardProps> = ({ onSelectProject }) => {
   // Fetch projects from Supabase
@@ -48,6 +41,12 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProject }) => {
     queryFn: getProjectsFinancialOverview,
   });
 
+  // Fetch profiles for Top 3 rankings
+  const { data: profiles = [], isLoading: profilesLoading } = useQuery({
+    queryKey: ['profiles'],
+    queryFn: getProfiles,
+  });
+
   // Calculate statistics
   const totalBudget = projects.reduce((sum, p) => sum + (Number(p.budget_total) || 0), 0);
   const activeProjects = projects.filter(p => p.status === 'active').length;
@@ -61,15 +60,77 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProject }) => {
     return dueDate < today;
   }).length;
 
-  // Prepare chart data
+  // Find PJM for a project
+  const findProjectPJM = (p: Project) => {
+    return p.project_members?.find(
+      m => m.role && (m.role.toLowerCase().includes('pjm') || m.role.toLowerCase().includes('projektleitung'))
+    );
+  };
 
-  const statusData = Object.values(ProjectStatus).map(status => ({
-    name: status.charAt(0).toUpperCase() + status.slice(1).replace('_', ' '),
-    value: projects.filter(p => p.status === status).length,
-  }));
+  // Filter profiles for creatives
+  const creatives = profiles.filter(p => p.role === 'creative');
+
+  // Helper to check task assignments
+  const isAssigned = (task: any, profileId: string) => {
+    if (task.assignee_ids?.includes(profileId)) return true;
+    if (task.assignee_id === profileId) return true;
+    if (task.assignee?.id === profileId) return true;
+    if (task.assignees?.some((a: any) => a.id === profileId)) return true;
+    return false;
+  };
+
+  // Top 3 Creatives with tasks in progress
+  const creativesInProgress = creatives.map(profile => {
+    const count = tasks.filter(t => t.status === 'in_progress' && isAssigned(t, profile.id)).length;
+    return {
+      id: profile.id,
+      name: profile.full_name || 'Unknown Creative',
+      avatarUrl: profile.avatar_url || '',
+      count,
+    };
+  })
+  .sort((a, b) => b.count - a.count)
+  .slice(0, 3);
+
+  // Top 3 Creatives with tasks done
+  const creativesDone = creatives.map(profile => {
+    const count = tasks.filter(t => t.status === 'done' && isAssigned(t, profile.id)).length;
+    return {
+      id: profile.id,
+      name: profile.full_name || 'Unknown Creative',
+      avatarUrl: profile.avatar_url || '',
+      count,
+    };
+  })
+  .sort((a, b) => b.count - a.count)
+  .slice(0, 3);
+
+  // PJM Counts
+  const pjmCounts: { [id: string]: { name: string; avatarUrl: string; count: number } } = {};
+  
+  projects.forEach(p => {
+    const pjmMember = findProjectPJM(p);
+    if (pjmMember && pjmMember.profile) {
+      const pjmId = pjmMember.profile.id || pjmMember.profile_id || pjmMember.user_id;
+      if (pjmId) {
+        if (!pjmCounts[pjmId]) {
+          pjmCounts[pjmId] = {
+            name: pjmMember.profile.full_name || 'Unknown PJM',
+            avatarUrl: pjmMember.profile.avatar_url || '',
+            count: 0
+          };
+        }
+        pjmCounts[pjmId].count += 1;
+      }
+    }
+  });
+
+  const topPJMs = Object.values(pjmCounts)
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 3);
 
   // Show loading state
-  if (projectsLoading || timeEntriesLoading || tasksLoading) {
+  if (projectsLoading || timeEntriesLoading || tasksLoading || profilesLoading) {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="text-muted-foreground text-xl">Loading dashboard...</div>
@@ -136,79 +197,100 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProject }) => {
         </Card>
       </div>
 
-      {/* Charts & News */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <NewsWidget />
-        </div>
-        
-        <div className="flex flex-col gap-6">
-          <Card>
-            <h3 className="text-lg font-semibold text-foreground">Project Status</h3>
-            <div className="h-[280px] mt-4 w-full relative">
-              <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
-                <PieChart>
-                  <Pie data={statusData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={90} label>
-                    {statusData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={statusColors[entry.name.toLowerCase().replace(' ', '_') as ProjectStatus]} />
-                    ))}
-                  </Pie>
-                  <Tooltip contentStyle={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)', borderRadius: '8px' }} itemStyle={{ color: 'var(--foreground)' }} />
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          </Card>
-        </div>
+      {/* Top 3 Rankings Section */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card className="flex flex-col h-full bg-card border-border">
+          <div className="flex items-center space-x-3 mb-4 pb-2 border-b border-border">
+            <span className="p-2 rounded-lg bg-blue-500/10 text-blue-500">
+              <Icon path="M9.663 17h4.673M12 3v1m6.364.364l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" className="w-5 h-5" />
+            </span>
+            <h3 className="text-lg font-bold text-foreground">Top 3 Creatives (In Progress)</h3>
+          </div>
+          <div className="space-y-4 flex-1">
+            {creativesInProgress.length > 0 ? (
+              creativesInProgress.map((creative, index) => (
+                <div key={creative.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
+                  <div className="flex items-center space-x-3">
+                    <span className="text-xl font-bold w-6 text-center">
+                      {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}`}
+                    </span>
+                    <Avatar avatarPath={creative.avatarUrl} alt={creative.name} size="sm" />
+                    <span className="font-semibold text-foreground text-sm">{creative.name}</span>
+                  </div>
+                  <span className="text-xs font-bold bg-blue-500/10 text-blue-500 px-2.5 py-1 rounded-full">
+                    {creative.count} Tasks
+                  </span>
+                </div>
+              ))
+            ) : (
+              <p className="text-sm text-muted-foreground text-center py-6">No tasks in progress.</p>
+            )}
+          </div>
+        </Card>
+
+        <Card className="flex flex-col h-full bg-card border-border">
+          <div className="flex items-center space-x-3 mb-4 pb-2 border-b border-border">
+            <span className="p-2 rounded-lg bg-emerald-500/10 text-emerald-500">
+              <Icon path="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" className="w-5 h-5" />
+            </span>
+            <h3 className="text-lg font-bold text-foreground">Top 3 Creatives (Done)</h3>
+          </div>
+          <div className="space-y-4 flex-1">
+            {creativesDone.length > 0 ? (
+              creativesDone.map((creative, index) => (
+                <div key={creative.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
+                  <div className="flex items-center space-x-3">
+                    <span className="text-xl font-bold w-6 text-center">
+                      {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}`}
+                    </span>
+                    <Avatar avatarPath={creative.avatarUrl} alt={creative.name} size="sm" />
+                    <span className="font-semibold text-foreground text-sm">{creative.name}</span>
+                  </div>
+                  <span className="text-xs font-bold bg-emerald-500/10 text-emerald-500 px-2.5 py-1 rounded-full">
+                    {creative.count} Tasks
+                  </span>
+                </div>
+              ))
+            ) : (
+              <p className="text-sm text-muted-foreground text-center py-6">No tasks done.</p>
+            )}
+          </div>
+        </Card>
+
+        <Card className="flex flex-col h-full bg-card border-border">
+          <div className="flex items-center space-x-3 mb-4 pb-2 border-b border-border">
+            <span className="p-2 rounded-lg bg-purple-500/10 text-purple-500">
+              <Icon path="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" className="w-5 h-5" />
+            </span>
+            <h3 className="text-lg font-bold text-foreground">Top 3 PJMs</h3>
+          </div>
+          <div className="space-y-4 flex-1">
+            {topPJMs.length > 0 ? (
+              topPJMs.map((pjm, index) => (
+                <div key={index} className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
+                  <div className="flex items-center space-x-3">
+                    <span className="text-xl font-bold w-6 text-center">
+                      {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}`}
+                    </span>
+                    <Avatar avatarPath={pjm.avatarUrl} alt={pjm.name} size="sm" />
+                    <span className="font-semibold text-foreground text-sm">{pjm.name}</span>
+                  </div>
+                  <span className="text-xs font-bold bg-purple-500/10 text-purple-500 px-2.5 py-1 rounded-full">
+                    {pjm.count} Projects
+                  </span>
+                </div>
+              ))
+            ) : (
+              <p className="text-sm text-muted-foreground text-center py-6">No PJMs assigned.</p>
+            )}
+          </div>
+        </Card>
       </div>
 
-      {/* Recent Projects Table */}
-      <Card>
-        <h3 className="text-lg font-semibold text-foreground mb-4">Active Projects</h3>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm text-left text-muted-foreground">
-            <thead className="text-xs text-muted-foreground uppercase bg-muted/50">
-              <tr>
-                <th scope="col" className="px-6 py-3">Project Name</th>
-                <th scope="col" className="px-6 py-3">Client</th>
-                <th scope="col" className="px-6 py-3">Deadline</th>
-                <th scope="col" className="px-6 py-3">Budget</th>
-                <th scope="col" className="px-6 py-3">Status</th>
-                <th scope="col" className="px-6 py-3">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {projects
-                .filter(p => p.status === 'active')
-                .sort((a, b) => {
-                  const clientA = (a.client?.company_name || '').toLowerCase();
-                  const clientB = (b.client?.company_name || '').toLowerCase();
-                  if (clientA < clientB) return -1;
-                  if (clientA > clientB) return 1;
-                  const titleA = (a.title || '').toLowerCase();
-                  const titleB = (b.title || '').toLowerCase();
-                  return titleA.localeCompare(titleB);
-                })
-                .map(project => (
-                <tr key={project.id} className="bg-card border-b border-border hover:bg-muted/30">
-                  <td className="px-6 py-4 font-medium text-foreground whitespace-nowrap">{project.title}</td>
-                  <td className="px-6 py-4">{project.client?.company_name}</td>
-                  <td className="px-6 py-4">{project.deadline}</td>
-                  <td className="px-6 py-4">€{project.budget_total?.toLocaleString()}</td>
-                  <td className="px-6 py-4">
-                    <span className={`px-2 py-1 text-xs font-medium rounded-full`} style={{ backgroundColor: `${statusColors[project.status!]}33`, color: statusColors[project.status!] }}>
-                      {project.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <button onClick={() => onSelectProject(project)} className="font-medium text-primary hover:underline">View</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </Card>
+      {/* News Widget */}
+      <div className="grid grid-cols-1 gap-6">
+        <NewsWidget />
+      </div>
     </div>
   );
 };
