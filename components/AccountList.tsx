@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { accounts, Account } from '../lib/apiClient';
+import { accounts, Account, uploadFile } from '../lib/apiClient';
 import { 
     Search, Copy, Check, Plus, Pencil, Trash2, Eye, EyeOff, 
-    ExternalLink, ShieldAlert, KeyRound, Building, Mail, Phone, MapPin, Tag, FileText, X
+    ExternalLink, ShieldAlert, KeyRound, Building, Mail, Phone, MapPin, Tag, FileText, X, Upload
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 
@@ -22,6 +22,10 @@ export const AccountList: React.FC<AccountListProps> = ({ searchQuery = '' }) =>
 
     // Password reveal states
     const [revealIds, setRevealIds] = useState<Record<string, boolean>>({});
+
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const [previewTitle, setPreviewTitle] = useState<string | null>(null);
+    const [isUploading, setIsUploading] = useState(false);
 
     // Modal state
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -168,6 +172,22 @@ export const AccountList: React.FC<AccountListProps> = ({ searchQuery = '' }) =>
             toast.success('Account erfolgreich gelöscht');
         } catch (err: any) {
             toast.error('Fehler beim Löschen: ' + err.message);
+        }
+    };
+
+    const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setIsUploading(true);
+        try {
+            const url = await uploadFile(file, 'accounts');
+            setFormData(prev => ({ ...prev, dokumente: url }));
+            toast.success('Dokument erfolgreich hochgeladen!');
+        } catch (err: any) {
+            toast.error('Upload fehlgeschlagen: ' + err.message);
+        } finally {
+            setIsUploading(false);
         }
     };
 
@@ -373,17 +393,29 @@ export const AccountList: React.FC<AccountListProps> = ({ searchQuery = '' }) =>
                                                 </div>
                                             )}
                                             {acc.dokumente && (
-                                                <div className="flex items-start gap-1 text-[11px] text-primary/80 hover:text-primary leading-normal border-t border-border/40 pt-1.5 overflow-hidden text-ellipsis">
-                                                    <FileText size={12} className="shrink-0 mt-0.5" />
-                                                    <a 
-                                                        href={acc.dokumente} 
-                                                        target="_blank" 
-                                                        rel="noopener noreferrer" 
-                                                        className="hover:underline truncate block"
-                                                        title={acc.dokumente}
-                                                    >
-                                                        Dokument öffnen
-                                                    </a>
+                                                <div className="border-t border-border/40 pt-1.5 space-y-1">
+                                                    <div className="flex items-center gap-1.5 text-[11px]">
+                                                        <FileText size={12} className="text-muted-foreground shrink-0" />
+                                                        <button 
+                                                            onClick={() => { setPreviewUrl(acc.dokumente || ''); setPreviewTitle(acc.firma); }}
+                                                            className="text-primary hover:underline font-semibold text-left truncate"
+                                                            title="Vorschau anzeigen"
+                                                        >
+                                                            Vorschau anzeigen
+                                                        </button>
+                                                    </div>
+                                                    <div className="flex items-center gap-1.5 text-[11px]">
+                                                        <ExternalLink size={12} className="text-muted-foreground shrink-0" />
+                                                        <a 
+                                                            href={acc.dokumente.startsWith('http') ? acc.dokumente : `https://${acc.dokumente}`} 
+                                                            target="_blank" 
+                                                            rel="noopener noreferrer" 
+                                                            className="text-muted-foreground hover:text-foreground hover:underline truncate"
+                                                            title={acc.dokumente}
+                                                        >
+                                                            Link öffnen
+                                                        </a>
+                                                    </div>
                                                 </div>
                                             )}
                                         </td>
@@ -544,14 +576,32 @@ export const AccountList: React.FC<AccountListProps> = ({ searchQuery = '' }) =>
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-semibold text-muted-foreground mb-1.5 uppercase tracking-wide">Dokumente (SharePoint/Cloud-Link)</label>
-                                    <input
-                                        type="text"
-                                        value={formData.dokumente || ''}
-                                        onChange={(e) => setFormData(prev => ({ ...prev, dokumente: e.target.value }))}
-                                        className="w-full px-3 py-2 bg-muted/40 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 text-foreground text-sm"
-                                        placeholder="Link zu Verträgen/Details"
-                                    />
+                                    <label className="block text-xs font-semibold text-muted-foreground mb-1.5 uppercase tracking-wide">
+                                        Dokumente (SharePoint-Link oder Datei hochladen)
+                                    </label>
+                                    <div className="flex gap-2">
+                                        <input
+                                            type="text"
+                                            value={formData.dokumente || ''}
+                                            onChange={(e) => setFormData(prev => ({ ...prev, dokumente: e.target.value }))}
+                                            className="flex-1 px-3 py-2 bg-muted/40 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 text-foreground text-sm"
+                                            placeholder="Link zu Verträgen/Details oder hochladen →"
+                                        />
+                                        <label className="flex items-center justify-center gap-2 px-4 py-2 bg-muted hover:bg-muted/80 border border-border text-foreground hover:text-primary rounded-xl cursor-pointer transition-colors text-sm shrink-0">
+                                            {isUploading ? (
+                                                <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                                            ) : (
+                                                <Upload size={16} />
+                                            )}
+                                            <span>Hochladen</span>
+                                            <input 
+                                                type="file" 
+                                                className="hidden" 
+                                                onChange={handleFileUpload} 
+                                                disabled={isUploading}
+                                            />
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
 
@@ -593,6 +643,80 @@ export const AccountList: React.FC<AccountListProps> = ({ searchQuery = '' }) =>
                                 </button>
                             </div>
                         </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Preview Modal */}
+            {previewUrl && (
+                <div 
+                    className="fixed inset-0 bg-black/85 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+                    onClick={() => { setPreviewUrl(null); setPreviewTitle(null); }}
+                >
+                    <div 
+                        className="bg-card border border-border w-full max-w-4xl rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-150"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {/* Preview Header */}
+                        <div className="flex items-center justify-between p-4 border-b border-border/60 bg-muted/10">
+                            <h2 className="text-sm font-bold text-foreground truncate max-w-lg">
+                                Dokumentenvorschau - {previewTitle || 'Account'}
+                            </h2>
+                            <button
+                                onClick={() => { setPreviewUrl(null); setPreviewTitle(null); }}
+                                className="p-1 hover:bg-muted rounded-lg text-muted-foreground hover:text-foreground transition-colors"
+                            >
+                                <X size={20} />
+                            </button>
+                        </div>
+
+                        {/* Preview Content */}
+                        <div className="flex-1 overflow-auto bg-muted/20 p-6 flex items-center justify-center min-h-[50vh]">
+                            {(() => {
+                                const url = previewUrl.toLowerCase();
+                                const isImage = url.match(/\.(jpg|jpeg|png|gif|svg|webp)$/) || url.startsWith('data:image/');
+                                const isPDF = url.endsWith('.pdf') || url.includes('/pdf') || url.includes('type=pdf');
+                                
+                                if (isImage) {
+                                    return (
+                                        <img 
+                                            src={previewUrl} 
+                                            alt={previewTitle || "Vorschau"} 
+                                            className="max-w-full max-h-[70vh] object-contain rounded-lg shadow-md"
+                                        />
+                                    );
+                                } else if (isPDF) {
+                                    return (
+                                        <iframe 
+                                            src={previewUrl} 
+                                            className="w-full h-[70vh] rounded-lg border border-border bg-white" 
+                                            title="PDF Vorschau"
+                                        />
+                                    );
+                                } else {
+                                    return (
+                                        <div className="text-center space-y-4 py-8">
+                                            <FileText className="mx-auto text-muted-foreground w-16 h-16" />
+                                            <div>
+                                                <h3 className="font-semibold text-lg text-foreground">Direkte Vorschau nicht möglich</h3>
+                                                <p className="text-muted-foreground text-sm mt-1 max-w-sm mx-auto">
+                                                    Dieses Format kann nicht direkt im Browser gerendert werden. Du kannst das Dokument in einem neuen Tab öffnen.
+                                                </p>
+                                            </div>
+                                            <a 
+                                                href={previewUrl.startsWith('http') ? previewUrl : `https://${previewUrl}`}
+                                                target="_blank" 
+                                                rel="noopener noreferrer" 
+                                                className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground font-semibold rounded-xl hover:bg-primary/90 shadow-md transition-colors text-sm"
+                                            >
+                                                <ExternalLink size={16} />
+                                                Dokument in neuem Tab öffnen
+                                            </a>
+                                        </div>
+                                    );
+                                }
+                            })()}
+                        </div>
                     </div>
                 </div>
             )}
