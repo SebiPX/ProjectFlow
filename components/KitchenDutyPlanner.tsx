@@ -5,6 +5,7 @@ import { Icon } from './ui/Icon';
 import { Avatar } from './ui/Avatar';
 import { getProfiles } from '../services/api/profiles';
 import type { Profile } from '../types/supabase';
+import { useAuth } from '../lib/AuthContext';
 
 // Local storage key
 const STORAGE_KEY = 'px_kitchen_duty_plan';
@@ -47,6 +48,9 @@ function getWeekNumber(d: Date) {
 export const KitchenDutyPlanner: React.FC = () => {
   const currentYear = new Date().getFullYear();
   const currentWeek = getWeekNumber(new Date());
+
+  const { profile } = useAuth();
+  const canEdit = profile?.role === 'GF' || profile?.role === 'superadmin';
 
   // Fetch profiles (employees)
   const { data: profiles = [], isLoading: profilesLoading } = useQuery({
@@ -199,29 +203,31 @@ export const KitchenDutyPlanner: React.FC = () => {
             Plane und verteile wöchentliche Küchendienste für Teams aus jeweils 4 Mitarbeitern.
           </p>
         </div>
-        <div className="flex flex-wrap gap-3">
-          <button
-            onClick={() => setShowConfigModal(true)}
-            className="flex items-center space-x-2 px-4 py-2 border border-border rounded-lg bg-card hover:bg-muted/40 transition-colors text-foreground font-medium text-sm"
-          >
-            <Icon path="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065zM15 12a3 3 0 11-6 0 3 3 0 016 0z" className="w-4 h-4" />
-            <span>Teilnehmer verwalten ({participantIds.length})</span>
-          </button>
-          <button
-            onClick={autoDistribute}
-            className="flex items-center space-x-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/95 transition-colors font-medium text-sm"
-          >
-            <Icon path="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H17m-.5 3.5v5H16.2c-.3 0-.6-.1-.8-.3l-3.4-3.4" className="w-4 h-4" />
-            <span>Automatisch verteilen</span>
-          </button>
-          <button
-            onClick={clearDuties}
-            className="flex items-center space-x-2 px-4 py-2 border border-destructive/20 text-destructive hover:bg-destructive/5 rounded-lg transition-colors font-medium text-sm"
-          >
-            <Icon path="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" className="w-4 h-4" />
-            <span>Zurücksetzen</span>
-          </button>
-        </div>
+        {canEdit && (
+          <div className="flex flex-wrap gap-3">
+            <button
+              onClick={() => setShowConfigModal(true)}
+              className="flex items-center space-x-2 px-4 py-2 border border-border rounded-lg bg-card hover:bg-muted/40 transition-colors text-foreground font-medium text-sm"
+            >
+              <Icon path="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065zM15 12a3 3 0 11-6 0 3 3 0 016 0z" className="w-4 h-4" />
+              <span>Teilnehmer verwalten ({participantIds.length})</span>
+            </button>
+            <button
+              onClick={autoDistribute}
+              className="flex items-center space-x-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/95 transition-colors font-medium text-sm"
+            >
+              <Icon path="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H17m-.5 3.5v5H16.2c-.3 0-.6-.1-.8-.3l-3.4-3.4" className="w-4 h-4" />
+              <span>Automatisch verteilen</span>
+            </button>
+            <button
+              onClick={clearDuties}
+              className="flex items-center space-x-2 px-4 py-2 border border-destructive/20 text-destructive hover:bg-destructive/5 rounded-lg transition-colors font-medium text-sm"
+            >
+              <Icon path="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" className="w-4 h-4" />
+              <span>Zurücksetzen</span>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Main Grid: Year selector & list of weeks */}
@@ -302,15 +308,17 @@ export const KitchenDutyPlanner: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="mt-4 pt-3 border-t border-border/50 flex justify-end">
-                  <button
-                    onClick={() => setEditingWeek(duty)}
-                    className="text-xs text-primary font-bold hover:underline flex items-center space-x-1"
-                  >
-                    <Icon path="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" className="w-3.5 h-3.5" />
-                    <span>{hasTeam ? 'Bearbeiten' : 'Zuweisen'}</span>
-                  </button>
-                </div>
+                {canEdit && (
+                  <div className="mt-4 pt-3 border-t border-border/50 flex justify-end">
+                    <button
+                      onClick={() => setEditingWeek(duty)}
+                      className="text-xs text-primary font-bold hover:underline flex items-center space-x-1"
+                    >
+                      <Icon path="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" className="w-3.5 h-3.5" />
+                      <span>{hasTeam ? 'Bearbeiten' : 'Zuweisen'}</span>
+                    </button>
+                  </div>
+                )}
               </div>
             );
           })}
