@@ -294,7 +294,16 @@ type View =
   | "employees"
   | "finances"
   | "reports"
-  | "settings";
+  | "settings"
+  | "kitchen-duty"
+  | "kalender"
+  | "logins"
+  | "links"
+  | "accounts"
+  | "notes"
+  | "cases"
+  | "directory-freelancers"
+  | "directory-locations";
 ```
 
 Navigation via `handleNavigate(view)` callback passed through Sidebar.

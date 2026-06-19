@@ -568,6 +568,8 @@ Don't try to create RLS policies for admin access to all profiles - use service 
 - ✅ Real-time budget tracking on project cards with margin badges
 - ✅ Asset approval workflow with status management
 - ✅ Authentication working perfectly and verified
+- ✅ **NEW: Küchendienst (Kitchen Duty) Planner & Dashboard**: Weekly calendar planning with 4-person team assignments, automatic round-robin distribution, and current-week widget on the dashboard.
+- ✅ **NEW: Team Rankings & Highlights on Dashboard**: Replaced old charts and project table with Top 3 rankings for Creatives (In Progress / ToDo), PJMs (most projects), and overall Users (In Progress / ToDo).
 - ✅ Database properly secured with RLS (14 tables + tasks extensions)
 - ✅ All known issues resolved
 - ✅ Comprehensive documentation including Deployment Guide
