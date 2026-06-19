@@ -33,6 +33,7 @@ import { CasesList } from './components/CasesList';
 import { PublicAssetReview } from './components/PublicAssetReview';
 import { Notes } from './components/Notes';
 import { AccountList } from './components/AccountList';
+import { KitchenDutyPlanner } from './components/KitchenDutyPlanner';
 
 export type { View } from './lib/useFlowHashRouter';
 import { useFlowHashRouter, View } from './lib/useFlowHashRouter';
@@ -99,6 +100,8 @@ const MainApp: React.FC = () => {
         return <Notes />;
       case 'accounts':
         return <AccountList searchQuery={searchQuery} />;
+      case 'kitchen-duty':
+        return <KitchenDutyPlanner />;
       case 'inventar':
       case 'verleih':
       case 'verleih-formular':

@@ -16,6 +16,34 @@ interface DashboardProps {
   onSelectProject: (project: Project) => void;
 }
 
+// Helper functions for date calculations
+function getWeekDates(weekNumber: number, year: number) {
+  const simple = new Date(year, 0, 1 + (weekNumber - 1) * 7);
+  const dow = simple.getDay();
+  const ISOweekStart = new Date(simple);
+  if (dow <= 4) {
+    ISOweekStart.setDate(simple.getDate() - simple.getDay() + 1);
+  } else {
+    ISOweekStart.setDate(simple.getDate() + 8 - simple.getDay());
+  }
+  const monday = new Date(ISOweekStart);
+  const sunday = new Date(ISOweekStart);
+  sunday.setDate(monday.getDate() + 6);
+  return { monday, sunday };
+}
+
+function getWeekNumber(d: Date) {
+  const target = new Date(d.valueOf());
+  const dayNr = (d.getDay() + 6) % 7;
+  target.setDate(target.getDate() - dayNr + 3);
+  const firstThursday = target.valueOf();
+  target.setMonth(0, 1);
+  if (target.getDay() !== 4) {
+    target.setMonth(0, 1 + ((4 - target.getDay()) + 7) % 7);
+  }
+  return 1 + Math.ceil((firstThursday - target.valueOf()) / 604800000);
+}
+
 export const Dashboard: React.FC<DashboardProps> = ({ onSelectProject }) => {
   // Fetch projects from Supabase
   const { data: projects = [], isLoading: projectsLoading, error: projectsError } = useQuery({
@@ -128,6 +156,35 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProject }) => {
   const topPJMs = Object.values(pjmCounts)
     .sort((a, b) => b.count - a.count)
     .slice(0, 3);
+
+  // Kitchen Duty calculations
+  const today = new Date();
+  const currentWeekNum = getWeekNumber(today);
+  const currentYearNum = today.getFullYear();
+  const { monday: kwStart, sunday: kwEnd } = getWeekDates(currentWeekNum, currentYearNum);
+
+  // Load from local storage
+  const [kitchenTeam, setKitchenTeam] = React.useState<any[]>([]);
+
+  React.useEffect(() => {
+    try {
+      const savedDutiesStr = localStorage.getItem('px_kitchen_duty_plan');
+      if (savedDutiesStr) {
+        const savedDuties = JSON.parse(savedDutiesStr);
+        const thisWeekDuty = savedDuties.find(
+          (d: any) => d.weekNumber === currentWeekNum && d.year === currentYearNum
+        );
+        if (thisWeekDuty && thisWeekDuty.assignedIds && thisWeekDuty.assignedIds.length > 0) {
+          const team = thisWeekDuty.assignedIds
+            .map((id: string) => profiles.find((p: any) => p.id === id))
+            .filter(Boolean);
+          setKitchenTeam(team);
+        }
+      }
+    } catch (e) {
+      console.error('Failed to parse kitchen duties', e);
+    }
+  }, [profiles, currentWeekNum, currentYearNum]);
 
   // Show loading state
   if (projectsLoading || timeEntriesLoading || tasksLoading || profilesLoading) {
@@ -287,9 +344,60 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProject }) => {
         </Card>
       </div>
 
-      {/* News Widget */}
-      <div className="grid grid-cols-1 gap-6">
-        <NewsWidget />
+      {/* News & Kitchen Duty */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <NewsWidget />
+        </div>
+        
+        <div>
+          <Card className="flex flex-col h-full bg-card border-border p-6">
+            <div className="flex items-center justify-between mb-4 pb-2 border-b border-border">
+              <div className="flex items-center space-x-2">
+                <span className="p-2 rounded-lg bg-yellow-500/10 text-yellow-500">
+                  <Icon path="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" className="w-5 h-5" />
+                </span>
+                <h3 className="text-lg font-bold text-foreground">🧹 Küchendienst</h3>
+              </div>
+              <button
+                onClick={() => { window.location.hash = '#kitchen-duty'; }}
+                className="text-xs text-primary font-bold hover:underline"
+              >
+                Planer öffnen
+              </button>
+            </div>
+            
+            <div className="flex-1 flex flex-col justify-between">
+              <div>
+                <p className="text-xs text-muted-foreground mb-4">
+                  Diensthabende in dieser Woche (KW {currentWeekNum}: {kwStart.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })} - {kwEnd.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })}):
+                </p>
+
+                {kitchenTeam.length > 0 ? (
+                  <div className="space-y-3">
+                    {kitchenTeam.map((member) => (
+                      <div key={member.id} className="flex items-center space-x-3 p-2.5 rounded-lg bg-muted/20 border border-border/40">
+                        <Avatar avatarPath={member.avatar_url} alt={member.full_name} size="sm" />
+                        <div>
+                          <p className="text-sm font-semibold text-foreground leading-tight">{member.full_name}</p>
+                          <p className="text-[10px] text-muted-foreground uppercase">{member.role || 'Mitarbeiter'}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-8 text-center bg-muted/10 rounded-lg border border-dashed border-border/80 p-4">
+                    <span className="text-2xl mb-2">🤷‍♂️</span>
+                    <p className="text-sm font-semibold text-foreground">Kein Dienst eingeteilt</p>
+                    <p className="text-xs text-muted-foreground mt-1 max-w-[200px]">
+                      Für diese Kalenderwoche wurde noch kein Team eingeteilt.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </Card>
+        </div>
       </div>
     </div>
   );

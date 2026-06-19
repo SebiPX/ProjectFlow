@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import type { Project } from '../types/supabase';
 import { MOCK_PROJECTS } from '../constants';
 
-export type View = 'dashboard' | 'projects' | 'project-detail' | 'tasks' | 'planning' | 'assets' | 'clients' | 'employees' | 'service-catalog' | 'finances' | 'reports' | 'resources' | 'settings' | 'inventar' | 'verleih' | 'verleih-formular' | 'kalender' | 'logins' | 'handyvertraege' | 'kreditkarten' | 'firmendaten' | 'links' | 'chat' | 'directory-freelancers' | 'directory-locations' | 'cases' | 'notes' | 'accounts';
+export type View = 'dashboard' | 'projects' | 'project-detail' | 'tasks' | 'planning' | 'assets' | 'clients' | 'employees' | 'service-catalog' | 'finances' | 'reports' | 'resources' | 'settings' | 'inventar' | 'verleih' | 'verleih-formular' | 'kalender' | 'logins' | 'handyvertraege' | 'kreditkarten' | 'firmendaten' | 'links' | 'chat' | 'directory-freelancers' | 'directory-locations' | 'cases' | 'notes' | 'accounts' | 'kitchen-duty';
 
 export function useFlowHashRouter() {
   const [view, setViewState] = useState<View>('dashboard');
