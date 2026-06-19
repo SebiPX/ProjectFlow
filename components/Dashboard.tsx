@@ -428,62 +428,59 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProject }) => {
             )}
           </div>
         </Card>
+
+        {/* 🧹 Küchendienst */}
+        <Card className="flex flex-col h-full bg-card border-border p-6">
+          <div className="flex items-center justify-between mb-4 pb-2 border-b border-border">
+            <div className="flex items-center space-x-2">
+              <span className="p-2 rounded-lg bg-yellow-500/10 text-yellow-500">
+                <Icon path="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" className="w-5 h-5" />
+              </span>
+              <h3 className="text-lg font-bold text-foreground">🧹 Küchendienst</h3>
+            </div>
+            <button
+              onClick={() => { window.location.hash = '#kitchen-duty'; }}
+              className="text-xs text-primary font-bold hover:underline"
+            >
+              Planer öffnen
+            </button>
+          </div>
+          
+          <div className="flex-1 flex flex-col justify-between">
+            <div>
+              <p className="text-xs text-muted-foreground mb-4">
+                Diensthabende in dieser Woche (KW {currentWeekNum}: {kwStart.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })} - {kwEnd.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })}):
+              </p>
+
+              {kitchenTeam.length > 0 ? (
+                <div className="space-y-3">
+                  {kitchenTeam.map((member) => (
+                    <div key={member.id} className="flex items-center space-x-3 p-2.5 rounded-lg bg-muted/20 border border-border/40">
+                      <Avatar avatarPath={member.avatar_url} alt={member.full_name} size="sm" />
+                      <div>
+                        <p className="text-sm font-semibold text-foreground leading-tight">{member.full_name}</p>
+                        <p className="text-[10px] text-muted-foreground uppercase">{member.role || 'Mitarbeiter'}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-8 text-center bg-muted/10 rounded-lg border border-dashed border-border/80 p-4">
+                  <span className="text-2xl mb-2">🤷‍♂️</span>
+                  <p className="text-sm font-semibold text-foreground">Kein Dienst eingeteilt</p>
+                  <p className="text-xs text-muted-foreground mt-1 max-w-[200px]">
+                    Für diese Kalenderwoche wurde noch kein Team eingeteilt.
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        </Card>
       </div>
 
-      {/* News & Kitchen Duty */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <NewsWidget />
-        </div>
-        
-        <div>
-          <Card className="flex flex-col h-full bg-card border-border p-6">
-            <div className="flex items-center justify-between mb-4 pb-2 border-b border-border">
-              <div className="flex items-center space-x-2">
-                <span className="p-2 rounded-lg bg-yellow-500/10 text-yellow-500">
-                  <Icon path="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" className="w-5 h-5" />
-                </span>
-                <h3 className="text-lg font-bold text-foreground">🧹 Küchendienst</h3>
-              </div>
-              <button
-                onClick={() => { window.location.hash = '#kitchen-duty'; }}
-                className="text-xs text-primary font-bold hover:underline"
-              >
-                Planer öffnen
-              </button>
-            </div>
-            
-            <div className="flex-1 flex flex-col justify-between">
-              <div>
-                <p className="text-xs text-muted-foreground mb-4">
-                  Diensthabende in dieser Woche (KW {currentWeekNum}: {kwStart.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })} - {kwEnd.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })}):
-                </p>
-
-                {kitchenTeam.length > 0 ? (
-                  <div className="space-y-3">
-                    {kitchenTeam.map((member) => (
-                      <div key={member.id} className="flex items-center space-x-3 p-2.5 rounded-lg bg-muted/20 border border-border/40">
-                        <Avatar avatarPath={member.avatar_url} alt={member.full_name} size="sm" />
-                        <div>
-                          <p className="text-sm font-semibold text-foreground leading-tight">{member.full_name}</p>
-                          <p className="text-[10px] text-muted-foreground uppercase">{member.role || 'Mitarbeiter'}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="flex flex-col items-center justify-center py-8 text-center bg-muted/10 rounded-lg border border-dashed border-border/80 p-4">
-                    <span className="text-2xl mb-2">🤷‍♂️</span>
-                    <p className="text-sm font-semibold text-foreground">Kein Dienst eingeteilt</p>
-                    <p className="text-xs text-muted-foreground mt-1 max-w-[200px]">
-                      Für diese Kalenderwoche wurde noch kein Team eingeteilt.
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
-          </Card>
-        </div>
+      {/* News Widget */}
+      <div className="grid grid-cols-1 gap-6">
+        <NewsWidget />
       </div>
     </div>
   );
