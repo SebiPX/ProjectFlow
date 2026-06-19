@@ -183,15 +183,27 @@ function InventarShell({ onBack, setView, navigateToItem, dashboardPath }: Inven
             } />
 
             <Route path="/handyvertraege" element={
-              <HandyvertraegePage vertraege={vertraege} isAdmin={isAdmin} onCreate={createVertrag} onUpdate={updateVertrag} onDelete={deleteVertrag} />
+              isGF ? (
+                <HandyvertraegePage vertraege={vertraege} isAdmin={isGF} onCreate={createVertrag} onUpdate={updateVertrag} onDelete={deleteVertrag} />
+              ) : (
+                <Navigate to="/dashboard" replace />
+              )
             } />
 
             <Route path="/kreditkarten" element={
-              <KreditkartenPage kreditkarten={kreditkarten} onCreate={createKreditkarte} onUpdate={updateKreditkarte} onDelete={deleteKreditkarte} />
+              isGF ? (
+                <KreditkartenPage kreditkarten={kreditkarten} onCreate={createKreditkarte} onUpdate={updateKreditkarte} onDelete={deleteKreditkarte} />
+              ) : (
+                <Navigate to="/dashboard" replace />
+              )
             } />
 
             <Route path="/firmendaten" element={
-              <FirmendatenPage firmendaten={firmendaten} onCreate={createEintrag} onUpdate={updateEintrag} onDelete={deleteEintrag} />
+              isGF ? (
+                <FirmendatenPage firmendaten={firmendaten} onCreate={createEintrag} onUpdate={updateEintrag} onDelete={deleteEintrag} />
+              ) : (
+                <Navigate to="/dashboard" replace />
+              )
             } />
 
             <Route path="/links" element={

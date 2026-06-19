@@ -21,6 +21,7 @@ const navItems = [
 
 
 export function Sidebar({ profile, isAdmin, onSignOut }: SidebarProps) {
+  const isGF = profile.role === 'GF' || profile.role === 'superadmin'
   const initials = profile.full_name
     ? profile.full_name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
     : profile.email.slice(0, 2).toUpperCase()
@@ -42,7 +43,12 @@ export function Sidebar({ profile, isAdmin, onSignOut }: SidebarProps) {
 
       {/* Navigation */}
       <nav className="flex-1 p-4 space-y-1">
-        {navItems.filter(item => !item.adminOnly || isAdmin).map(({ to, label, icon: Icon, end }) => (
+        {navItems.filter(item => {
+          if (item.to === '/handyvertraege' || item.to === '/kreditkarten' || item.to === '/firmendaten') {
+            return isGF
+          }
+          return !item.adminOnly || isAdmin
+        }).map(({ to, label, icon: Icon, end }) => (
           <NavLink
             key={to}
             to={to}

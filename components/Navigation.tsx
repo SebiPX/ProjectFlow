@@ -20,7 +20,8 @@ interface NavItem {
   icon: string;
   label: string;
   adminOnly?: boolean;
-  subItems?: { view: View; label: string; icon: string; adminOnly?: boolean }[];
+  gfOrSuperAdminOnly?: boolean;
+  subItems?: { view: View; label: string; icon: string; adminOnly?: boolean; gfOrSuperAdminOnly?: boolean }[];
 }
 
 interface NavCategory {
@@ -53,9 +54,9 @@ const navCategories: NavCategory[] = [
         ]
       },
       { view: 'notes', label: 'ToDo / Notizen', icon: 'M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z' },
-      { view: 'handyvertraege', label: 'Verträge', icon: 'smartphone', adminOnly: true },
-      { view: 'kreditkarten', label: 'Karten', icon: 'credit_card', adminOnly: true },
-      { view: 'firmendaten', label: 'Firma', icon: 'business', adminOnly: true },
+      { view: 'handyvertraege', label: 'Verträge', icon: 'smartphone', gfOrSuperAdminOnly: true },
+      { view: 'kreditkarten', label: 'Karten', icon: 'credit_card', gfOrSuperAdminOnly: true },
+      { view: 'firmendaten', label: 'Firma', icon: 'business', gfOrSuperAdminOnly: true },
     ],
   },
   {
@@ -93,7 +94,8 @@ const navCategories: NavCategory[] = [
 
 export const Navigation: React.FC<NavigationProps> = ({ currentView, onNavigate, searchQuery, onSearch }) => {
   const { profile, signOut } = useAuth();
-  const isAdmin = profile?.role === 'admin' || profile?.role === 'superadmin';
+  const isGF = profile?.role === 'GF' || profile?.role === 'superadmin';
+  const isAdmin = profile?.role === 'admin' || isGF;
   const isClient = profile?.role === 'client';
 
   const [showDropdown, setShowDropdown] = useState(false);
@@ -187,11 +189,13 @@ export const Navigation: React.FC<NavigationProps> = ({ currentView, onNavigate,
     return {
       ...cat,
       items: cat.items.filter(item => {
+        if (item.gfOrSuperAdminOnly && !isGF) return false;
         if (item.adminOnly && !isAdmin) return false;
         
         // Handle subItems filtering
         if (item.subItems) {
           item.subItems = item.subItems.filter(sub => {
+            if (sub.gfOrSuperAdminOnly && !isGF) return false;
             if (sub.adminOnly && !isAdmin) return false;
             if (isClient) {
               const allowedClientViews: View[] = ['dashboard', 'projects'];
@@ -238,7 +242,7 @@ export const Navigation: React.FC<NavigationProps> = ({ currentView, onNavigate,
       if (item.subItems) {
         return item.subItems;
       }
-      return [{ view: item.view!, label: item.label, icon: item.icon, adminOnly: item.adminOnly }];
+      return [{ view: item.view!, label: item.label, icon: item.icon, adminOnly: item.adminOnly, gfOrSuperAdminOnly: item.gfOrSuperAdminOnly }];
     })
   );
 

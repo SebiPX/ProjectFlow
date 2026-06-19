@@ -101,12 +101,20 @@ const MainApp: React.FC = () => {
       case 'verleih-formular':
       case 'kalender':
       case 'logins':
-      case 'handyvertraege':
-      case 'kreditkarten':
-      case 'firmendaten':
       case 'links':
         // InventarApp intercepts these paths and uses its own MemoryRouter structure
         return <InventarApp onBack={() => handleNavigate('dashboard')} setView={handleNavigate} dashboardPath={`/${view}`} />;
+      case 'handyvertraege':
+      case 'kreditkarten':
+      case 'firmendaten': {
+        const isGF = profile?.role === 'GF' || profile?.role === 'superadmin';
+        if (!isGF) {
+          return profile?.role === 'client'
+            ? <ClientDashboard onSelectProject={handleSelectProject} />
+            : <Dashboard onSelectProject={handleSelectProject} />;
+        }
+        return <InventarApp onBack={() => handleNavigate('dashboard')} setView={handleNavigate} dashboardPath={`/${view}`} />;
+      }
       default:
         return profile?.role === 'client'
           ? <ClientDashboard onSelectProject={handleSelectProject} />
