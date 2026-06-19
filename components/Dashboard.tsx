@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Card } from './ui/Card';
@@ -458,8 +457,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProject }) => {
                     <div key={member.id} className="flex items-center space-x-3 p-2.5 rounded-lg bg-muted/20 border border-border/40">
                       <Avatar avatarPath={member.avatar_url} alt={member.full_name} size="sm" />
                       <div>
-                        <p className="text-sm font-semibold text-foreground leading-tight">{member.full_name}</p>
-                        <p className="text-[10px] text-muted-foreground uppercase">{member.role || 'Mitarbeiter'}</p>
+                        <p className="text-sm font-semibold text-foreground">{member.full_name}</p>
                       </div>
                     </div>
                   ))}

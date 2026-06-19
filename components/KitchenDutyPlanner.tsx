@@ -465,8 +465,7 @@ export const KitchenDutyPlanner: React.FC = () => {
                         <div className="flex items-center space-x-2.5">
                           <Avatar avatarPath={profile.avatar_url} alt={profile.full_name || ''} size="sm" />
                           <div>
-                            <p className="text-sm text-foreground leading-tight">{profile.full_name}</p>
-                            <p className="text-[10px] text-muted-foreground">{profile.role}</p>
+                            <p className="text-sm text-foreground">{profile.full_name}</p>
                           </div>
                         </div>
                         <div
