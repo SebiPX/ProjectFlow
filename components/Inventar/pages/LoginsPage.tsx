@@ -50,12 +50,26 @@ export function LoginsPage({ logins, isAdmin, isGF, onCreate, onUpdate, onDelete
   const filtered = useMemo(() => {
     const q = search.toLowerCase()
     return logins.filter(l => {
-      const matchKat = kat === 'Alle' || l.kategorie?.includes(kat)
+      // 1. Enforce access control: non-GF users can NEVER see GF-only logins
+      if (l.is_gf_only && !isGF) return false
+
+      // 2. Category / GF Filter check
+      let matchKat = false
+      if (kat === 'Alle') {
+        matchKat = true
+      } else if (kat === 'GF') {
+        matchKat = !!l.is_gf_only
+      } else {
+        matchKat = !!l.kategorie?.includes(kat)
+      }
+
+      // 3. Search query check
       const matchQ = !q || [l.name, l.website, l.login_name, l.anmerkung, l.department]
         .some(f => f?.toLowerCase().includes(q))
+
       return matchKat && matchQ
     })
-  }, [logins, search, kat])
+  }, [logins, search, kat, isGF])
 
   function startEdit(l: Login) { setEditId(l.id); setEditData({ ...l }) }
   function cancelEdit() { setEditId(null); setEditData({}) }
@@ -114,6 +128,12 @@ export function LoginsPage({ logins, isAdmin, isGF, onCreate, onUpdate, onDelete
               {k}
             </button>
           ))}
+          {isGF && (
+            <button onClick={() => setKat('GF')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${kat === 'GF' ? 'bg-red-600 text-foreground' : 'text-red-400 hover:text-red-300'}`}>
+              GF
+            </button>
+          )}
         </div>
       </div>
 
@@ -214,8 +234,12 @@ export function LoginsPage({ logins, isAdmin, isGF, onCreate, onUpdate, onDelete
                       {isAdmin && (
                         <td className={td + ' sticky right-0 bg-background/95 backdrop-blur z-10 shadow-[-10px_0_15px_-10px_rgba(0,0,0,0.3)] border-l border-border/50'}>
                           <div className="flex gap-1 justify-center">
-                            <button onClick={() => startEdit(l)} className="p-1.5 text-muted-foreground hover:text-brand-400 transition-colors"><Pencil size={13} /></button>
-                            <button onClick={() => handleDelete(l.id, l.name)} className="p-1.5 text-muted-foreground hover:text-red-400 transition-colors"><Trash2 size={13} /></button>
+                            {(!l.is_gf_only || isGF) && (
+                              <>
+                                <button onClick={() => startEdit(l)} className="p-1.5 text-muted-foreground hover:text-brand-400 transition-colors"><Pencil size={13} /></button>
+                                <button onClick={() => handleDelete(l.id, l.name)} className="p-1.5 text-muted-foreground hover:text-red-400 transition-colors"><Trash2 size={13} /></button>
+                              </>
+                            )}
                           </div>
                         </td>
                       )}
