@@ -636,3 +636,32 @@ export const admin = {
             body: JSON.stringify(data)
         })
 };
+
+// ── Accountliste (Airtable Mirror) ──────────────────────────────────
+export interface Account {
+    id: string;
+    firma: string;
+    kategorie: string | null;
+    bemerkung: string | null;
+    website: string | null;
+    benutzername: string | null;
+    passwort: string | null;
+    kundennummer: string | null;
+    strasse: string | null;
+    telefonnummer: string | null;
+    email: string | null;
+    sonstiges: string | null;
+    dokumente: string | null;
+    created_at: string;
+    updated_at: string;
+}
+
+export const accounts = {
+    list: () => request<Account[]>('/api/accounts'),
+    create: (data: Omit<Account, 'id' | 'created_at' | 'updated_at'>) =>
+        request<Account>('/api/accounts', { method: 'POST', body: JSON.stringify(data) }),
+    update: (id: string, data: Partial<Account>) =>
+        request<Account>(`/api/accounts/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+    delete: (id: string) => request<void>(`/api/accounts/${id}`, { method: 'DELETE' }),
+};
+

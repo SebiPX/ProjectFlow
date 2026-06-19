@@ -32,6 +32,7 @@ import { LocationsList } from './components/directory/LocationsList';
 import { CasesList } from './components/CasesList';
 import { PublicAssetReview } from './components/PublicAssetReview';
 import { Notes } from './components/Notes';
+import { AccountList } from './components/AccountList';
 
 export type { View } from './lib/useFlowHashRouter';
 import { useFlowHashRouter, View } from './lib/useFlowHashRouter';
@@ -96,6 +97,8 @@ const MainApp: React.FC = () => {
         return <ChatView />;
       case 'notes':
         return <Notes />;
+      case 'accounts':
+        return <AccountList searchQuery={searchQuery} />;
       case 'inventar':
       case 'verleih':
       case 'verleih-formular':

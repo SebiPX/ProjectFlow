@@ -54,6 +54,7 @@ const navCategories: NavCategory[] = [
         ]
       },
       { view: 'notes', label: 'ToDo / Notizen', icon: 'M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z' },
+      { view: 'accounts', label: 'Accountliste', icon: 'list_alt' },
       { view: 'handyvertraege', label: 'Verträge', icon: 'smartphone', gfOrSuperAdminOnly: true },
       { view: 'kreditkarten', label: 'Karten', icon: 'credit_card', gfOrSuperAdminOnly: true },
       { view: 'firmendaten', label: 'Firma', icon: 'business', gfOrSuperAdminOnly: true },
@@ -180,6 +181,7 @@ export const Navigation: React.FC<NavigationProps> = ({ currentView, onNavigate,
       case 'assets': return 'Search assets...';
       case 'employees': return 'Search employees...';
       case 'service-catalog': return 'Search services...';
+      case 'accounts': return 'Accounts suchen...';
       default: return 'Search...';
     }
   };
