@@ -17,7 +17,7 @@ const KATEGORIEN = ['Alle', 'Interne Logins', 'Externe Logins', 'Social Media']
 const inputCls = 'w-full px-2.5 py-1.5 bg-background border border-input rounded-lg text-sm text-foreground placeholder-slate-500 focus:outline-none focus:border-brand-500'
 
 function emptyLogin(): Omit<Login, 'id' | 'created_at' | 'updated_at'> {
-  return { name: '', website: '', login_name: '', passwort: '', anmerkung: '', kategorie: 'Interne Logins', department: '', is_gf_only: false }
+  return { name: '', website: '', login_name: '', passwort: '', anmerkung: '', kategorie: 'Interne Logins', is_gf_only: false }
 }
 
 // Single-cell password reveal
@@ -64,7 +64,7 @@ export function LoginsPage({ logins, isAdmin, isGF, onCreate, onUpdate, onDelete
       }
 
       // 3. Search query check
-      const matchQ = !q || [l.name, l.website, l.login_name, l.anmerkung, l.department]
+      const matchQ = !q || [l.name, l.website, l.login_name, l.anmerkung]
         .some(f => f?.toLowerCase().includes(q))
 
       return matchKat && matchQ
@@ -149,7 +149,6 @@ export function LoginsPage({ logins, isAdmin, isGF, onCreate, onUpdate, onDelete
                 <th className={th}>Passwort</th>
                 <th className={th}>Anmerkung</th>
                 <th className={th}>Kategorie</th>
-                <th className={th}>Department</th>
                 {isAdmin && <th className={th + ' w-24 sticky right-0 bg-background/95 backdrop-blur z-10 shadow-[-10px_0_15px_-10px_rgba(0,0,0,0.3)]'}></th>}
               </tr>
             </thead>
@@ -157,7 +156,7 @@ export function LoginsPage({ logins, isAdmin, isGF, onCreate, onUpdate, onDelete
               {/* Add row */}
               {adding && (
                 <tr className="bg-brand-500/5">
-                  {(['name','website','login_name','passwort','anmerkung','kategorie','department'] as const).map(f => (
+                  {(['name','website','login_name','passwort','anmerkung','kategorie'] as const).map(f => (
                     <td key={f} className="px-2 py-1.5">
                       {f === 'kategorie' ? (
                         <select
@@ -194,7 +193,7 @@ export function LoginsPage({ logins, isAdmin, isGF, onCreate, onUpdate, onDelete
                 <tr key={l.id} className="hover:bg-muted/20 transition-colors">
                   {editId === l.id ? (
                     <>
-                      {(['name','website','login_name','passwort','anmerkung','kategorie','department'] as const).map(f => (
+                      {(['name','website','login_name','passwort','anmerkung','kategorie'] as const).map(f => (
                         <td key={f} className="px-2 py-1.5">
                           {f === 'kategorie' ? (
                             <select
@@ -254,7 +253,6 @@ export function LoginsPage({ logins, isAdmin, isGF, onCreate, onUpdate, onDelete
                           </span>
                         )}
                       </td>
-                      <td className={td}><span className="text-xs text-muted-foreground">{l.department || ''}</span></td>
                       {isAdmin && (
                         <td className={td + ' sticky right-0 bg-background/95 backdrop-blur z-10 shadow-[-10px_0_15px_-10px_rgba(0,0,0,0.3)] border-l border-border/50'}>
                           <div className="flex gap-1 justify-center">
