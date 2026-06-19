@@ -92,9 +92,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProject }) => {
   .sort((a, b) => b.count - a.count)
   .slice(0, 3);
 
-  // Top 3 Creatives with tasks done
-  const creativesDone = creatives.map(profile => {
-    const count = tasks.filter(t => t.status === 'done' && isAssigned(t, profile.id)).length;
+  // Top 3 Creatives with tasks todo
+  const creativesTodo = creatives.map(profile => {
+    const count = tasks.filter(t => t.status === 'todo' && isAssigned(t, profile.id)).length;
     return {
       id: profile.id,
       name: profile.full_name || 'Unknown Creative',
@@ -230,14 +230,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProject }) => {
 
         <Card className="flex flex-col h-full bg-card border-border">
           <div className="flex items-center space-x-3 mb-4 pb-2 border-b border-border">
-            <span className="p-2 rounded-lg bg-emerald-500/10 text-emerald-500">
-              <Icon path="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" className="w-5 h-5" />
+            <span className="p-2 rounded-lg bg-amber-500/10 text-amber-500">
+              <Icon path="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" className="w-5 h-5" />
             </span>
-            <h3 className="text-lg font-bold text-foreground">Top 3 Creatives (Done)</h3>
+            <h3 className="text-lg font-bold text-foreground">Top 3 Creatives (ToDo)</h3>
           </div>
           <div className="space-y-4 flex-1">
-            {creativesDone.length > 0 ? (
-              creativesDone.map((creative, index) => (
+            {creativesTodo.length > 0 ? (
+              creativesTodo.map((creative, index) => (
                 <div key={creative.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
                   <div className="flex items-center space-x-3">
                     <span className="text-xl font-bold w-6 text-center">
@@ -246,13 +246,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProject }) => {
                     <Avatar avatarPath={creative.avatarUrl} alt={creative.name} size="sm" />
                     <span className="font-semibold text-foreground text-sm">{creative.name}</span>
                   </div>
-                  <span className="text-xs font-bold bg-emerald-500/10 text-emerald-500 px-2.5 py-1 rounded-full">
+                  <span className="text-xs font-bold bg-amber-500/10 text-amber-500 px-2.5 py-1 rounded-full">
                     {creative.count} Tasks
                   </span>
                 </div>
               ))
             ) : (
-              <p className="text-sm text-muted-foreground text-center py-6">No tasks done.</p>
+              <p className="text-sm text-muted-foreground text-center py-6">No tasks in ToDo.</p>
             )}
           </div>
         </Card>
