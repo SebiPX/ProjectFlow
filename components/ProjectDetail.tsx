@@ -433,11 +433,79 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
                 )}
               </div>
             </div>
-            <div className="flex-grow overflow-hidden">
+
+            {/* Filter and Sort Bar */}
+            <div className="px-6 py-3 border-b border-border bg-muted/10 flex flex-wrap gap-4 items-center justify-between">
+              <div className="flex flex-wrap items-center gap-3">
+                {/* Search */}
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Search tasks..."
+                    value={taskSearchQuery}
+                    onChange={(e) => setTaskSearchQuery(e.target.value)}
+                    className="pl-8 pr-3 py-1.5 bg-muted border border-input rounded-lg text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary w-48"
+                  />
+                  <Icon path="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" className="w-3.5 h-3.5 text-muted-foreground absolute left-2.5 top-1/2 -translate-y-1/2" />
+                </div>
+
+                {/* Brand Filter */}
+                <select
+                  value={taskBrandFilter}
+                  onChange={(e) => setTaskBrandFilter(e.target.value)}
+                  className="px-3 py-1.5 bg-muted border border-input rounded-lg text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                >
+                  <option value="all">All Brands</option>
+                  {uniqueBrands.map(brand => (
+                    <option key={brand} value={brand}>{brand}</option>
+                  ))}
+                </select>
+
+                {/* Show Filter */}
+                <select
+                  value={taskShowFilter}
+                  onChange={(e) => setTaskShowFilter(e.target.value)}
+                  className="px-3 py-1.5 bg-muted border border-input rounded-lg text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary max-w-[200px]"
+                >
+                  <option value="all">All Shows</option>
+                  {uniqueShows.map(show => (
+                    <option key={show} value={show}>{show}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Sorting */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground">Sort by:</span>
+                <select
+                  value={taskSortField}
+                  onChange={(e) => setTaskSortField(e.target.value as any)}
+                  className="px-3 py-1.5 bg-muted border border-input rounded-lg text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                >
+                  <option value="due_date">Deadline</option>
+                  <option value="title">Item Name</option>
+                  <option value="brand">Brand</option>
+                  <option value="show">Show</option>
+                </select>
+                <button
+                  onClick={() => setTaskSortDirection(prev => prev === 'asc' ? 'desc' : 'asc')}
+                  className="p-1.5 bg-muted border border-input rounded-lg hover:bg-muted/80 text-foreground transition-colors"
+                  title={taskSortDirection === 'asc' ? 'Ascending' : 'Descending'}
+                >
+                  {taskSortDirection === 'asc' ? (
+                    <Icon path="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" className="w-4 h-4 text-primary" />
+                  ) : (
+                    <Icon path="M3 4h13M3 8h9m-9 4h9m2-4l4 4m0 0l4-4m-4 4V4" className="w-4 h-4 text-primary" />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <div className="flex-grow overflow-hidden flex flex-col">
                 {viewMode === 'grid' && (
-                  <div className="p-6 overflow-y-auto h-full">
+                  <div className="p-6 overflow-y-auto h-full flex-grow">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                      {sortedTasks.filter(t => t.status !== TaskStatus.Done).map((task) => (
+                      {filteredAndSortedTasks.filter(t => t.status !== TaskStatus.Done).map((task) => (
                         <TaskCard
                           key={task.id}
                           task={task}
@@ -452,26 +520,21 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
                   </div>
                 )}
                 {viewMode === 'list' && (
-                  <div className="p-6 overflow-y-auto h-full">
-                    <div className="flex flex-col gap-2">
-                      {sortedTasks.filter(t => t.status !== TaskStatus.Done).map((task) => (
-                        <TaskCard
-                          key={task.id}
-                          task={task}
-                          project={project}
-                          onEdit={setEditingTask}
-                          onTimeTrack={setTrackingTask}
-                          onDelete={isClient ? undefined : handleDeleteTask}
-                          onDuplicate={isClient ? undefined : handleDuplicateTask}
-                          layout="row"
-                        />
-                      ))}
-                    </div>
+                  <div className="p-6 overflow-hidden h-full flex flex-col flex-grow">
+                    <TaskTableView
+                      tasks={filteredAndSortedTasks}
+                      profiles={allProfiles}
+                      onUpdateTask={handleUpdateTask}
+                      onDeleteTask={handleDeleteTask}
+                      onDuplicateTask={handleDuplicateTask}
+                      onEditTask={setEditingTask}
+                      onTimeTrack={setTrackingTask}
+                    />
                   </div>
                 )}
                 {viewMode === 'board' && (
                   <KanbanBoard 
-                    tasks={sortedTasks} 
+                    tasks={filteredAndSortedTasks} 
                     onStatusChange={isClient ? undefined : handleUpdateTaskStatus} 
                     onDeleteTask={isClient ? undefined : handleDeleteTask} 
                     onDuplicateTask={isClient ? undefined : handleDuplicateTask}
