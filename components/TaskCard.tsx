@@ -5,6 +5,10 @@ import { Icon } from './ui/Icon';
 import { Avatar } from './ui/Avatar';
 import { Card } from './ui/Card';
 import { useAuth } from '../lib/AuthContext';
+import { useQuery } from '@tanstack/react-query';
+import { getAssetsByProject, downloadAsset } from '../services/api/assets';
+import { AssetPreviewModal } from './AssetPreviewModal';
+import { toast } from 'react-toastify';
 
 export const taskStatusStyles: { [key in TaskStatus]: string } = {
   [TaskStatus.Todo]: 'bg-secondary text-secondary-foreground',
@@ -42,6 +46,25 @@ export const TaskCard: React.FC<TaskCardProps> = ({
   const isClient = profile?.role === 'client';
   const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
   const [isMaterialsOpen, setIsMaterialsOpen] = useState(false);
+  const [localPreviewAsset, setLocalPreviewAsset] = useState<any | null>(null);
+
+  // Fetch project assets if they are not passed via props or if the array is empty
+  const { data: localProjectAssets = [] } = useQuery({
+    queryKey: ['assets', task.project_id],
+    queryFn: () => getAssetsByProject(task.project_id),
+    enabled: !!task.project_id && (!projectAssets || projectAssets.length === 0),
+  });
+
+  const assetsToUse = projectAssets && projectAssets.length > 0 ? projectAssets : localProjectAssets;
+
+  const handleDownloadAsset = async (storagePath: string, name: string) => {
+    try {
+      await downloadAsset(storagePath, name);
+      toast.success('Download started!');
+    } catch (error: any) {
+      toast.error(`Failed to download: ${error.message}`);
+    }
+  };
   
   // Clients can never edit tasks once created. The PJM takes over.
   const isAdminPJM = profile?.role === 'admin' || profile?.role === 'pjm' || profile?.role === 'superadmin';
@@ -309,13 +332,47 @@ export const TaskCard: React.FC<TaskCardProps> = ({
                         const isAsset = mat.startsWith('Asset: ');
                         const isDoc = mat.startsWith('Doc: ');
                         
-                        const matchedAsset = isAsset && projectAssets 
-                          ? projectAssets.find(a => a.name.toLowerCase() === cleanName.toLowerCase()) 
-                          : null;
+                        // Robust asset matching
+                        const findMatchedAsset = () => {
+                          if (!isAsset || !assetsToUse) return null;
+                          // 1. Try exact match (case insensitive)
+                          let match = assetsToUse.find((a: any) => a.name.toLowerCase().trim() === cleanName.toLowerCase().trim());
+                          if (match) return match;
+
+                          // 2. Try match without extension
+                          const stripExt = (name: string) => name.replace(/\.[^/.]+$/, "");
+                          match = assetsToUse.find((a: any) => stripExt(a.name).toLowerCase().trim() === stripExt(cleanName).toLowerCase().trim());
+                          if (match) return match;
+
+                          // 3. Try partial match
+                          match = assetsToUse.find((a: any) => 
+                            a.name.toLowerCase().includes(cleanName.toLowerCase()) || 
+                            cleanName.toLowerCase().includes(a.name.toLowerCase())
+                          );
+                          return match;
+                        };
+
+                        const matchedAsset = findMatchedAsset();
+                        
+                        const handlePreviewClick = (e: React.MouseEvent) => {
+                          e.stopPropagation();
+                          if (matchedAsset) {
+                            setIsMaterialsOpen(false);
+                            if (onPreviewAsset) {
+                              onPreviewAsset(matchedAsset);
+                            } else {
+                              setLocalPreviewAsset(matchedAsset);
+                            }
+                          }
+                        };
                           
                         return (
-                          <div key={i} className="flex items-center justify-between gap-2 p-1.5 hover:bg-muted/50 rounded transition-colors">
-                            <span className="truncate flex-1 font-medium" title={mat}>{cleanName}</span>
+                          <div 
+                            key={i} 
+                            onClick={matchedAsset ? handlePreviewClick : undefined}
+                            className={`flex items-center justify-between gap-2 p-1.5 hover:bg-muted/50 rounded transition-colors ${matchedAsset ? 'cursor-pointer hover:text-primary font-medium' : ''}`}
+                          >
+                            <span className="truncate flex-1" title={mat}>{cleanName}</span>
                             {isAsset && (
                               <span className="text-[10px] bg-amber-500/10 text-amber-600 px-1 py-0.2 rounded border border-amber-500/20 shrink-0">
                                 Asset
@@ -326,19 +383,10 @@ export const TaskCard: React.FC<TaskCardProps> = ({
                                 Doc
                               </span>
                             )}
-                            {matchedAsset && onPreviewAsset && (
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setIsMaterialsOpen(false);
-                                  onPreviewAsset(matchedAsset);
-                                }}
-                                className="text-primary hover:text-primary/80 font-semibold shrink-0 flex items-center gap-0.5 ml-1 bg-primary/10 border border-primary/20 px-1.5 py-0.5 rounded"
-                                title="Open preview"
-                              >
+                            {matchedAsset && (
+                              <span className="text-primary opacity-60 hover:opacity-100 shrink-0 ml-1" title="Preview asset">
                                 <Icon path="M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" className="w-3.5 h-3.5" />
-                                Open
-                              </button>
+                              </span>
                             )}
                           </div>
                         );
@@ -531,6 +579,13 @@ export const TaskCard: React.FC<TaskCardProps> = ({
           </button>
         )}
       </div>
+
+      <AssetPreviewModal
+        isOpen={!!localPreviewAsset}
+        onClose={() => setLocalPreviewAsset(null)}
+        asset={localPreviewAsset}
+        onDownload={localPreviewAsset?.storage_path ? () => handleDownloadAsset(localPreviewAsset.storage_path!, localPreviewAsset.name) : undefined}
+      />
     </Card>
   );
 };

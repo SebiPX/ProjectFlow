@@ -3,6 +3,9 @@ import type { Task, Profile } from '../types/supabase';
 import { TaskStatus } from '../types/supabase';
 import { Icon } from './ui/Icon';
 import { toast } from 'react-toastify';
+import { useQuery } from '@tanstack/react-query';
+import { getAssetsByProject, downloadAsset } from '../services/api/assets';
+import { AssetPreviewModal } from './AssetPreviewModal';
 
 interface TaskTableViewProps {
   tasks: Task[];
@@ -29,6 +32,16 @@ export const TaskTableView: React.FC<TaskTableViewProps> = ({
 }) => {
   const [editingCells, setEditingCells] = useState<Record<string, string>>({}); // taskId-field -> current value during typing
   const [savingCells, setSavingCells] = useState<Record<string, boolean>>({}); // taskId-field -> isSaving status
+  const [localPreviewAsset, setLocalPreviewAsset] = useState<any | null>(null);
+
+  const handleDownloadAsset = async (storagePath: string, name: string) => {
+    try {
+      await downloadAsset(storagePath, name);
+      toast.success('Download started!');
+    } catch (error: any) {
+      toast.error(`Failed to download: ${error.message}`);
+    }
+  };
 
   const handleTextChange = (taskId: string, field: string, value: string) => {
     setEditingCells(prev => ({ ...prev, [`${taskId}-${field}`]: value }));
@@ -272,14 +285,46 @@ export const TaskTableView: React.FC<TaskTableViewProps> = ({
                           const isAsset = mat.startsWith('Asset: ');
                           const isDoc = mat.startsWith('Doc: ');
                           
-                          const matchedAsset = isAsset && projectAssets 
-                            ? projectAssets.find(a => a.name.toLowerCase() === cleanName.toLowerCase()) 
-                            : null;
+                          // Robust asset matching
+                          const findMatchedAsset = () => {
+                            if (!isAsset || !projectAssets) return null;
+                            // 1. Try exact match (case-insensitive)
+                            let match = projectAssets.find(a => a.name.toLowerCase().trim() === cleanName.toLowerCase().trim());
+                            if (match) return match;
+
+                            // 2. Try match without extension
+                            const stripExt = (name: string) => name.replace(/\.[^/.]+$/, "");
+                            match = projectAssets.find(a => stripExt(a.name).toLowerCase().trim() === stripExt(cleanName).toLowerCase().trim());
+                            if (match) return match;
+
+                            // 3. Try partial match
+                            match = projectAssets.find(a => 
+                              a.name.toLowerCase().includes(cleanName.toLowerCase()) || 
+                              cleanName.toLowerCase().includes(a.name.toLowerCase())
+                            );
+                            return match;
+                          };
+
+                          const matchedAsset = findMatchedAsset();
+
+                          const handlePreviewClick = (e: React.MouseEvent) => {
+                            e.stopPropagation();
+                            if (matchedAsset) {
+                              if (onPreviewAsset) {
+                                onPreviewAsset(matchedAsset);
+                              } else if (typeof setLocalPreviewAsset !== 'undefined') {
+                                setLocalPreviewAsset(matchedAsset);
+                              }
+                            }
+                          };
 
                           return (
                             <span 
                               key={i} 
+                              onClick={matchedAsset ? handlePreviewClick : undefined}
                               className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded border font-medium truncate max-w-full ${
+                                matchedAsset ? 'cursor-pointer hover:text-primary hover:border-primary/50' : ''
+                              } ${
                                 isAsset 
                                   ? 'bg-amber-500/10 text-amber-600 border-amber-500/20' 
                                   : isDoc 
@@ -288,18 +333,10 @@ export const TaskTableView: React.FC<TaskTableViewProps> = ({
                               }`}
                             >
                               <span className="truncate">{cleanName}</span>
-                              {matchedAsset && onPreviewAsset && (
-                                <button
-                                  type="button"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    onPreviewAsset(matchedAsset);
-                                  }}
-                                  className="text-primary hover:text-blue-600 p-0.5"
-                                  title="Preview Asset"
-                                >
-                                  <Icon path="M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" className="w-3.5 h-3.5" />
-                                </button>
+                              {matchedAsset && (
+                                <span className="text-primary opacity-60 hover:opacity-100 shrink-0 ml-0.5" title="Preview asset">
+                                  <Icon path="M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" className="w-3 h-3" />
+                                </span>
                               )}
                             </span>
                           );
@@ -361,6 +398,13 @@ export const TaskTableView: React.FC<TaskTableViewProps> = ({
           </tbody>
         </table>
       </div>
+
+      <AssetPreviewModal
+        isOpen={!!localPreviewAsset}
+        onClose={() => setLocalPreviewAsset(null)}
+        asset={localPreviewAsset}
+        onDownload={localPreviewAsset?.storage_path ? () => handleDownloadAsset(localPreviewAsset.storage_path!, localPreviewAsset.name) : undefined}
+      />
     </div>
   );
 };
