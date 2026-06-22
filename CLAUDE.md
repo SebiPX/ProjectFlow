@@ -51,6 +51,8 @@ npm run preview                # Preview production build
 │   ├── ProjectDetail.tsx      # Multi-tab project view (tasks, assets, finances)
 │   ├── KanbanBoard.tsx        # Task management board
 │   ├── TaskList.tsx           # All tasks view (Grid layout with filters, "Only Me")
+│   ├── TaskTableView.tsx      # Spreadsheet list view with inline editing
+│   ├── TaskImportModal.tsx    # Airtable CSV batch task importer
 │   ├── AssetList.tsx          # File/document management (Grid layout with filters, "Only Me")
 │   ├── ClientList.tsx         # Client management with contacts & logos
 │   ├── EmployeeList.tsx       # Admin/Employee team management (with online status)

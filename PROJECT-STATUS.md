@@ -44,9 +44,12 @@
 ### 3. Frontend Components (100%)
 
 - ✨ **NEW: Complete Inventar & IT Management Module** migrated from PX-Studio
+- ✨ **NEW: Spreadsheet-like Task Table (Inline Editing)** with direct inline updates on cell blur/change
+- ✨ **NEW: Airtable CSV Task Importer** with smart legend filters, assignee matching, and progress feedback
+- ✨ **NEW: Click-to-Preview Task Materials** to view project assets directly from cards or spreadsheet columns
 - Dashboard with KPIs and statistics
 - Project list (card view)
-- ✅ Project detail (tabs: tasks, finances, assets with preview)
+- ✅ Project detail (tabs: tasks, finances with cost tracking, assets with preview, Archiving)
 - ✅ Task list (modern grid view with filters & sorting)
 - ✅ Kanban board for tasks
 - ✅ Client list with contact management
@@ -86,6 +89,8 @@
 | ProjectDetail           | ✅ Complete | Supabase         | Tabs: tasks, finances with cost tracking, assets with preview, Archiving   |
 | KanbanBoard             | ✅ Complete | Supabase         | Drag-and-drop (mock only)                                            |
 | TaskList                | ✅ Complete | Supabase         | Modern grid layout with filters, sorting & "Only Me" filter          |
+| TaskTableView           | ✅ Complete | Supabase         | Spreadsheet-like scrollable table with inline cell editing           |
+| TaskImportModal         | ✅ Complete | Supabase         | Batch imports Airtable CSVs, auto-maps statuses/assignees            |
 | AssetList               | ✅ Complete | Supabase         | Modern grid layout with filters, sorting, preview & "Only Me" filter |
 | AssetPreviewModal       | ✅ Complete | Supabase Storage | Multi-format preview (images, PDFs, videos, audio)                   |
 | AssetStatusModal        | ✅ Complete | Supabase         | Change asset approval status                                         |
