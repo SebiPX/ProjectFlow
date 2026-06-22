@@ -270,6 +270,22 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
     updateTaskStatusMutation.mutate({ id: taskId, status: newStatus });
   };
 
+  // Task Update Mutation
+  const updateTaskMutation = useMutation({
+    mutationFn: ({ id, updates }: { id: string; updates: Partial<Task> }) =>
+      updateTask(id, updates),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks', project.id] });
+    },
+    onError: (error: any) => {
+      toast.error(`Failed to update task: ${error.message}`);
+    }
+  });
+
+  const handleUpdateTask = async (taskId: string, updates: Partial<Task>) => {
+    return updateTaskMutation.mutateAsync({ id: taskId, updates });
+  };
+
   const deleteTaskMutation = useMutation({
     mutationFn: deleteTask,
     onSuccess: () => {
