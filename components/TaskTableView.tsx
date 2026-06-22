@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import type { Task, Profile } from '../types/supabase';
 import { TaskStatus } from '../types/supabase';
 import { Icon } from './ui/Icon';
+import { toast } from 'react-toastify';
 
 interface TaskTableViewProps {
   tasks: Task[];
@@ -51,8 +52,10 @@ export const TaskTableView: React.FC<TaskTableViewProps> = ({
     setSavingCells(prev => ({ ...prev, [key]: true }));
     try {
       await onUpdateTask(taskId, { [field]: checked });
-    } catch (err) {
+      toast.success(`${field === 'material_wbd' ? 'WBD' : 'PX'} updated successfully!`);
+    } catch (err: any) {
       console.error(err);
+      toast.error(`Failed to update ${field === 'material_wbd' ? 'WBD' : 'PX'}: ${err.message || err}`);
     } finally {
       setSavingCells(prev => ({ ...prev, [key]: false }));
     }
