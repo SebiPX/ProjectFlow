@@ -12,6 +12,8 @@ interface TaskTableViewProps {
   onDuplicateTask: (task: Task) => void;
   onEditTask: (task: Task) => void;
   onTimeTrack: (task: Task) => void;
+  projectAssets?: any[];
+  onPreviewAsset?: (asset: any) => void;
 }
 
 export const TaskTableView: React.FC<TaskTableViewProps> = ({
@@ -21,7 +23,9 @@ export const TaskTableView: React.FC<TaskTableViewProps> = ({
   onDeleteTask,
   onDuplicateTask,
   onEditTask,
-  onTimeTrack
+  onTimeTrack,
+  projectAssets = [],
+  onPreviewAsset
 }) => {
   const [editingCells, setEditingCells] = useState<Record<string, string>>({}); // taskId-field -> current value during typing
   const [savingCells, setSavingCells] = useState<Record<string, boolean>>({}); // taskId-field -> isSaving status
@@ -99,6 +103,7 @@ export const TaskTableView: React.FC<TaskTableViewProps> = ({
               <th className="p-3 w-[120px]">Status</th>
               <th className="p-3 w-[180px]">Freigabelink</th>
               <th className="p-3 w-[180px]">Link to Material</th>
+              <th className="p-3 w-[180px]">Materials</th>
               <th className="p-3 w-[250px]">Notizen / Änderungen</th>
               <th className="p-3 w-[120px] text-right">Actions</th>
             </tr>
@@ -254,6 +259,53 @@ export const TaskTableView: React.FC<TaskTableViewProps> = ({
                         >
                           <Icon path="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" className="w-3.5 h-3.5" />
                         </a>
+                      )}
+                    </div>
+                  </td>
+
+                  {/* Materials / Equipment */}
+                  <td className="p-2">
+                    <div className="flex flex-wrap gap-1 max-w-[220px]">
+                      {task.materials && task.materials.length > 0 ? (
+                        task.materials.map((mat, i) => {
+                          const cleanName = mat.startsWith('Asset: ') ? mat.substring(7) : (mat.startsWith('Doc: ') ? mat.substring(5) : mat);
+                          const isAsset = mat.startsWith('Asset: ');
+                          const isDoc = mat.startsWith('Doc: ');
+                          
+                          const matchedAsset = isAsset && projectAssets 
+                            ? projectAssets.find(a => a.name.toLowerCase() === cleanName.toLowerCase()) 
+                            : null;
+
+                          return (
+                            <span 
+                              key={i} 
+                              className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded border font-medium truncate max-w-full ${
+                                isAsset 
+                                  ? 'bg-amber-500/10 text-amber-600 border-amber-500/20' 
+                                  : isDoc 
+                                    ? 'bg-blue-500/10 text-blue-600 border-blue-500/20' 
+                                    : 'bg-muted text-muted-foreground border-border'
+                              }`}
+                            >
+                              <span className="truncate">{cleanName}</span>
+                              {matchedAsset && onPreviewAsset && (
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    onPreviewAsset(matchedAsset);
+                                  }}
+                                  className="text-primary hover:text-blue-600 p-0.5"
+                                  title="Preview Asset"
+                                >
+                                  <Icon path="M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" className="w-3.5 h-3.5" />
+                                </button>
+                              )}
+                            </span>
+                          );
+                        })
+                      ) : (
+                        <span className="text-muted-foreground/30 italic">-</span>
                       )}
                     </div>
                   </td>

@@ -22,6 +22,8 @@ interface TaskCardProps {
   onDelete?: (task: Task) => void;
   onDuplicate?: (task: Task) => void;
   layout?: 'card' | 'row';
+  projectAssets?: any[];
+  onPreviewAsset?: (asset: any) => void;
 }
 
 export const TaskCard: React.FC<TaskCardProps> = ({
@@ -32,11 +34,14 @@ export const TaskCard: React.FC<TaskCardProps> = ({
   onSelectProject,
   onDelete,
   onDuplicate,
-  layout = 'card'
+  layout = 'card',
+  projectAssets = [],
+  onPreviewAsset
 }) => {
   const { profile } = useAuth();
   const isClient = profile?.role === 'client';
   const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
+  const [isMaterialsOpen, setIsMaterialsOpen] = useState(false);
   
   // Clients can never edit tasks once created. The PJM takes over.
   const isAdminPJM = profile?.role === 'admin' || profile?.role === 'pjm' || profile?.role === 'superadmin';
@@ -262,9 +267,86 @@ export const TaskCard: React.FC<TaskCardProps> = ({
           )}
           
           {task.materials && task.materials.length > 0 && (
-            <div className="flex items-center gap-1 text-xs px-2 py-1 bg-amber-500/10 border border-amber-500/30 rounded text-amber-600">
-              <Icon path="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" className="w-3 h-3" />
-              <span>{task.materials.length} Material{task.materials.length !== 1 ? 's' : ''}</span>
+            <div className="relative">
+              <button 
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsMaterialsOpen(!isMaterialsOpen);
+                }}
+                className="flex items-center gap-1 text-xs px-2 py-1 bg-amber-500/10 border border-amber-500/30 rounded text-amber-600 hover:bg-amber-500/20 transition-colors"
+                title="Show project materials"
+              >
+                <Icon path="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" className="w-3 h-3" />
+                <span>{task.materials.length} Material{task.materials.length !== 1 ? 's' : ''}</span>
+              </button>
+              
+              {isMaterialsOpen && (
+                <>
+                  <div 
+                    className="fixed inset-0 z-20" 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsMaterialsOpen(false);
+                    }}
+                  />
+                  <div 
+                    className="absolute left-0 top-full mt-1 z-30 min-w-[220px] bg-card border border-border rounded-lg shadow-xl p-2.5 text-xs text-foreground"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className="font-semibold text-muted-foreground border-b border-border pb-1.5 mb-1.5 flex justify-between items-center">
+                      <span>Materials / Equipment</span>
+                      <button 
+                        onClick={() => setIsMaterialsOpen(false)}
+                        className="text-muted-foreground hover:text-foreground"
+                      >
+                        <Icon path="M6 18L18 6M6 6l12 12" className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                    <div className="space-y-1.5 max-h-[180px] overflow-y-auto">
+                      {task.materials.map((mat, i) => {
+                        const cleanName = mat.startsWith('Asset: ') ? mat.substring(7) : (mat.startsWith('Doc: ') ? mat.substring(5) : mat);
+                        const isAsset = mat.startsWith('Asset: ');
+                        const isDoc = mat.startsWith('Doc: ');
+                        
+                        const matchedAsset = isAsset && projectAssets 
+                          ? projectAssets.find(a => a.name.toLowerCase() === cleanName.toLowerCase()) 
+                          : null;
+                          
+                        return (
+                          <div key={i} className="flex items-center justify-between gap-2 p-1.5 hover:bg-muted/50 rounded transition-colors">
+                            <span className="truncate flex-1 font-medium" title={mat}>{cleanName}</span>
+                            {isAsset && (
+                              <span className="text-[10px] bg-amber-500/10 text-amber-600 px-1 py-0.2 rounded border border-amber-500/20 shrink-0">
+                                Asset
+                              </span>
+                            )}
+                            {isDoc && (
+                              <span className="text-[10px] bg-blue-500/10 text-blue-600 px-1 py-0.2 rounded border border-blue-500/20 shrink-0">
+                                Doc
+                              </span>
+                            )}
+                            {matchedAsset && onPreviewAsset && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setIsMaterialsOpen(false);
+                                  onPreviewAsset(matchedAsset);
+                                }}
+                                className="text-primary hover:text-primary/80 font-semibold shrink-0 flex items-center gap-0.5 ml-1 bg-primary/10 border border-primary/20 px-1.5 py-0.5 rounded"
+                                title="Open preview"
+                              >
+                                <Icon path="M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" className="w-3.5 h-3.5" />
+                                Open
+                              </button>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           )}
 

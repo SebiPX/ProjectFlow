@@ -595,6 +595,8 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
                           onTimeTrack={setTrackingTask}
                           onDelete={isClient ? undefined : handleDeleteTask}
                           onDuplicate={isClient ? undefined : handleDuplicateTask}
+                          projectAssets={assets}
+                          onPreviewAsset={setPreviewAsset}
                         />
                       ))}
                     </div>
@@ -610,6 +612,8 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
                       onDuplicateTask={handleDuplicateTask}
                       onEditTask={setEditingTask}
                       onTimeTrack={setTrackingTask}
+                      projectAssets={assets}
+                      onPreviewAsset={setPreviewAsset}
                     />
                   </div>
                 )}
@@ -619,6 +623,8 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
                     onStatusChange={isClient ? undefined : handleUpdateTaskStatus} 
                     onDeleteTask={isClient ? undefined : handleDeleteTask} 
                     onDuplicateTask={isClient ? undefined : handleDuplicateTask}
+                    projectAssets={assets}
+                    onPreviewAsset={setPreviewAsset}
                   />
                 )}
             </div>
