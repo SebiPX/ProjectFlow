@@ -40,6 +40,9 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
     freigabelink: '',
     rights_expiration_date: '',
     status_influencerclips: false,
+    material_wbd: false,
+    material_px: false,
+    link_to_material: '',
   });
   const [formats, setFormats] = useState<string[]>([]);
   const [materials, setMaterials] = useState<string[]>([]);
@@ -135,6 +138,9 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
       freigabelink: '',
       rights_expiration_date: '',
       status_influencerclips: false,
+      material_wbd: false,
+      material_px: false,
+      link_to_material: '',
     });
     setFormats([]);
     setMaterials([]);
@@ -195,6 +201,9 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
       freigabelink: formData.freigabelink || null,
       rights_expiration_date: formData.rights_expiration_date || null,
       status_influencerclips: formData.status_influencerclips,
+      material_wbd: formData.material_wbd,
+      material_px: formData.material_px,
+      link_to_material: formData.link_to_material || null,
     });
   };
 
@@ -309,7 +318,21 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 mt-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+             {/* Link to Material */}
+             <div>
+               <label className="block text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
+                 <Icon path="M10 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" className="w-4 h-4 text-primary" />
+                 Link to Material
+               </label>
+               <input
+                 type="url"
+                 value={formData.link_to_material}
+                 onChange={(e) => setFormData({ ...formData, link_to_material: e.target.value })}
+                 className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                 placeholder="Link to raw material..."
+               />
+             </div>
              {/* Freigabelink */}
              <div>
                <label className="block text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
@@ -399,18 +422,47 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, p
              </div>
           </div>
 
-          {/* Influencer Clips */}
-          <div className="flex items-center gap-3">
-             <input
-               type="checkbox"
-               id="influencerclips"
-               checked={formData.status_influencerclips}
-               onChange={(e) => setFormData({ ...formData, status_influencerclips: e.target.checked })}
-               className="w-4 h-4 bg-background border-input rounded focus:ring-2 focus:ring-primary"
-             />
-             <label htmlFor="influencerclips" className="text-sm font-medium text-muted-foreground cursor-pointer">
-               Status Influencer Clips (Needs clearing)
-             </label>
+          {/* Checkboxes for Workflow States */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-muted/20 p-4 rounded-lg border border-border/50">
+             <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  id="material_wbd"
+                  checked={formData.material_wbd}
+                  onChange={(e) => setFormData({ ...formData, material_wbd: e.target.checked })}
+                  className="w-4 h-4 bg-background border-input rounded focus:ring-2 focus:ring-primary"
+                />
+                <label htmlFor="material_wbd" className="text-sm font-medium text-muted-foreground cursor-pointer flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block"></span>
+                  Material WBD (Warner)
+                </label>
+             </div>
+             <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  id="material_px"
+                  checked={formData.material_px}
+                  onChange={(e) => setFormData({ ...formData, material_px: e.target.checked })}
+                  className="w-4 h-4 bg-background border-input rounded focus:ring-2 focus:ring-primary"
+                />
+                <label htmlFor="material_px" className="text-sm font-medium text-muted-foreground cursor-pointer flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-green-500 inline-block"></span>
+                  Material PX (Schickeria)
+                </label>
+             </div>
+             <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  id="influencerclips"
+                  checked={formData.status_influencerclips}
+                  onChange={(e) => setFormData({ ...formData, status_influencerclips: e.target.checked })}
+                  className="w-4 h-4 bg-background border-input rounded focus:ring-2 focus:ring-primary"
+                />
+                <label htmlFor="influencerclips" className="text-sm font-medium text-muted-foreground cursor-pointer flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-yellow-500 inline-block"></span>
+                  Influencer Clips (Needs clearing)
+                </label>
+             </div>
           </div>
 
           {/* Project Selection */}

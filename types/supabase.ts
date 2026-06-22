@@ -283,6 +283,9 @@ export interface Task {
   freigabelink?: string | null;
   rights_expiration_date?: string | null;
   status_influencerclips?: boolean;
+  material_wbd?: boolean;
+  material_px?: boolean;
+  link_to_material?: string | null;
 
   // Enriched data
   assignee?: Profile; // Legacy single assignee

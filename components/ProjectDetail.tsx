@@ -17,6 +17,7 @@ import { CostEditModal } from './CostEditModal';
 import { TaskFormModal } from './TaskFormModal';
 import { TaskEditModal } from './TaskEditModal';
 import { TimeTrackingModal } from './TimeTrackingModal';
+import { TaskImportModal } from './TaskImportModal';
 import { AssetKanbanBoard } from './AssetKanbanBoard';
 import { getTasksByProject, updateTaskStatus, deleteTask, createTask } from '../services/api/tasks';
 import { getAssetsByProject, downloadAsset, deleteAsset, getAssetSignedUrl, updateAsset } from '../services/api/assets';
@@ -91,6 +92,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
     }
   }, [defaultTab]);
   const [isTaskFormModalOpen, setIsTaskFormModalOpen] = useState(false);
+  const [isTaskImportModalOpen, setIsTaskImportModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAssetUploadModalOpen, setIsAssetUploadModalOpen] = useState(false);
   const [isAddTeamMemberModalOpen, setIsAddTeamMemberModalOpen] = useState(false);
@@ -412,13 +414,22 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
                   </button>
                 </div>
                 {!isClient && (
-                  <button
-                    onClick={() => setIsTaskFormModalOpen(true)}
-                    className="px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-colors flex items-center gap-2"
-                  >
-                    <Icon path="M12 4v16m8-8H4" className="w-5 h-5" />
-                    Create Task
-                  </button>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setIsTaskImportModalOpen(true)}
+                      className="px-4 py-2 bg-muted hover:bg-muted/80 text-foreground border border-border rounded-lg transition-colors flex items-center gap-2"
+                    >
+                      <Icon path="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" className="w-5 h-5 text-primary" />
+                      Import Tasks
+                    </button>
+                    <button
+                      onClick={() => setIsTaskFormModalOpen(true)}
+                      className="px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-colors flex items-center gap-2"
+                    >
+                      <Icon path="M12 4v16m8-8H4" className="w-5 h-5" />
+                      Create Task
+                    </button>
+                  </div>
                 )}
               </div>
             </div>
@@ -1009,6 +1020,12 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
         isOpen={isTaskFormModalOpen}
         onClose={() => setIsTaskFormModalOpen(false)}
         preSelectedProjectId={project.id}
+      />
+
+      <TaskImportModal
+        isOpen={isTaskImportModalOpen}
+        onClose={() => setIsTaskImportModalOpen(false)}
+        projectId={project.id}
       />
 
       {editingTask && (

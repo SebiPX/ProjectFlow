@@ -44,6 +44,9 @@ export const TaskEditModal: React.FC<TaskEditModalProps> = ({ isOpen, onClose, t
     freigabelink: task.freigabelink || '',
     rights_expiration_date: task.rights_expiration_date ? new Date(task.rights_expiration_date).toISOString().split('T')[0] : '',
     status_influencerclips: task.status_influencerclips || false,
+    material_wbd: task.material_wbd || false,
+    material_px: task.material_px || false,
+    link_to_material: task.link_to_material || '',
   });
 
   const [formats, setFormats] = useState<string[]>(task.formats || []);
@@ -71,6 +74,9 @@ export const TaskEditModal: React.FC<TaskEditModalProps> = ({ isOpen, onClose, t
       freigabelink: task.freigabelink || '',
       rights_expiration_date: task.rights_expiration_date ? new Date(task.rights_expiration_date).toISOString().split('T')[0] : '',
       status_influencerclips: task.status_influencerclips || false,
+      material_wbd: task.material_wbd || false,
+      material_px: task.material_px || false,
+      link_to_material: task.link_to_material || '',
     });
     setFormats(task.formats || []);
     setMaterials(task.materials || []);
@@ -205,6 +211,9 @@ export const TaskEditModal: React.FC<TaskEditModalProps> = ({ isOpen, onClose, t
       freigabelink: formData.freigabelink || null,
       rights_expiration_date: formData.rights_expiration_date || null,
       status_influencerclips: formData.status_influencerclips,
+      material_wbd: formData.material_wbd,
+      material_px: formData.material_px,
+      link_to_material: formData.link_to_material || null,
     });
   };
 
@@ -307,7 +316,21 @@ export const TaskEditModal: React.FC<TaskEditModalProps> = ({ isOpen, onClose, t
              </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 mt-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+             {/* Link to Material */}
+             <div>
+               <label className="block text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
+                 <Icon path="M10 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" className="w-4 h-4 text-primary" />
+                 Link to Material
+               </label>
+               <input
+                 type="url"
+                 value={formData.link_to_material}
+                 onChange={(e) => setFormData({ ...formData, link_to_material: e.target.value })}
+                 className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                 placeholder="Link to raw material..."
+               />
+             </div>
              <div>
                <label className="block text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
                  <Icon path="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" className="w-4 h-4 text-primary" />
@@ -387,17 +410,47 @@ export const TaskEditModal: React.FC<TaskEditModalProps> = ({ isOpen, onClose, t
              </div>
           </div>
 
-          <div className="flex items-center gap-3 mt-4">
-             <input
-               type="checkbox"
-               id="influencerclips_edit"
-               checked={formData.status_influencerclips}
-               onChange={(e) => setFormData({ ...formData, status_influencerclips: e.target.checked })}
-               className="w-4 h-4 bg-background border-input rounded focus:ring-2 focus:ring-primary"
-             />
-             <label htmlFor="influencerclips_edit" className="text-sm font-medium text-muted-foreground cursor-pointer">
-               Status Influencer Clips (Needs clearing)
-             </label>
+          {/* Checkboxes for Workflow States */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-muted/20 p-4 rounded-lg border border-border/50 mt-4">
+             <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  id="material_wbd_edit"
+                  checked={formData.material_wbd}
+                  onChange={(e) => setFormData({ ...formData, material_wbd: e.target.checked })}
+                  className="w-4 h-4 bg-background border-input rounded focus:ring-2 focus:ring-primary"
+                />
+                <label htmlFor="material_wbd_edit" className="text-sm font-medium text-muted-foreground cursor-pointer flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block"></span>
+                  Material WBD (Warner)
+                </label>
+             </div>
+             <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  id="material_px_edit"
+                  checked={formData.material_px}
+                  onChange={(e) => setFormData({ ...formData, material_px: e.target.checked })}
+                  className="w-4 h-4 bg-background border-input rounded focus:ring-2 focus:ring-primary"
+                />
+                <label htmlFor="material_px_edit" className="text-sm font-medium text-muted-foreground cursor-pointer flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-green-500 inline-block"></span>
+                  Material PX (Schickeria)
+                </label>
+             </div>
+             <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  id="influencerclips_edit"
+                  checked={formData.status_influencerclips}
+                  onChange={(e) => setFormData({ ...formData, status_influencerclips: e.target.checked })}
+                  className="w-4 h-4 bg-background border-input rounded focus:ring-2 focus:ring-primary"
+                />
+                <label htmlFor="influencerclips_edit" className="text-sm font-medium text-muted-foreground cursor-pointer flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-yellow-500 inline-block"></span>
+                  Influencer Clips (Needs clearing)
+                </label>
+             </div>
           </div>
 
           {/* Project Selection */}
