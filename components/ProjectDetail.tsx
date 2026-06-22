@@ -19,13 +19,15 @@ import { TaskEditModal } from './TaskEditModal';
 import { TimeTrackingModal } from './TimeTrackingModal';
 import { TaskImportModal } from './TaskImportModal';
 import { AssetKanbanBoard } from './AssetKanbanBoard';
-import { getTasksByProject, updateTaskStatus, deleteTask, createTask } from '../services/api/tasks';
+import { getTasksByProject, updateTaskStatus, deleteTask, createTask, updateTask } from '../services/api/tasks';
 import { getAssetsByProject, downloadAsset, deleteAsset, getAssetSignedUrl, updateAsset } from '../services/api/assets';
 import { getProjectMembers, removeProjectMember } from '../services/api/projectMembers';
 import { getCostsByProject, deleteCost, getCostDocumentSignedUrl } from '../services/api/costs';
 import { getProjectById } from '../services/api/projects';
+import { getProfiles } from '../services/api/profiles';
 import { calculateProjectBillableValue } from '../services/api/timeEntries';
-import type { Cost } from '../types/supabase';
+import type { Cost, Profile } from '../types/supabase';
+import { TaskTableView } from './TaskTableView';
 import { Icon } from './ui/Icon';
 import { ProjectMarginCard } from './ProjectMarginCard';
 import { ProjectServiceBreakdown } from './ProjectServiceBreakdown';
@@ -115,14 +117,77 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
     queryFn: () => getTasksByProject(project.id),
   });
 
-  const sortedTasks = useMemo(() => {
-    return [...tasks].sort((a, b) => {
-      if (!a.due_date && !b.due_date) return 0;
-      if (!a.due_date) return 1;
-      if (!b.due_date) return -1;
-      return new Date(a.due_date).getTime() - new Date(b.due_date).getTime();
-    });
+  // Task filter and sort states
+  const [taskSearchQuery, setTaskSearchQuery] = useState('');
+  const [taskBrandFilter, setTaskBrandFilter] = useState('all');
+  const [taskShowFilter, setTaskShowFilter] = useState('all');
+  const [taskSortField, setTaskSortField] = useState<'due_date' | 'title' | 'brand' | 'show'>('due_date');
+  const [taskSortDirection, setTaskSortDirection] = useState<'asc' | 'desc'>('asc');
+
+  // Fetch profiles (for Task Table editor dropdown mapping)
+  const { data: allProfiles = [] } = useQuery({
+    queryKey: ['profiles'],
+    queryFn: getProfiles,
+  });
+
+  // Get unique brands and shows for filters
+  const uniqueBrands = useMemo(() => {
+    return Array.from(new Set(tasks.map(t => t.brand).filter(Boolean))) as string[];
   }, [tasks]);
+
+  const uniqueShows = useMemo(() => {
+    return Array.from(new Set(tasks.map(t => t.show).filter(Boolean))) as string[];
+  }, [tasks]);
+
+  const filteredAndSortedTasks = useMemo(() => {
+    let result = [...tasks];
+
+    // 1. Text Search Filter
+    if (taskSearchQuery.trim()) {
+      const q = taskSearchQuery.toLowerCase();
+      result = result.filter(t => 
+        t.title.toLowerCase().includes(q) || 
+        (t.description && t.description.toLowerCase().includes(q)) ||
+        (t.brand && t.brand.toLowerCase().includes(q)) ||
+        (t.show && t.show.toLowerCase().includes(q))
+      );
+    }
+
+    // 2. Brand Filter
+    if (taskBrandFilter !== 'all') {
+      result = result.filter(t => t.brand === taskBrandFilter);
+    }
+
+    // 3. Show Filter
+    if (taskShowFilter !== 'all') {
+      result = result.filter(t => t.show === taskShowFilter);
+    }
+
+    // 4. Sorting
+    result.sort((a, b) => {
+      let aVal = a[taskSortField] || '';
+      let bVal = b[taskSortField] || '';
+
+      if (typeof aVal === 'string') aVal = aVal.toLowerCase();
+      if (typeof bVal === 'string') bVal = bVal.toLowerCase();
+
+      // Special case for due_date
+      if (taskSortField === 'due_date') {
+        if (!a.due_date && !b.due_date) return 0;
+        if (!a.due_date) return 1;
+        if (!b.due_date) return -1;
+        return taskSortDirection === 'asc' 
+          ? new Date(a.due_date).getTime() - new Date(b.due_date).getTime()
+          : new Date(b.due_date).getTime() - new Date(a.due_date).getTime();
+      }
+
+      if (aVal < bVal) return taskSortDirection === 'asc' ? -1 : 1;
+      if (aVal > bVal) return taskSortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
+
+    return result;
+  }, [tasks, taskSearchQuery, taskBrandFilter, taskShowFilter, taskSortField, taskSortDirection]);
 
   // Fetch real assets for this project
   const { data: assets = [], isLoading: assetsLoading } = useQuery({
