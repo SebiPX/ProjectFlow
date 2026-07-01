@@ -313,10 +313,10 @@ export const MocoOffers: React.FC = () => {
           {/* Help Overlay Toggle */}
           <button
             onClick={() => setShowHelpModal(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-secondary text-secondary-foreground rounded-md text-sm font-semibold border border-border hover:bg-accent transition"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-secondary text-secondary-foreground rounded-md text-sm font-semibold border border-style hover:bg-accent transition"
             title="Hilfe-Handbuch & Workflows öffnen"
           >
-            <HelpCircle className="w-4 h-4 text-pxpink" />
+            <HelpCircle className="w-4 h-4 text-[#ff26a8]" />
             Hilfe / Handbuch
           </button>
 
@@ -783,125 +783,39 @@ export const MocoOffers: React.FC = () => {
         </>
       )}
 
-      {/* HELP MULTI-MODAL OVERLAY (Pure React embedded, identical to the standalone html Guide) */}
+      {/* HELP MULTI-MODAL OVERLAY (Pure Iframe wrapper for 100% exact layout/visual equivalence) */}
       {showHelpModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-fadeIn">
-          <div className="bg-pxdark border border-pxborder rounded-xl max-w-4xl w-full max-h-[85vh] overflow-y-auto flex flex-col shadow-2xl relative select-none">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md transition-all">
+          <div className="bg-[#0b0f19] border border-[#243242] rounded-xl max-w-5xl w-full h-[90vh] flex flex-col shadow-2xl overflow-hidden relative">
             
             {/* Modal Header */}
-            <div className="flex justify-between items-center px-6 py-4 border-b border-pxborder sticky top-0 bg-pxdark z-10">
+            <div className="flex justify-between items-center px-6 py-4 border-b border-[#243242] bg-[#0b0f19] z-10 shrink-0">
               <div className="flex items-center gap-2">
-                <HelpCircle className="w-5 h-5 text-pxpink" />
-                <h2 className="font-bold text-lg text-white">KVA-Presenter & MOCO-Sync Handbuch</h2>
+                <HelpCircle className="w-5 h-5 text-[#ff26a8]" />
+                <span className="font-bold text-lg text-white">KVA-Presenter Handbuch & Workflows</span>
               </div>
               <button 
                 onClick={() => setShowHelpModal(false)}
-                className="text-muted-foreground hover:text-foreground hover:bg-muted p-1.5 rounded-lg transition"
+                className="text-gray-400 hover:text-white p-1.5 rounded-lg hover:bg-[#161e2e] transition"
               >
-                <X className="w-5 h-5" />
+                <X className="w-6 h-6" />
               </button>
             </div>
 
-            {/* Modal Body (Inlined premium instructions) */}
-            <div className="p-6 md:p-8 space-y-8 text-sm text-gray shadow-inner">
-              
-              {/* Highlight Intro */}
-              <div className="bg-pxcard p-5 rounded-lg border border-pxborder">
-                <h3 className="font-bold text-white text-base mb-2">Konzept & Mehrwert</h3>
-                <p className="text-muted-foreground leading-relaxed text-xs">
-                  MOCO erlaubt nativ keine tieferen Untergruppierungen innerhalb von Gruppen. Mit dem <strong>KVA-Presenter in PX-Flow</strong> 
-                  müllen wir MOCO nicht mit unnötigen Zwischenüberschriften zu, sondern sortieren die Zeilen hier digital in die 10 logischen 
-                  PX-Bereiche. PJMs können Mengen live manipulieren und diese ohne mühsames Abtippen zurück ins Live-MOCO-Angebot synchronisieren.
-                </p>
-              </div>
-
-              {/* 3 Step Workflow */}
-              <div className="space-y-4">
-                <h3 className="font-bold text-white text-base flex items-center gap-2">
-                  <span className="bg-pxpink/10 text-pxpink text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">1</span>
-                  Schritt-für-Schritt Workflow
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-                  <div className="bg-pxcard p-4 rounded border border-pxborder">
-                    <strong className="text-white block mb-1">1. Erstellen in MOCO</strong>
-                    <span className="text-muted-foreground">Lege das Projekt und das Angebot flach untereinander in MOCO an. Notiere dir die ID aus dem MOCO-Link.</span>
-                  </div>
-                  <div className="bg-pxcard p-4 rounded border border-pxborder">
-                    <strong className="text-white block mb-1">2. Ordnen in PX-Flow</strong>
-                    <span className="text-muted-foreground">Lade die ID im KVA-Presenter. Tweak Mengen, Einzelpreise, überschreibe Kategorien und setze optionale Posten.</span>
-                  </div>
-                  <div className="bg-pxcard p-4 rounded border border-pxborder">
-                    <strong className="text-white block mb-1">3. Drucken & Senden</strong>
-                    <span className="text-muted-foreground">Nutze die druckoptimierte Vorschau für das Kunden-PDF. Klicke auf "Werte an MOCO senden", um alles live zurück zu synchronisieren!</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* The 10 Logical Groups */}
-              <div className="space-y-4">
-                <h3 className="font-bold text-white text-base flex items-center gap-2">
-                  <span className="bg-pxpink/10 text-pxpink text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">2</span>
-                  Die 10 standardisierten Leistungsbereiche
-                </h3>
-                <div className="space-y-2 text-xs">
-                  <div className="p-3 bg-pxcard rounded border border-pxborder/65">
-                    <strong className="text-white">1. Konzeption & Kreation:</strong> <span className="text-muted-foreground">Briefing, Scribbles, Creative/Art Direction, Layouts. CD/AD-Stunden.</span>
-                  </div>
-                  <div className="p-3 bg-pxcard rounded border border-pxborder/65">
-                    <strong className="text-white">2. Projektmanagement:</strong> <span className="text-muted-foreground">Projektsteuerung, Koordination, Senior-PM / PM, GF-Stunden.</span>
-                  </div>
-                  <div className="p-3 bg-pxcard rounded border border-pxborder/65">
-                    <strong className="text-white">3. Standorte:</strong> <span className="text-muted-foreground">Recherche, Anfragen, Mietgebühren, Locationchecks.</span>
-                  </div>
-                  <div className="p-3 bg-pxcard rounded border border-pxborder/65">
-                    <strong className="text-white">4. Technische Planung:</strong> <span className="text-muted-foreground">Statik, CAD-Modelle, Genehmigungspläne, Aufrisse.</span>
-                  </div>
-                  <div className="p-3 bg-pxcard rounded border border-pxborder/65">
-                    <strong className="text-white">5. Produktion (Default):</strong> <span className="text-muted-foreground">Messebau, Deko, Catering, Show-Acts, Hostessen, Eventtechnik.</span>
-                  </div>
-                  <div className="p-3 bg-pxcard rounded border border-pxborder/65">
-                    <strong className="text-white">6. Digital:</strong> <span className="text-muted-foreground">Landingpages, QR-Codes, Registrierungen, Tracking, Mailings.</span>
-                  </div>
-                  <div className="p-3 bg-pxcard rounded border border-pxborder/65">
-                    <strong className="text-white">7. Logistik:</strong> <span className="text-muted-foreground">Transporte, Auf- und Abbau, Speditionen, Crew-Hotels, Shuttles.</span>
-                  </div>
-                  <div className="p-3 bg-pxcard rounded border border-pxborder/65">
-                    <strong className="text-white">8. Betrieb:</strong> <span className="text-muted-foreground">Security, Nachtbewachung, Sanitäter, Brandschutzkonzept, Versicherungen.</span>
-                  </div>
-                  <div className="p-3 bg-pxcard rounded border border-pxborder/65">
-                    <strong className="text-white">9. Kommunikation:</strong> <span className="text-muted-foreground">Radio-Splits, Foto/Video, Kooperationen, Dokumentation, PR.</span>
-                  </div>
-                  <div className="p-3 bg-pxcard rounded border border-pxborder/65">
-                    <strong className="text-white">10. Projektabschluss:</strong> <span className="text-muted-foreground">Debriefing, Case-Aufbereitung, Post-Report an den Kunden.</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Sync Deep-dive */}
-              <div className="space-y-3">
-                <h3 className="font-bold text-white text-base flex items-center gap-2">
-                  <span className="bg-pxpink/10 text-pxpink text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">3</span>
-                  Live-Synchronisation im Detail
-                </h3>
-                <p className="text-muted-foreground text-xs leading-relaxed">
-                  Deine Simulationen und Gruppenspiegelungen im PX-Flow Browser belasten MOCO zu keiner Zeit mit Entwürfen. Erst der Klick auf 
-                  <span className="text-emerald-400 font-semibold mx-1">"Werte an MOCO senden"</span> initiiert den REST-Call. 
-                  Die App mappt die geänderten Posten über ihre ursprünglichen MOCO-IDs und überschreibt dort in Echtzeit die 
-                  <strong> Mengen, Einzelpreise und den Optional-Zustand</strong>.
-                </p>
-                <div className="p-3 bg-yellow-500/10 border border-yellow-500/20 rounded text-xs text-yellow-500 flex gap-2">
-                  <span>⚠️</span>
-                  <span>Achtung: Wenn du das Browser-Tab schließt, ohne "Senden" zu drücken, gehen deine am Bildschirm simulierten Mengen und Preisänderungen verloren. Speichere deine Arbeit also stets ab!</span>
-                </div>
-              </div>
-
+            {/* Embed the EXACT gorgeous html page we just streamlined for 100% equivalent style */}
+            <div className="flex-1 bg-[#0b0f19] relative w-full h-full">
+              <iframe 
+                src="/moco-kva-anleitung.html" 
+                className="w-full h-full border-none"
+                title="KVA Presenter Premium Team Guide"
+              />
             </div>
 
             {/* Modal Footer */}
-            <div className="px-6 py-4 bg-pxcard border-t border-pxborder flex justify-end sticky bottom-0 z-10">
+            <div className="px-6 py-4 bg-[#161e2e] border-t border-[#243242] flex justify-end shrink-0">
               <button 
                 onClick={() => setShowHelpModal(false)}
-                className="px-4 py-1.5 bg-primary text-primary-foreground font-semibold rounded hover:bg-primary/95 transition text-sm"
+                className="px-5 py-2 bg-primary text-white font-bold rounded hover:bg-primary/95 transition text-sm shadow-md"
               >
                 Verstanden, schließen
               </button>
