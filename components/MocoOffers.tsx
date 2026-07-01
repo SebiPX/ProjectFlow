@@ -7,16 +7,15 @@ import {
   ChevronDown, 
   ChevronUp, 
   Printer, 
-  LayoutGrid, 
   Sliders, 
-  DollarSign, 
   CheckCircle2, 
   AlertCircle,
   Eye,
-  Settings,
   ArrowRightLeft,
-  Info
+  Info,
+  CloudUpload
 } from 'lucide-react';
+import { toast } from 'react-toastify';
 
 // 10 Logical Groupings
 const LOGICAL_GROUPS = [
@@ -64,6 +63,7 @@ interface MocoOffer {
 export const MocoOffers: React.FC = () => {
   const [offerId, setOfferId] = useState<string>('2310479');
   const [loading, setLoading] = useState<boolean>(false);
+  const [syncing, setSyncing] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [offer, setOffer] = useState<MocoOffer | null>(null);
   const [items, setItems] = useState<MocoItem[]>([]);
@@ -166,6 +166,53 @@ export const MocoOffers: React.FC = () => {
       setError(err.message || 'Ein unbekannter Fehler ist aufgetreten.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const pushModifiedOfferToMoco = async () => {
+    if (!offer) return;
+    setSyncing(true);
+    try {
+      const token = getToken();
+
+      // We need to map our locally modified items back into MOCO's flat array schema
+      // MOCO expects us to keep the original item IDs if we are modifying them, or pass them in order.
+      // Any calculations of totals should respect MOCO's decimal patterns.
+      const payloadItems = items.map(item => ({
+        id: item.id,
+        type: item.type,
+        title: item.title,
+        description: item.description,
+        quantity: item.quantity,
+        unit: item.unit,
+        unit_price: item.unit_price,
+        optional: item.optional
+      }));
+
+      const res = await fetch(`${API_URL}/api/offers/${offer.id}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          items: payloadItems
+        })
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || 'Fehler beim Senden.');
+      }
+
+      toast.success('Mengen und Preise erfolgreich live in MOCO aktualisiert!');
+      // Re-fetch to get completely fresh, synced state from MOCO
+      await fetchOffer(offer.id.toString());
+    } catch (err: any) {
+      console.error(err);
+      toast.error(`Sync-Fehler: ${err.message || 'Die Daten konnten nicht live an MOCO gesendet werden.'}`);
+    } finally {
+      setSyncing(false);
     }
   };
 
@@ -320,6 +367,16 @@ export const MocoOffers: React.FC = () => {
             </div>
 
             <div className="flex items-center gap-3 flex-wrap">
+              {/* Push modified values to MOCO */}
+              <button
+                onClick={pushModifiedOfferToMoco}
+                disabled={syncing || loading}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md text-sm font-semibold transition disabled:opacity-50 shrink-0 shadow-sm"
+              >
+                <CloudUpload className={`w-4 h-4 ${syncing ? 'animate-spin' : ''}`} />
+                {syncing ? 'Übertrage...' : 'Werte an MOCO senden'}
+              </button>
+
               {/* Search */}
               <div className="relative">
                 <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
