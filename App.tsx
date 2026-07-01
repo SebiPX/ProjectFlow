@@ -34,6 +34,7 @@ import { PublicAssetReview } from './components/PublicAssetReview';
 import { Notes } from './components/Notes';
 import { AccountList } from './components/AccountList';
 import { KitchenDutyPlanner } from './components/KitchenDutyPlanner';
+import { MocoOffers } from './components/MocoOffers';
 
 export type { View } from './lib/useFlowHashRouter';
 import { useFlowHashRouter, View } from './lib/useFlowHashRouter';
@@ -102,6 +103,8 @@ const MainApp: React.FC = () => {
         return <AccountList searchQuery={searchQuery} />;
       case 'kitchen-duty':
         return <KitchenDutyPlanner />;
+      case 'moco-offers':
+        return <MocoOffers />;
       case 'inventar':
       case 'verleih':
       case 'verleih-formular':
