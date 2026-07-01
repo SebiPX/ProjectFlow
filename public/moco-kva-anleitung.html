@@ -4,88 +4,487 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>KVA-Presenter & MOCO-Sync — Team-Guide | PIXELSCHICKERIA</title>
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Google Fonts - Inter & Playfair Display / Syne for Pixelschickeria feeling -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-            display: ['Syne', 'sans-serif'],
-          },
-          colors: {
-            pxpink: '#ff26a8',
-            pxindigo: '#6366f1',
-            pxdark: '#0b0f19',
-            pxcard: '#161e2e',
-            pxborder: '#243242'
-          }
-        }
-      }
-    }
-  </script>
+  
   <style>
+    /* ==========================================
+       PURE EMBEDDED CSS — NO EXTERNAL DEPENDENCIES
+       ========================================== */
+    
+    /* Box Sizing & Reset */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Fallback Font Stack matching Pixelschickeria premium look */
     body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       background-color: #0b0f19;
       color: #f3f4f6;
+      line-height: 1.6;
+      font-size: 15px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
+
+    a {
+      color: #ff26a8;
+      text-decoration: none;
+      transition: color 0.15s ease;
+    }
+
+    a:hover {
+      color: #6366f1;
+    }
+
+    /* Layout Wrapper */
+    .container {
+      max-width: 56rem; /* 896px — corresponds to max-w-4xl */
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    /* Header Section */
+    .header-section {
+      position: relative;
+      overflow: hidden;
+      border-b-width: 1px;
+      border-bottom: 1px solid #243242;
+      background-color: #0b0f19;
+      padding: 3rem 1.5rem;
+    }
+
+    /* Pink Glow Background (pure CSS gradient, no external assets) */
+    .header-glow {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      background: radial-gradient(circle at top right, rgba(255, 38, 168, 0.08), transparent 45%);
+      pointer-events: none;
+    }
+
+    .header-container {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    @media (min-width: 768px) {
+      .header-container {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+      }
+    }
+
+    /* Badge & Tag styling */
+    .badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #ff26a8;
+      margin-bottom: 0.5rem;
+    }
+
+    .status-card {
+      background-color: #161e2e;
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      border: 1px solid #243242;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-shrink: 0;
+      box-shadow: 0 0 15px rgba(255, 38, 168, 0.1);
+    }
+
+    .status-dot {
+      width: 0.875rem;
+      height: 0.875rem;
+      border-radius: 9999px;
+      background-color: #10b981;
+      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: .5; }
+    }
+
+    .status-text {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #d1d5db;
+    }
+
+    .status-sub {
+      display: block;
+      font-size: 0.625rem;
+      color: #6b7280;
+      margin-top: 0.125rem;
+    }
+
+    /* Typography */
+    h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      color: #ffffff;
+      line-height: 1.25;
+    }
+
+    @media (min-width: 768px) {
+      h1 {
+        font-size: 2.5rem;
+      }
+    }
+
+    h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 1rem;
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
     .gradient-text {
       background: linear-gradient(135deg, #ff26a8 0%, #6366f1 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
-    .px-border-glow {
-      box-shadow: 0 0 15px rgba(255, 38, 168, 0.15);
+
+    .text-lead {
+      font-size: 0.875rem;
+      color: #9ca3af;
+      margin-top: 0.5rem;
+      max-width: 36rem;
     }
+
+    .text-sm {
+      font-size: 0.875rem;
+    }
+
+    .text-xs {
+      font-size: 0.75rem;
+    }
+
+    .text-gray {
+      color: #d1d5db;
+    }
+
+    .text-muted {
+      color: #9ca3af;
+    }
+
+    /* Cards */
+    .card {
+      background-color: #161e2e;
+      padding: 1.5rem;
+      border-radius: 0.75rem;
+      border: 1px solid #243242;
+      position: relative;
+    }
+
+    @media (min-width: 768px) {
+      .card-large {
+        padding: 2rem;
+      }
+    }
+
+    .card-badge {
+      position: absolute;
+      top: -0.75rem;
+      left: 1.5rem;
+      padding: 0.25rem 0.75rem;
+      background-color: #ff26a8;
+      color: #ffffff;
+      font-size: 0.625rem;
+      font-weight: 700;
+      border-radius: 9999px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .card-badge-emerald {
+      background-color: #10b981;
+    }
+
+    /* Grids */
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+
+    @media (min-width: 768px) {
+      .grid-3 {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    /* Alert / Info Boxes */
+    .info-box {
+      background-color: rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      padding: 1rem;
+      border-radius: 0.5rem;
+      font-size: 0.75rem;
+      color: #f3f4f6;
+      display: flex;
+      gap: 0.75rem;
+      align-items: flex-start;
+      margin-top: 1rem;
+    }
+
+    .info-box-pill {
+      font-weight: 700;
+      color: #ff26a8;
+    }
+
+    .warning-box {
+      background-color: rgba(245, 158, 11, 0.05);
+      border: 1px solid rgba(245, 158, 11, 0.20);
+      padding: 1rem;
+      border-radius: 0.5rem;
+      display: flex;
+      gap: 0.75rem;
+      align-items: flex-start;
+      margin-top: 1rem;
+    }
+
+    .warning-box select, .warning-box svg {
+      flex-shrink: 0;
+    }
+
+    /* SVG Vector Icons - inline & standalone */
+    .icon-svg {
+      width: 1.25rem;
+      height: 1.25rem;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+    }
+    
+    .icon-amber {
+      color: #f59e0b;
+    }
+
+    /* Step Card Specifics */
+    .step-card {
+      background-color: #161e2e;
+      padding: 1.25rem;
+      border-radius: 0.5rem;
+      border: 1px solid #243242;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .step-badge {
+      font-size: 0.625rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #6366f1;
+      margin-bottom: 0.25rem;
+    }
+
+    .step-title {
+      font-weight: 700;
+      color: #ffffff;
+      font-size: 1rem;
+    }
+
+    .step-desc {
+      font-size: 0.75rem;
+      color: #9cb3af;
+      margin-top: 0.5rem;
+      line-height: 1.5;
+    }
+
+    .step-footer {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid #243242;
+      font-size: 0.625rem;
+      color: #6b7280;
+    }
+
+    /* Step Round Badges */
+    .circle-num {
+      background-color: rgba(255, 38, 168, 0.1);
+      color: #ff26a8;
+      width: 2rem;
+      height: 2rem;
+      border-radius: 9999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.875rem;
+      flex-shrink: 0;
+    }
+
+    /* Groups List */
+    .group-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      padding: 0.75rem;
+      background-color: rgba(11, 15, 25, 0.55);
+      border-radius: 0.25rem;
+      border: 1px solid rgba(36, 50, 66, 0.6);
+      transition: background-color 0.15s ease;
+    }
+
+    .group-item:hover {
+      background-color: #0b0f19;
+    }
+
+    .group-meta {
+      font-size: 0.75rem;
+      color: #9ca3af;
+      margin-top: 0.125rem;
+    }
+
+    .group-keywords {
+      display: block;
+      margin-top: 0.25rem;
+      font-weight: 500;
+    }
+
+    .text-pink-soft {
+      color: rgba(255, 38, 168, 0.8);
+    }
+
+    .text-indigo-soft {
+      color: rgba(99, 102, 241, 0.8);
+    }
+
+    /* Unordered Lists */
+    .styled-list {
+      list-style-type: none;
+      padding-left: 0.5rem;
+    }
+
+    .styled-list li {
+      position: relative;
+      padding-left: 1.25rem;
+      margin-bottom: 0.5rem;
+      font-size: 0.75rem;
+      color: #9cb3af;
+    }
+
+    .styled-list li::before {
+      content: "•";
+      color: #ff26a8;
+      font-weight: bold;
+      position: absolute;
+      left: 0;
+      top: 0;
+      font-size: 1.125rem;
+    }
+
+    /* FAQ Block */
+    .faq-block {
+      margin-bottom: 1.25rem;
+    }
+
+    .faq-q {
+      font-weight: 800;
+      color: #ffffff;
+      font-size: 0.875rem;
+      margin-bottom: 0.375rem;
+    }
+
+    .faq-a {
+      color: #9ca3af;
+      font-size: 0.75rem;
+    }
+
+    /* Footer styles */
+    .footer {
+      text-align: center;
+      font-size: 0.625rem;
+      color: #555e6d;
+      margin-top: 4rem;
+    }
+
+    .footer p:last-child {
+      margin-top: 0.25rem;
+    }
+
+    /* Spacing helpers */
+    .space-y-4 > * + * { margin-top: 1rem; }
+    .space-y-6 > * + * { margin-top: 1.5rem; }
+    .space-y-12 > * + * { margin-top: 3rem; }
+    .mt-4 { margin-top: 1rem; }
+    .mb-2 { margin-bottom: 0.5rem; }
+    .mb-4 { margin-bottom: 1rem; }
+    .mb-6 { margin-bottom: 1.5rem; }
+    .py-12 { padding-top: 3rem; padding-bottom: 3rem; }
+
   </style>
 </head>
-<body class="font-sans antialiased text-gray-200">
+<body>
 
   <!-- Header Section -->
-  <div class="relative overflow-hidden border-b border-pxborder bg-pxdark py-12 px-6">
-    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,38,168,0.1),transparent_45%)]"></div>
-    <div class="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
-      <div>
-        <div class="text-xs font-bold uppercase tracking-widest text-pxpink mb-2">Internal Tool Guide & Workflows</div>
-        <h1 class="text-3xl md:text-4xl font-extrabold font-display tracking-tight text-white">
-          Strukturierter <span class="gradient-text">KVA-Presenter</span> & Live-Sync
-        </h1>
-        <p class="text-sm text-gray-400 mt-2 max-w-xl">
-          Das offizielle Handbuch für alle Project Manager (PJMs) und Producer der PIXELSCHICKERIA zur Erstellung kundenfertiger Kostenvoranschläge aus MOCO.
-        </p>
-      </div>
-      <div class="bg-pxcard px-4 py-3 rounded-lg border border-pxborder shrink-0 flex items-center gap-3 px-border-glow">
-        <div class="w-3.5 h-3.5 rounded-full bg-emerald-500 animate-pulse"></div>
-        <div class="text-xs font-semibold text-gray-300">
-          <span class="text-emerald-400">Live in PX-Flow v2.3</span>
-          <span class="block text-[10px] text-gray-500 mt-0.5">Letztes Update: Juli 2026</span>
+  <div class="header-section">
+    <div class="header-glow"></div>
+    <div class="container relative">
+      <div class="header-container">
+        <div>
+          <div class="badge">Internal Tool Guide & Workflows</div>
+          <h1>
+            Strukturierter <span class="gradient-text">KVA-Presenter</span> & Live-Sync
+          </h1>
+          <p class="text-lead">
+            Das offizielle Handbuch für alle Project Manager (PJMs) und Producer der PIXELSCHICKERIA zur Erstellung kundenfertiger Kostenvoranschläge aus MOCO.
+          </p>
+        </div>
+        <div class="status-card">
+          <div class="status-dot"></div>
+          <div class="status-text">
+            <span style="color: #10b981;">Live in PX-Flow v2.3</span>
+            <span class="status-sub">Letztes Update: Juli 2026</span>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
   <!-- Content Container -->
-  <div class="max-w-4xl mx-auto px-6 py-12 space-y-12">
+  <div class="container py-12 space-y-12">
 
     <!-- Section 1: Das Problem & die Lösung -->
-    <div class="bg-pxcard p-6 md:p-8 rounded-xl border border-pxborder relative">
-      <div class="absolute -top-3 left-6 px-3 py-1 bg-pxpink text-white text-[10px] font-bold rounded-full uppercase tracking-wider">01. Hintergrund</div>
-      <h2 class="text-xl font-bold text-white mb-4">Das Problem in MOCO & unsere PX-Flow Lösung</h2>
+    <div class="card card-large relative">
+      <div class="card-badge">01. Hintergrund</div>
+      <h2>Das Problem in MOCO & unsere PX-Flow Lösung</h2>
       
-      <div class="space-y-4 text-sm text-gray-300 leading-relaxed">
+      <div class="space-y-4 text-sm text-gray">
         <p>
-          <strong>Das Problem:</strong> MOCO ist unser Master-Tool für Zeiterfassung, Finanzen und Rechnungen. Bei großen Projekten (z.&nbsp;B. der <span class="text-pxpink">DMAX Aktivierung</span> mit über 120 Positionen) stoßen wir in MOCO jedoch an Grenzen. MOCO erlaubt keine tieferen Untergruppierungen innerhalb von Gruppen. Dadurch wirken Angebote unübersichtlich, unstrukturiert und sind vor dem Kunden schwer verständlich.
+          <strong>Das Problem:</strong> MOCO ist unser Master-Tool für Zeiterfassung, Finanzen und Rechnungen. Bei großen Projekten (z.&nbsp;B. der <span style="color: #ff26a8; font-weight: 600;">DMAX Aktivierung</span> mit über 120 Positionen) stoßen wir in MOCO jedoch an Grenzen. MOCO erlaubt keine tieferen Untergruppierungen innerhalb von Gruppen. Dadurch wirken Angebote unübersichtlich, unstrukturiert und sind vor dem Kunden schwer verständlich.
         </p>
         <p>
           <strong>Unsere Lösung:</strong> Mit dem neuen <strong>KVA-Presenter</strong> in PX-Flow ziehen wir uns beliebige Angebote live via API aus MOCO heraus, sortieren sie vollautomatisch nach Keywords in <strong>10 logische Kategorien</strong> und bieten ein interaktives Interface zur Strukturierung und Kalkulation. 
         </p>
-        <div class="p-3 bg-pxdark border border-pxborder rounded text-xs text-gray-400 flex items-start gap-2.5">
-          <span class="text-pxpink font-bold">💡 Highlight:</span>
+        <div class="info-box">
+          <span class="info-box-pill">💡 Highlight:</span>
           <span>PJMs können Mengen und Preise in PX-Flow live anpassen, optionale Posten toggeln und die veränderten Daten mit einem einzigen Klick <strong>direkt zurück ins Live-Angebot nach MOCO synchronisieren</strong>, ohne händisches Abtippen!</span>
         </div>
       </div>
@@ -93,184 +492,185 @@
 
     <!-- Section 2: Step-by-Step Workflow -->
     <div class="space-y-6">
-      <h2 class="text-2xl font-bold text-white flex items-center gap-3 font-display">
-        <span class="bg-pxpink/10 text-pxpink w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm">2</span>
+      <h2 class="section-title">
+        <span class="circle-num">2</span>
         Schritt-für-Schritt-Anleitung
       </h2>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="grid-3">
         <!-- Step 1 -->
-        <div class="bg-pxcard p-5 rounded-lg border border-pxborder flex flex-col justify-between">
+        <div class="step-card">
           <div>
-            <div class="text-[10px] uppercase font-bold text-pxindigo mb-1">Schritt 1</div>
-            <h3 class="font-bold text-white text-base">In MOCO anlegen</h3>
-            <p class="text-xs text-gray-400 mt-2 leading-relaxed">
+            <div class="step-badge">Schritt 1</div>
+            <h3 class="step-title">In MOCO anlegen</h3>
+            <p class="step-desc">
               Erstelle das Projekt und das Angebot wie gewohnt in MOCO. Lege alle Positionen flach untereinander an (die Strukturierung machen wir erst gleich in PX-Flow). Notiere dir die <strong>Angebots-ID</strong> (letzte Ziffern im URL-Link).
             </p>
           </div>
-          <div class="mt-4 pt-4 border-t border-pxborder text-[10px] text-gray-500">Master-Daten erstellen</div>
+          <div class="step-footer">Master-Daten erstellen</div>
         </div>
 
         <!-- Step 2 -->
-        <div class="bg-pxcard p-5 rounded-lg border border-pxborder flex flex-col justify-between">
+        <div class="step-card">
           <div>
-            <div class="text-[10px] uppercase font-bold text-pxindigo mb-1">Schritt 2</div>
-            <h3 class="font-bold text-white text-base">PX-Flow Strukturierung</h3>
-            <p class="text-xs text-gray-400 mt-2 leading-relaxed">
+            <div class="step-badge">Schritt 2</div>
+            <h3 class="step-title">PX-Flow Strukturierung</h3>
+            <p class="step-desc">
               Wechsle in PX-Flow in den Reiter <strong>"Moco Angebote (KVA)"</strong>. Gib die Angebots-ID ein und klicke auf "Laden". Der KVA-Presenter sortiert die Positionen automatisch in die 10 Gruppen. Überprüfe die Zuordnung und passe sie ggf. über die Dropdowns rechts pro Item an.
             </p>
           </div>
-          <div class="mt-4 pt-4 border-t border-pxborder text-[10px] text-gray-500">Auto-Gruppierung nutzen</div>
+          <div class="step-footer">Auto-Gruppierung nutzen</div>
         </div>
 
         <!-- Step 3 -->
-        <div class="bg-pxcard p-5 rounded-lg border border-pxborder flex flex-col justify-between">
+        <div class="step-card">
           <div>
-            <div class="text-[10px] uppercase font-bold text-pxindigo mb-1">Schritt 3</div>
-            <h3 class="font-bold text-white text-base">Kunden-Vorschau & Druck</h3>
-            <p class="text-xs text-gray-400 mt-2 leading-relaxed">
+            <div class="step-badge">Schritt 3</div>
+            <h3 class="step-title">Kunden-Vorschau & Druck</h3>
+            <p class="step-desc">
               Klicke oben auf <strong>"Drucken / PDF Vorschau"</strong>. Die Steuerungs-UI wird ausgeblendet und du erhältst ein absolut sauberes KVA-PDF im originalen, minimalistischen Pixelschickeria-Layout. Drücke auf "Drucken" zum PDF-Export!
             </p>
           </div>
-          <div class="mt-4 pt-4 border-t border-pxborder text-[10px] text-gray-500">PDF-Export im PX-Style</div>
+          <div class="step-footer">PDF-Export im PX-Style</div>
         </div>
       </div>
     </div>
 
     <!-- Section 3: Die 10 logischen Leistungsbereiche -->
-    <div class="bg-pxcard p-6 md:p-8 rounded-xl border border-pxborder">
-      <h2 class="text-xl font-bold text-white mb-2">Die 10 standardisierten Leistungsbereiche</h2>
-      <p class="text-xs text-gray-400 mb-6">Unser Auto-Grouping Algorithmus durchsucht Titel & Beschreibungen nach Keywords und sortiert sie wie folgt:</p>
+    <div class="card card-large">
+      <h2>Die 10 standardisierten Leistungsbereiche</h2>
+      <p class="text-xs text-muted mb-6">Unser Auto-Grouping Algorithmus durchsucht Titel & Beschreibungen nach Keywords und sortiert sie wie folgt:</p>
 
-      <div class="space-y-3.5 text-xs">
+      <div class="space-y-4">
         <!-- Group 1 -->
-        <div class="flex items-start gap-4 p-3 bg-pxdark/55 rounded border border-pxborder/60 hover:bg-pxdark transition">
-          <span class="bg-pxpink text-white w-6 h-6 rounded-full flex items-center justify-center font-bold font-display shrink-0">1</span>
+        <div class="group-item">
+          <span class="circle-num">1</span>
           <div>
-            <strong class="text-white block text-sm">Konzeption & Kreation</strong>
-            <span class="text-gray-400 block mt-0.5">Briefing, Brainstormings, Konzeptentwicklung, Creative/Art Direction, Scribbles, Grafik-Entwürfe, Layouts.</span>
-            <span class="text-pxpink/80 font-medium block mt-1">Keywords: concept, kreation, creative direction, art direction, scribbles, design, layout</span>
+            <strong class="text-gray" style="font-size: 0.875rem; display: block; font-weight: 700;">Konzeption & Kreation</strong>
+            <span class="group-meta block">Briefing, Brainstormings, Konzeptentwicklung, Creative/Art Direction, Scribbles, Grafik-Entwürfe, Layouts.</span>
+            <span class="group-keywords text-pink-soft text-xs">Keywords: concept, kreation, creative direction, art direction, scribbles, design, layout</span>
           </div>
         </div>
 
         <!-- Group 2 -->
-        <div class="flex items-start gap-4 p-3 bg-pxdark/55 rounded border border-pxborder/60 hover:bg-pxdark transition">
-          <span class="bg-pxpink text-white w-6 h-6 rounded-full flex items-center justify-center font-bold font-display shrink-0">2</span>
+        <div class="group-item">
+          <span class="circle-num">2</span>
           <div>
-            <strong class="text-white block text-sm">Projektmanagement</strong>
-            <span class="text-gray-400 block mt-0.5">Projektsteuerung, Koordination, Abrechnung, Dienstleistersteuerung, GF-Stunden, Senior-PM / PM.</span>
-            <span class="text-pxindigo/80 font-medium block mt-1">Keywords: projektsteuerung, pm, projectmanager, geschäftsführung, organisation, planung</span>
+            <strong class="text-gray" style="font-size: 0.875rem; display: block; font-weight: 700;">Projektmanagement</strong>
+            <span class="group-meta block">Projektsteuerung, Koordination, Abrechnung, Dienstleistersteuerung, GF-Stunden, Senior-PM / PM.</span>
+            <span class="group-keywords text-indigo-soft text-xs">Keywords: projektsteuerung, pm, projectmanager, geschäftsführung, organisation, planung</span>
           </div>
         </div>
 
         <!-- Group 3 -->
-        <div class="flex items-start gap-4 p-3 bg-pxdark/55 rounded border border-pxborder/60 hover:bg-pxdark transition">
-          <span class="bg-pxpink text-white w-6 h-6 rounded-full flex items-center justify-center font-bold font-display shrink-0">3</span>
+        <div class="group-item">
+          <span class="circle-num">3</span>
           <div>
-            <strong class="text-white block text-sm">Standorte</strong>
-            <span class="text-gray-400 block mt-0.5">Standortrecherche, Flächenanfragen, Mietgebühren, Reservierung, Nutzungsverträge.</span>
-            <span class="text-pxpink/80 font-medium block mt-1">Keywords: standort, fläche, location, miete</span>
+            <strong class="text-gray" style="font-size: 0.875rem; display: block; font-weight: 700;">Standorte</strong>
+            <span class="group-meta block">Standortrecherche, Flächenanfragen, Mietgebühren, Reservierung, Nutzungsverträge.</span>
+            <span class="group-keywords text-pink-soft text-xs">Keywords: standort, fläche, location, miete</span>
           </div>
         </div>
 
         <!-- Group 4 -->
-        <div class="flex items-start gap-4 p-3 bg-pxdark/55 rounded border border-pxborder/60 hover:bg-pxdark transition">
-          <span class="bg-pxpink text-white w-6 h-6 rounded-full flex items-center justify-center font-bold font-display shrink-0">4</span>
+        <div class="group-item">
+          <span class="circle-num">4</span>
           <div>
-            <strong class="text-white block text-sm">Technische Planung</strong>
-            <span class="text-gray-400 block mt-0.5">CAD-Entwürfe, statische Prüfungen, Machbarkeitsprüfung vor Ort, technische Bauleitung, Aufrisspläne.</span>
-            <span class="text-pxindigo/80 font-medium block mt-1">Keywords: machbarkeitsprüfung, statik, cad-planung, genehmigung, aufrissplanung</span>
+            <strong class="text-gray" style="font-size: 0.875rem; display: block; font-weight: 700;">Technische Planung</strong>
+            <span class="group-meta block">CAD-Entwürfe, statische Prüfungen, Machbarkeitsprüfung vor Ort, technische Bauleitung, Aufrisspläne.</span>
+            <span class="group-keywords text-indigo-soft text-xs">Keywords: machbarkeitsprüfung, statik, cad-planung, genehmigung, aufrissplanung</span>
           </div>
         </div>
 
         <!-- Group 5 -->
-        <div class="flex items-start gap-4 p-3 bg-pxdark/55 rounded border border-pxborder/60 hover:bg-pxdark transition">
-          <span class="bg-pxpink text-white w-6 h-6 rounded-full flex items-center justify-center font-bold font-display shrink-0">5</span>
+        <div class="group-item">
+          <span class="circle-num">5</span>
           <div>
-            <strong class="text-white block text-sm">Produktion (Default / Fallback)</strong>
-            <span class="text-gray-400 block mt-0.5">Messebau, Bühnenbau, Kulissen, Mobiliar, Catering (Speisen & Getränke), Eventtechnik, Hostessen, Show-Acts, Dekoration.</span>
-            <span class="text-pxpink/80 font-medium block mt-1">Keywords: produktion, catering, bühnenbau, messebau, deko, technik, crew, personal</span>
+            <strong class="text-gray" style="font-size: 0.875rem; display: block; font-weight: 700;">Produktion (Default / Fallback)</strong>
+            <span class="group-meta block">Messebau, Bühnenbau, Kulissen, Mobiliar, Catering (Speisen & Getränke), Eventtechnik, Hostessen, Show-Acts, Dekoration.</span>
+            <span class="group-keywords text-pink-soft text-xs">Keywords: produktion, catering, bühnenbau, messebau, deko, technik, crew, personal</span>
           </div>
         </div>
 
         <!-- Group 6 -->
-        <div class="flex items-start gap-4 p-3 bg-pxdark/55 rounded border border-pxborder/60 hover:bg-pxdark transition">
-          <span class="bg-pxpink text-white w-6 h-6 rounded-full flex items-center justify-center font-bold font-display shrink-0">6</span>
+        <div class="group-item">
+          <span class="circle-num">6</span>
           <div>
-            <strong class="text-white block text-sm">Digital</strong>
-            <span class="text-gray-400 block mt-0.5">Landingpages, Registrierungsplattformen, QR-Code-Generierung, Analytics, Mailings.</span>
-            <span class="text-pxindigo/80 font-medium block mt-1">Keywords: landingpage, qr-code, tracking, analytics, registrierung, mailings</span>
+            <strong class="text-gray" style="font-size: 0.875rem; display: block; font-weight: 700;">Digital</strong>
+            <span class="group-meta block">Landingpages, Registrierungsplattformen, QR-Code-Generierung, Analytics, Mailings.</span>
+            <span class="group-keywords text-indigo-soft text-xs">Keywords: landingpage, qr-code, tracking, analytics, registrierung, mailings</span>
           </div>
         </div>
 
         <!-- Group 7 -->
-        <div class="flex items-start gap-4 p-3 bg-pxdark/55 rounded border border-pxborder/60 hover:bg-pxdark transition">
-          <span class="bg-pxpink text-white w-6 h-6 rounded-full flex items-center justify-center font-bold font-display shrink-0">7</span>
+        <div class="group-item">
+          <span class="circle-num">7</span>
           <div>
-            <strong class="text-white block text-sm">Logistik</strong>
-            <span class="text-gray-400 block mt-0.5">Transporte, Speditionen, Auf- und Abbautage vor Ort, Hotelübernachtungen für Crew & VIPs, Shuttles und Flüge.</span>
-            <span class="text-pxpink/80 font-medium block mt-1">Keywords: transport, logistik, spedition, lagerung, aufbau, abbau, hotel, reisekosten</span>
+            <strong class="text-gray" style="font-size: 0.875rem; display: block; font-weight: 700;">Logistik</strong>
+            <span class="group-meta block">Transporte, Speditionen, Auf- und Abbautage vor Ort, Hotelübernachtungen für Crew & VIPs, Shuttles und Flüge.</span>
+            <span class="group-keywords text-pink-soft text-xs">Keywords: transport, logistik, spedition, lagerung, aufbau, abbau, hotel, reisekosten</span>
           </div>
         </div>
 
         <!-- Group 8 -->
-        <div class="flex items-start gap-4 p-3 bg-pxdark/55 rounded border border-pxborder/60 hover:bg-pxdark transition">
-          <span class="bg-pxpink text-white w-6 h-6 rounded-full flex items-center justify-center font-bold font-display shrink-0">8</span>
+        <div class="group-item">
+          <span class="circle-num">8</span>
           <div>
-            <strong class="text-white block text-sm">Betrieb</strong>
-            <span class="text-gray-400 block mt-0.5">Security, Nachtbewachung, Abnahme-Sanitäter, Brandschutzkonzept, Brandwache, Haftpflicht- & Event-Versicherungen.</span>
-            <span class="text-pxindigo/80 font-medium block mt-1">Keywords: security, bewachung, versicherung, brandschutz, brandwache, sanitaeter</span>
+            <strong class="text-gray" style="font-size: 0.875rem; display: block; font-weight: 700;">Betrieb</strong>
+            <span class="group-meta block">Security, Nachtbewachung, Abnahme-Sanitäter, Brandschutzkonzept, Brandwache, Haftpflicht- & Event-Versicherungen.</span>
+            <span class="group-keywords text-indigo-soft text-xs">Keywords: security, bewachung, versicherung, brandschutz, brandwache, sanitaeter</span>
           </div>
         </div>
 
         <!-- Group 9 -->
-        <div class="flex items-start gap-4 p-3 bg-pxdark/55 rounded border border-pxborder/60 hover:bg-pxdark transition">
-          <span class="bg-pxpink text-white w-6 h-6 rounded-full flex items-center justify-center font-bold font-display shrink-0">9</span>
+        <div class="group-item">
+          <span class="circle-num">9</span>
           <div>
-            <strong class="text-white block text-sm">Kommunikation</strong>
-            <span class="text-gray-400 block mt-0.5">Foto- und Videodokumentation, Kooperationen, Radio-Splits, PR & Pressearbeit.</span>
-            <span class="text-pxpink/80 font-medium block mt-1">Keywords: foto, video, fotograf, videograph, radio, pr, marketing</span>
+            <strong class="text-gray" style="font-size: 0.875rem; display: block; font-weight: 700;">Kommunikation</strong>
+            <span class="group-meta block">Foto- und Videodokumentation, Kooperationen, Radio-Splits, PR & Pressearbeit.</span>
+            <span class="group-keywords text-pink-soft text-xs">Keywords: foto, video, fotograf, videograph, radio, pr, marketing</span>
           </div>
         </div>
 
         <!-- Group 10 -->
-        <div class="flex items-start gap-4 p-3 bg-pxdark/55 rounded border border-pxborder/60 hover:bg-pxdark transition">
-          <span class="bg-pxpink text-white w-6 h-6 rounded-full flex items-center justify-center font-bold font-display shrink-0">10</span>
+        <div class="group-item">
+          <span class="circle-num">10</span>
           <div>
-            <strong class="text-white block text-sm">Projektabschluss</strong>
-            <span class="text-gray-400 block mt-0.5">Debriefing, Auswertung, Erstellung des Abschlussberichts/Reports an den Kunden.</span>
-            <span class="text-pxindigo/80 font-medium block mt-1">Keywords: debrief, abschlussreport, nachbereitung, abschluss</span>
+            <strong class="text-gray" style="font-size: 0.875rem; display: block; font-weight: 700;">Projektabschluss</strong>
+            <span class="group-meta block">Debriefing, Auswertung, Erstellung des Abschlussberichts/Reports an den Kunden.</span>
+            <span class="group-keywords text-indigo-soft text-xs">Keywords: debrief, abschlussreport, nachbereitung, abschluss</span>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Section 4: Live-Sync -->
-    <div class="bg-pxcard p-6 md:p-8 rounded-xl border border-pxborder relative" id="sync-details">
-      <div class="absolute -top-3 left-6 px-3 py-1 bg-emerald-500 text-white text-[10px] font-bold rounded-full uppercase tracking-wider">Feature in Depth</div>
-      <h2 class="text-xl font-bold text-white mb-4">Das "Werte an MOCO senden" Feature</h2>
+    <div class="card card-large relative" id="sync-details">
+      <div class="card-badge card-badge-emerald">Feature in Depth</div>
+      <h2>Das "Werte an MOCO senden" Feature</h2>
       
-      <div class="space-y-4 text-sm text-gray-300 leading-relaxed">
+      <div class="space-y-4 text-sm text-gray">
         <p>
           Dieses Feature wurde implementiert, um euch lästige händische Doppeleingaben zu ersparen. So verhält sich die Synchronisation:
         </p>
-        <ul class="list-disc pl-6 space-y-2 text-xs text-gray-400">
+        <ul class="styled-list">
           <li>
-            <strong class="text-gray-200">Sicherheits-Puffer (Sandbox):</strong> Solange der PJM im KVA-Presenter Mengen, Preise oder "Optional"-Flags verändert, passiert in MOCO absolut gar nichts. PJMs können das Angebot gefahrlos simulieren und verwerfen.
+            <strong style="color: #ffffff;">Sicherheits-Puffer (Sandbox):</strong> Solange der PJM im KVA-Presenter Mengen, Preise oder "Optional"-Flags verändert, passiert in MOCO absolut gar nichts. PJMs können das Angebot gefahrlos simulieren und verwerfen.
           </li>
           <li>
-            <strong class="text-gray-200">Die Synchronisation:</strong> Erst mit Klick auf den grünen Button <span class="bg-emerald-600/20 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded font-mono font-bold text-[10px]">Werte an MOCO senden</span> werden die Mengen, Einzelpreise und der Optional-Status pro Zeile live über die API an das original ausgewählte MOCO-Angebot gesendet und dort festgeschrieben.
+            <strong style="color: #ffffff;">Die Synchronisation:</strong> Erst mit Klick auf den grünen Button <span style="background-color: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.25); padding: 0.15rem 0.5rem; rounded-radius: 0.25rem; font-family: monospace; font-size: 0.625rem; font-weight: 700;">Werte an MOCO senden</span> werden die Mengen, Einzelpreise und der Optional-Status pro Zeile live über die API an das original ausgewählte MOCO-Angebot gesendet und dort festgeschrieben.
           </li>
           <li>
-            <strong class="text-gray-200">Visuelle Struktur:</strong> Die hierarchischen Kassenbereiche (Gruppen 1 bis 10) und manuell umgehängten Rubriken verbleiben als visuelles Element in PX-Flow und verändern die Moco-Artikeldatenstruktur nicht (Moco behält seine lineare Struktur bei).
+            <strong style="color: #ffffff;">Visuelle Struktur:</strong> Die hierarchischen Kassenbereiche (Gruppen 1 bis 10) und manuell umgehängten Rubriken verbleiben als visuelles Element in PX-Flow und verändern die Moco-Artikeldatenstruktur nicht (Moco behält seine lineare Struktur bei).
           </li>
         </ul>
-        <div class="bg-pxdark border border-pxborder rounded p-4 flex gap-3 text-xs text-gray-400">
-          <svg class="w-5 h-5 text-amber-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        
+        <div class="warning-box">
+          <svg class="icon-svg icon-amber" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
           </svg>
-          <div>
-            <strong class="text-gray-300 block mb-0.5">⚠️ WICHTIGER HINWEIS FÜR PJMs:</strong>
+          <div class="text-xs text-muted">
+            <strong style="color: #f3f4f6; display: block; margin-bottom: 0.25rem;">⚠️ WICHTIGER HINWEIS FÜR PJMs:</strong>
             Durch Verwerfen des Browser-Tabs (ohne Klick auf "Senden") gehen lokale Mengen- und Preissimulationen verloren. Achtet darauf, die finalisierten Mengen stets zurückzusynchronisieren, wenn das Angebot steht!
           </div>
         </div>
@@ -278,27 +678,27 @@
     </div>
 
     <!-- Section 5: Troubleshooting & FAQs -->
-    <div class="bg-pxcard p-6 md:p-8 rounded-xl border border-pxborder">
-      <h2 class="text-xl font-bold text-white mb-6">FAQ & Troubleshooting</h2>
+    <div class="card card-large">
+      <h2 class="mb-6">FAQ & Troubleshooting</h2>
       
-      <div class="space-y-6 text-xs text-gray-300 leading-relaxed">
-        <div>
-          <h4 class="font-extrabold text-white text-sm mb-1.5">Q: Woher weiß ich, ob eine Position im KVA-Presenter als "Optional" gilt?</h4>
-          <p class="text-gray-400">
-            A: In der Bearbeitungs-Vorschau ist das Element bei "Option" mit "Ja" markiert und verringert seine Deckkraft leicht. In der finalen PDF-Druck-Vorschau wird an der entsprechenden Zeile ein gut sichtbares, elegantes Label <span class="bg-orange-100 text-orange-800 border border-orange-200 uppercase font-extrabold text-[8px] px-1 py-0.25 rounded">Optional</span> ausgegeben und die Position wird vollautomatisch aus euren Zwischen- und Gesamtsummen herausgerechnet.
+      <div class="space-y-6">
+        <div class="faq-block">
+          <h4 class="faq-q">Q: Woher weiß ich, ob eine Position im KVA-Presenter als "Optional" gilt?</h4>
+          <p class="faq-a">
+            A: In der Bearbeitungs-Vorschau ist das Element bei "Option" mit "Ja" markiert und verringert seine Deckkraft leicht. In der finalen PDF-Druck-Vorschau wird an der entsprechenden Zeile ein gut sichtbares, elegantes Label <span style="background-color: #ffedd5; color: #9a3412; font-size: 0.55rem; padding: 0.125rem 0.375rem; border-radius: 0.125rem; font-weight: 800; text-transform: uppercase;">Optional</span> ausgegeben und die Position wird vollautomatisch aus euren Zwischen- und Gesamtsummen herausgerechnet.
           </p>
         </div>
 
-        <div>
-          <h4 class="font-extrabold text-white text-sm mb-1.5">Q: Ich erhalte einen "Route not found" oder "Authorization" Fehler beim Laden?</h4>
-          <p class="text-gray-400">
+        <div class="faq-block">
+          <h4 class="faq-q">Q: Ich erhalte einen "Route not found" oder "Authorization" Fehler beim Laden?</h4>
+          <p class="faq-a">
             A: Vergewissere dich, dass du ein gültiges MOCO-Angebot mit einer echten ID lädst (z.&nbsp;B. 2310479). Vergewissere dich außerdem, dass du mit einem gültigen Benutzer (Admin/GF) im PX-Flow eingeloggt bist, da Freelancer und Gäste aus Sicherheitsgründen keinen Zugriff auf MOCO-Finanzdaten haben.
           </p>
         </div>
 
-        <div>
-          <h4 class="font-extrabold text-white text-sm mb-1.5">Q: Was passiert mit Moco-Zwischensummen und Trenn-Überschriften beim Laden?</h4>
-          <p class="text-gray-400">
+        <div class="faq-block">
+          <h4 class="faq-q">Q: Was passiert mit Moco-Zwischensummen und Trenn-Überschriften beim Laden?</h4>
+          <p class="faq-a">
             A: Unser Importer löscht irrelevante manuelle Moco-Subtotale (wie "Zwischensumme" oder die Moco-System-Trenner "FREMDLEISTUNGEN") automatisch auf eurer KVA-Spiegelseite, da wir in PX-Flow unsere eigenen, fehlerfreien 10 Bereichs-Zwischensummen dynamisch über die gruppierten Items errechnen. Ihr müsst diese also in MOCO nicht penibel von Hand pflegen.
           </p>
         </div>
@@ -306,9 +706,9 @@
     </div>
 
     <!-- Footer Disclaimer -->
-    <div class="text-center text-[10px] text-gray-500">
+    <div class="footer">
       <p>PIXELSCHICKERIA GmbH — Gärtnerplatz 1, 80469 München</p>
-      <p class="mt-1">Entwickelt vom Innovation-Studio für optimierte PJM-Workflows.</p>
+      <p>Entwickelt vom Innovation-Studio für optimierte PJM-Workflows.</p>
     </div>
 
   </div>
