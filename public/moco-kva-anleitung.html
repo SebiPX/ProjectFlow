@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KVA-Presenter & MOCO-Sync — Team-Guide | PIXELSCHICKERIA</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts - Inter & Playfair Display / Syne for Pixelschickeria feeling -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            display: ['Syne', 'sans-serif'],
+          },
+          colors: {
+            pxpink: '#ff26a8',
+            pxindigo: '#6366f1',
+            pxdark: '#0b0f19',
+            pxcard: '#161e2e',
+            pxborder: '#243242'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #0b0f19;
+      color: #f3f4f6;
+    }
+    .gradient-text {
+      background: linear-gradient(135deg, #ff26a8 0%, #6366f1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .px-border-glow {
+      box-shadow: 0 0 15px rgba(255, 38, 168, 0.15);
+    }
+  </style>
+</head>
+<body class="font-sans antialiased text-gray-200">
+
+  <!-- Header Section -->
+  <div class="relative overflow-hidden border-b border-pxborder bg-pxdark py-12 px-6">
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,38,168,0.1),transparent_45%)]"></div>
+    <div class="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
+      <div>
+        <div class="text-xs font-bold uppercase tracking-widest text-pxpink mb-2">Internal Tool Guide & Workflows</div>
+        <h1 class="text-3xl md:text-4xl font-extrabold font-display tracking-tight text-white">
+          Strukturierter <span class="gradient-text">KVA-Presenter</span> & Live-Sync
+        </h1>
+        <p class="text-sm text-gray-400 mt-2 max-w-xl">
+          Das offizielle Handbuch für alle Project Manager (PJMs) und Producer der PIXELSCHICKERIA zur Erstellung kundenfertiger Kostenvoranschläge aus MOCO.
+        </p>
+      </div>
+      <div class="bg-pxcard px-4 py-3 rounded-lg border border-pxborder shrink-0 flex items-center gap-3 px-border-glow">
+        <div class="w-3.5 h-3.5 rounded-full bg-emerald-500 animate-pulse"></div>
+        <div class="text-xs font-semibold text-gray-300">
+          <span class="text-emerald-400">Live in PX-Flow v2.3</span>
+          <span class="block text-[10px] text-gray-500 mt-0.5">Letztes Update: Juli 2026</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content Container -->
+  <div class="max-w-4xl mx-auto px-6 py-12 space-y-12">
+
+    <!-- Section 1: Das Problem & die Lösung -->
+    <div class="bg-pxcard p-6 md:p-8 rounded-xl border border-pxborder relative">
+      <div class="absolute -top-3 left-6 px-3 py-1 bg-pxpink text-white text-[10px] font-bold rounded-full uppercase tracking-wider">01. Hintergrund</div>
+      <h2 class="text-xl font-bold text-white mb-4">Das Problem in MOCO & unsere PX-Flow Lösung</h2>
+      
+      <div class="space-y-4 text-sm text-gray-300 leading-relaxed">
+        <p>
+          <strong>Das Problem:</strong> MOCO ist unser Master-Tool für Zeiterfassung, Finanzen und Rechnungen. Bei großen Projekten (z.&nbsp;B. der <span class="text-pxpink">DMAX Aktivierung</span> mit über 120 Positionen) stoßen wir in MOCO jedoch an Grenzen. MOCO erlaubt keine tieferen Untergruppierungen innerhalb von Gruppen. Dadurch wirken Angebote unübersichtlich, unstrukturiert und sind vor dem Kunden schwer verständlich.
+        </p>
+        <p>
+          <strong>Unsere Lösung:</strong> Mit dem neuen <strong>KVA-Presenter</strong> in PX-Flow ziehen wir uns beliebige Angebote live via API aus MOCO heraus, sortieren sie vollautomatisch nach Keywords in <strong>10 logische Kategorien</strong> und bieten ein interaktives Interface zur Strukturierung und Kalkulation. 
+        </p>
+        <div class="p-3 bg-pxdark border border-pxborder rounded text-xs text-gray-400 flex items-start gap-2.5">
+          <span class="text-pxpink font-bold">💡 Highlight:</span>
+          <span>PJMs können Mengen und Preise in PX-Flow live anpassen, optionale Posten toggeln und die veränderten Daten mit einem einzigen Klick <strong>direkt zurück ins Live-Angebot nach MOCO synchronisieren</strong>, ohne händisches Abtippen!</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 2: Step-by-Step Workflow -->
+    <div class="space-y-6">
+      <h2 class="text-2xl font-bold text-white flex items-center gap-3 font-display">
+        <span class="bg-pxpink/10 text-pxpink w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm">2</span>
+        Schritt-für-Schritt-Anleitung
+      </h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Step 1 -->
+        <div class="bg-pxcard p-5 rounded-lg border border-pxborder flex flex-col justify-between">
+          <div>
+            <div class="text-[10px] uppercase font-bold text-pxindigo mb-1">Schritt 1</div>
+            <h3 class="font-bold text-white text-base">In MOCO anlegen</h3>
+            <p class="text-xs text-gray-400 mt-2 leading-relaxed">
+              Erstelle das Projekt und das Angebot wie gewohnt in MOCO. Lege alle Positionen flach untereinander an (die Strukturierung machen wir erst gleich in PX-Flow). Notiere dir die <strong>Angebots-ID</strong> (letzte Ziffern im URL-Link).
+            </p>
+          </div>
+          <div class="mt-4 pt-4 border-t border-pxborder text-[10px] text-gray-500">Master-Daten erstellen</div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="bg-pxcard p-5 rounded-lg border border-pxborder flex flex-col justify-between">
+          <div>
+            <div class="text-[10px] uppercase font-bold text-pxindigo mb-1">Schritt 2</div>
+            <h3 class="font-bold text-white text-base">PX-Flow Strukturierung</h3>
+            <p class="text-xs text-gray-400 mt-2 leading-relaxed">
+              Wechsle in PX-Flow in den Reiter <strong>"Moco Angebote (KVA)"</strong>. Gib die Angebots-ID ein und klicke auf "Laden". Der KVA-Presenter sortiert die Positionen automatisch in die 10 Gruppen. Überprüfe die Zuordnung und passe sie ggf. über die Dropdowns rechts pro Item an.
+            </p>
+          </div>
+          <div class="mt-4 pt-4 border-t border-pxborder text-[10px] text-gray-500">Auto-Gruppierung nutzen</div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="bg-pxcard p-5 rounded-lg border border-pxborder flex flex-col justify-between">
+          <div>
+            <div class="text-[10px] uppercase font-bold text-pxindigo mb-1">Schritt 3</div>
+            <h3 class="font-bold text-white text-base">Kunden-Vorschau & Druck</h3>
+            <p class="text-xs text-gray-400 mt-2 leading-relaxed">
+              Klicke oben auf <strong>"Drucken / PDF Vorschau"</strong>. Die Steuerungs-UI wird ausgeblendet und du erhältst ein absolut sauberes KVA-PDF im originalen, minimalistischen Pixelschickeria-Layout. Drücke auf "Drucken" zum PDF-Export!
+            </p>
+          </div>
+          <div class="mt-4 pt-4 border-t border-pxborder text-[10px] text-gray-500">PDF-Export im PX-Style</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 3: Die 10 logischen Leistungsbereiche -->
+    <div class="bg-pxcard p-6 md:p-8 rounded-xl border border-pxborder">
+      <h2 class="text-xl font-bold text-white mb-2">Die 10 standardisierten Leistungsbereiche</h2>
+      <p class="text-xs text-gray-400 mb-6">Unser Auto-Grouping Algorithmus durchsucht Titel & Beschreibungen nach Keywords und sortiert sie wie folgt:</p>
+
+      <div class="space-y-3.5 text-xs">
+        <!-- Group 1 -->
+        <div class="flex items-start gap-4 p-3 bg-pxdark/55 rounded border border-pxborder/60 hover:bg-pxdark transition">
+          <span class="bg-pxpink text-white w-6 h-6 rounded-full flex items-center justify-center font-bold font-display shrink-0">1</span>
+          <div>
+            <strong class="text-white block text-sm">Konzeption & Kreation</strong>
+            <span class="text-gray-400 block mt-0.5">Briefing, Brainstormings, Konzeptentwicklung, Creative/Art Direction, Scribbles, Grafik-Entwürfe, Layouts.</span>
+            <span class="text-pxpink/80 font-medium block mt-1">Keywords: concept, kreation, creative direction, art direction, scribbles, design, layout</span>
+          </div>
+        </div>
+
+        <!-- Group 2 -->
+        <div class="flex items-start gap-4 p-3 bg-pxdark/55 rounded border border-pxborder/60 hover:bg-pxdark transition">
+          <span class="bg-pxpink text-white w-6 h-6 rounded-full flex items-center justify-center font-bold font-display shrink-0">2</span>
+          <div>
+            <strong class="text-white block text-sm">Projektmanagement</strong>
+            <span class="text-gray-400 block mt-0.5">Projektsteuerung, Koordination, Abrechnung, Dienstleistersteuerung, GF-Stunden, Senior-PM / PM.</span>
+            <span class="text-pxindigo/80 font-medium block mt-1">Keywords: projektsteuerung, pm, projectmanager, geschäftsführung, organisation, planung</span>
+          </div>
+        </div>
+
+        <!-- Group 3 -->
+        <div class="flex items-start gap-4 p-3 bg-pxdark/55 rounded border border-pxborder/60 hover:bg-pxdark transition">
+          <span class="bg-pxpink text-white w-6 h-6 rounded-full flex items-center justify-center font-bold font-display shrink-0">3</span>
+          <div>
+            <strong class="text-white block text-sm">Standorte</strong>
+            <span class="text-gray-400 block mt-0.5">Standortrecherche, Flächenanfragen, Mietgebühren, Reservierung, Nutzungsverträge.</span>
+            <span class="text-pxpink/80 font-medium block mt-1">Keywords: standort, fläche, location, miete</span>
+          </div>
+        </div>
+
+        <!-- Group 4 -->
+        <div class="flex items-start gap-4 p-3 bg-pxdark/55 rounded border border-pxborder/60 hover:bg-pxdark transition">
+          <span class="bg-pxpink text-white w-6 h-6 rounded-full flex items-center justify-center font-bold font-display shrink-0">4</span>
+          <div>
+            <strong class="text-white block text-sm">Technische Planung</strong>
+            <span class="text-gray-400 block mt-0.5">CAD-Entwürfe, statische Prüfungen, Machbarkeitsprüfung vor Ort, technische Bauleitung, Aufrisspläne.</span>
+            <span class="text-pxindigo/80 font-medium block mt-1">Keywords: machbarkeitsprüfung, statik, cad-planung, genehmigung, aufrissplanung</span>
+          </div>
+        </div>
+
+        <!-- Group 5 -->
+        <div class="flex items-start gap-4 p-3 bg-pxdark/55 rounded border border-pxborder/60 hover:bg-pxdark transition">
+          <span class="bg-pxpink text-white w-6 h-6 rounded-full flex items-center justify-center font-bold font-display shrink-0">5</span>
+          <div>
+            <strong class="text-white block text-sm">Produktion (Default / Fallback)</strong>
+            <span class="text-gray-400 block mt-0.5">Messebau, Bühnenbau, Kulissen, Mobiliar, Catering (Speisen & Getränke), Eventtechnik, Hostessen, Show-Acts, Dekoration.</span>
+            <span class="text-pxpink/80 font-medium block mt-1">Keywords: produktion, catering, bühnenbau, messebau, deko, technik, crew, personal</span>
+          </div>
+        </div>
+
+        <!-- Group 6 -->
+        <div class="flex items-start gap-4 p-3 bg-pxdark/55 rounded border border-pxborder/60 hover:bg-pxdark transition">
+          <span class="bg-pxpink text-white w-6 h-6 rounded-full flex items-center justify-center font-bold font-display shrink-0">6</span>
+          <div>
+            <strong class="text-white block text-sm">Digital</strong>
+            <span class="text-gray-400 block mt-0.5">Landingpages, Registrierungsplattformen, QR-Code-Generierung, Analytics, Mailings.</span>
+            <span class="text-pxindigo/80 font-medium block mt-1">Keywords: landingpage, qr-code, tracking, analytics, registrierung, mailings</span>
+          </div>
+        </div>
+
+        <!-- Group 7 -->
+        <div class="flex items-start gap-4 p-3 bg-pxdark/55 rounded border border-pxborder/60 hover:bg-pxdark transition">
+          <span class="bg-pxpink text-white w-6 h-6 rounded-full flex items-center justify-center font-bold font-display shrink-0">7</span>
+          <div>
+            <strong class="text-white block text-sm">Logistik</strong>
+            <span class="text-gray-400 block mt-0.5">Transporte, Speditionen, Auf- und Abbautage vor Ort, Hotelübernachtungen für Crew & VIPs, Shuttles und Flüge.</span>
+            <span class="text-pxpink/80 font-medium block mt-1">Keywords: transport, logistik, spedition, lagerung, aufbau, abbau, hotel, reisekosten</span>
+          </div>
+        </div>
+
+        <!-- Group 8 -->
+        <div class="flex items-start gap-4 p-3 bg-pxdark/55 rounded border border-pxborder/60 hover:bg-pxdark transition">
+          <span class="bg-pxpink text-white w-6 h-6 rounded-full flex items-center justify-center font-bold font-display shrink-0">8</span>
+          <div>
+            <strong class="text-white block text-sm">Betrieb</strong>
+            <span class="text-gray-400 block mt-0.5">Security, Nachtbewachung, Abnahme-Sanitäter, Brandschutzkonzept, Brandwache, Haftpflicht- & Event-Versicherungen.</span>
+            <span class="text-pxindigo/80 font-medium block mt-1">Keywords: security, bewachung, versicherung, brandschutz, brandwache, sanitaeter</span>
+          </div>
+        </div>
+
+        <!-- Group 9 -->
+        <div class="flex items-start gap-4 p-3 bg-pxdark/55 rounded border border-pxborder/60 hover:bg-pxdark transition">
+          <span class="bg-pxpink text-white w-6 h-6 rounded-full flex items-center justify-center font-bold font-display shrink-0">9</span>
+          <div>
+            <strong class="text-white block text-sm">Kommunikation</strong>
+            <span class="text-gray-400 block mt-0.5">Foto- und Videodokumentation, Kooperationen, Radio-Splits, PR & Pressearbeit.</span>
+            <span class="text-pxpink/80 font-medium block mt-1">Keywords: foto, video, fotograf, videograph, radio, pr, marketing</span>
+          </div>
+        </div>
+
+        <!-- Group 10 -->
+        <div class="flex items-start gap-4 p-3 bg-pxdark/55 rounded border border-pxborder/60 hover:bg-pxdark transition">
+          <span class="bg-pxpink text-white w-6 h-6 rounded-full flex items-center justify-center font-bold font-display shrink-0">10</span>
+          <div>
+            <strong class="text-white block text-sm">Projektabschluss</strong>
+            <span class="text-gray-400 block mt-0.5">Debriefing, Auswertung, Erstellung des Abschlussberichts/Reports an den Kunden.</span>
+            <span class="text-pxindigo/80 font-medium block mt-1">Keywords: debrief, abschlussreport, nachbereitung, abschluss</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 4: Live-Sync -->
+    <div class="bg-pxcard p-6 md:p-8 rounded-xl border border-pxborder relative" id="sync-details">
+      <div class="absolute -top-3 left-6 px-3 py-1 bg-emerald-500 text-white text-[10px] font-bold rounded-full uppercase tracking-wider">Feature in Depth</div>
+      <h2 class="text-xl font-bold text-white mb-4">Das "Werte an MOCO senden" Feature</h2>
+      
+      <div class="space-y-4 text-sm text-gray-300 leading-relaxed">
+        <p>
+          Dieses Feature wurde implementiert, um euch lästige händische Doppeleingaben zu ersparen. So verhält sich die Synchronisation:
+        </p>
+        <ul class="list-disc pl-6 space-y-2 text-xs text-gray-400">
+          <li>
+            <strong class="text-gray-200">Sicherheits-Puffer (Sandbox):</strong> Solange der PJM im KVA-Presenter Mengen, Preise oder "Optional"-Flags verändert, passiert in MOCO absolut gar nichts. PJMs können das Angebot gefahrlos simulieren und verwerfen.
+          </li>
+          <li>
+            <strong class="text-gray-200">Die Synchronisation:</strong> Erst mit Klick auf den grünen Button <span class="bg-emerald-600/20 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded font-mono font-bold text-[10px]">Werte an MOCO senden</span> werden die Mengen, Einzelpreise und der Optional-Status pro Zeile live über die API an das original ausgewählte MOCO-Angebot gesendet und dort festgeschrieben.
+          </li>
+          <li>
+            <strong class="text-gray-200">Visuelle Struktur:</strong> Die hierarchischen Kassenbereiche (Gruppen 1 bis 10) und manuell umgehängten Rubriken verbleiben als visuelles Element in PX-Flow und verändern die Moco-Artikeldatenstruktur nicht (Moco behält seine lineare Struktur bei).
+          </li>
+        </ul>
+        <div class="bg-pxdark border border-pxborder rounded p-4 flex gap-3 text-xs text-gray-400">
+          <svg class="w-5 h-5 text-amber-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+          </svg>
+          <div>
+            <strong class="text-gray-300 block mb-0.5">⚠️ WICHTIGER HINWEIS FÜR PJMs:</strong>
+            Durch Verwerfen des Browser-Tabs (ohne Klick auf "Senden") gehen lokale Mengen- und Preissimulationen verloren. Achtet darauf, die finalisierten Mengen stets zurückzusynchronisieren, wenn das Angebot steht!
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 5: Troubleshooting & FAQs -->
+    <div class="bg-pxcard p-6 md:p-8 rounded-xl border border-pxborder">
+      <h2 class="text-xl font-bold text-white mb-6">FAQ & Troubleshooting</h2>
+      
+      <div class="space-y-6 text-xs text-gray-300 leading-relaxed">
+        <div>
+          <h4 class="font-extrabold text-white text-sm mb-1.5">Q: Woher weiß ich, ob eine Position im KVA-Presenter als "Optional" gilt?</h4>
+          <p class="text-gray-400">
+            A: In der Bearbeitungs-Vorschau ist das Element bei "Option" mit "Ja" markiert und verringert seine Deckkraft leicht. In der finalen PDF-Druck-Vorschau wird an der entsprechenden Zeile ein gut sichtbares, elegantes Label <span class="bg-orange-100 text-orange-800 border border-orange-200 uppercase font-extrabold text-[8px] px-1 py-0.25 rounded">Optional</span> ausgegeben und die Position wird vollautomatisch aus euren Zwischen- und Gesamtsummen herausgerechnet.
+          </p>
+        </div>
+
+        <div>
+          <h4 class="font-extrabold text-white text-sm mb-1.5">Q: Ich erhalte einen "Route not found" oder "Authorization" Fehler beim Laden?</h4>
+          <p class="text-gray-400">
+            A: Vergewissere dich, dass du ein gültiges MOCO-Angebot mit einer echten ID lädst (z.&nbsp;B. 2310479). Vergewissere dich außerdem, dass du mit einem gültigen Benutzer (Admin/GF) im PX-Flow eingeloggt bist, da Freelancer und Gäste aus Sicherheitsgründen keinen Zugriff auf MOCO-Finanzdaten haben.
+          </p>
+        </div>
+
+        <div>
+          <h4 class="font-extrabold text-white text-sm mb-1.5">Q: Was passiert mit Moco-Zwischensummen und Trenn-Überschriften beim Laden?</h4>
+          <p class="text-gray-400">
+            A: Unser Importer löscht irrelevante manuelle Moco-Subtotale (wie "Zwischensumme" oder die Moco-System-Trenner "FREMDLEISTUNGEN") automatisch auf eurer KVA-Spiegelseite, da wir in PX-Flow unsere eigenen, fehlerfreien 10 Bereichs-Zwischensummen dynamisch über die gruppierten Items errechnen. Ihr müsst diese also in MOCO nicht penibel von Hand pflegen.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer Disclaimer -->
+    <div class="text-center text-[10px] text-gray-500">
+      <p>PIXELSCHICKERIA GmbH — Gärtnerplatz 1, 80469 München</p>
+      <p class="mt-1">Entwickelt vom Innovation-Studio für optimierte PJM-Workflows.</p>
+    </div>
+
+  </div>
+
+</body>
+</html>
