@@ -14,7 +14,9 @@ import {
   Info,
   CloudUpload,
   HelpCircle,
-  X
+  X,
+  Save,
+  RotateCcw
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 
@@ -59,11 +61,17 @@ interface MocoOffer {
   items: MocoItem[];
   company?: { name: string };
   project?: { id: number; name: string };
+  
+  // Local persistent draft capabilities
+  hasLocalDraft?: boolean;
+  draftItems?: MocoItem[];
+  draftUpdatedAt?: string;
 }
 
 export const MocoOffers: React.FC = () => {
   const [offerId, setOfferId] = useState<string>('2310479');
   const [loading, setLoading] = useState<boolean>(false);
+  const [savingDraft, setSavingDraft] = useState<boolean>(false);
   const [syncing, setSyncing] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [offer, setOffer] = useState<MocoOffer | null>(null);
@@ -151,23 +159,90 @@ export const MocoOffers: React.FC = () => {
       const data: MocoOffer = await res.json();
       setOffer(data);
       
-      // Clean up items (remove intermediate subtotal headers as we will calculate our own sub-group totals!)
-      const cleanedItems = (data.items || [])
-        .filter(item => {
-          // Filter out moco's built-in 'Zwischensumme' or purely section dividers to avoid confusion
-          const t = (item.title || '').toLowerCase();
-          return t !== 'zwischensumme' && t !== 'fremdleistungen' && t !== 'agenturservices';
-        })
-        .map(item => ({
-          ...item,
-          // Calculate active net_total
-          net_total: (item.quantity || 0) * (item.unit_price || 0),
-          optional: item.optional || false
-        }));
-        
-      setItems(cleanedItems);
+      // If we have a persistent draft saved locally in labs_db, load that instead of raw MOCO items!
+      if (data.hasLocalDraft && data.draftItems && data.draftItems.length > 0) {
+        // Hydrate local manualGroups, quantities, unit prices and optional states
+        setItems(data.draftItems);
+        toast.info(`Eigener Entwurf vom ${new Date(data.draftUpdatedAt || '').toLocaleString('de-DE')} erfolgreich geladen!`);
+      } else {
+        // Clean up items (remove intermediate subtotal headers as we will calculate our own sub-group totals!)
+        const cleanedItems = (data.items || [])
+          .filter(item => {
+            // Filter out moco's built-in 'Zwischensumme' or purely section dividers to avoid confusion
+            const t = (item.title || '').toLowerCase();
+            return t !== 'zwischensumme' && t !== 'fremdleistungen' && t !== 'agenturservices';
+          })
+          .map(item => ({
+            ...item,
+            net_total: (item.quantity || 0) * (item.unit_price || 0),
+            optional: item.optional || false
+          }));
+          
+        setItems(cleanedItems);
+      }
     } catch (err: any) {
       setError(err.message || 'Ein unbekannter Fehler ist aufgetreten.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Saves a localized secure draft in labs_db without modifying anything in live MOCO
+  const saveLocalDraft = async () => {
+    if (!offer) return;
+    setSavingDraft(true);
+    try {
+      const token = getToken();
+      const res = await fetch(`${API_URL}/api/offers/${offer.id}/draft`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          title: offer.title,
+          projectId: offer.project?.id || null,
+          items: items
+        })
+      });
+
+      if (!res.ok) {
+        throw new Error('Entwurf konnte nicht in labs_db gesichert werden.');
+      }
+      
+      toast.success('Änderungen (Gruppierungen, Mengen & Optionen) erfolgreich lokal zwischengespeichert!');
+    } catch (err: any) {
+      console.error(err);
+      toast.error(`Auto-Save Fehler: ${err.message}`);
+    } finally {
+      setSavingDraft(false);
+    }
+  };
+
+  // Resets/Deletes local secure draft to fall back completely to pristine Live MOCO fields
+  const deleteLocalDraft = async () => {
+    if (!offer) return;
+    if (!window.confirm('Möchtest du diesen lokalen Entwurf wirklich löschen und das Angebot komplett auf MOCO-Echtzeitwerte zurücksetzen?')) return;
+    
+    setLoading(true);
+    try {
+      const token = getToken();
+      const res = await fetch(`${API_URL}/api/offers/${offer.id}/draft`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!res.ok) {
+        throw new Error('Fehler beim Löschen des Entwurfs.');
+      }
+
+      toast.success('Lokaler Entwurf gelöscht. Lade MOCO Originaldaten...');
+      await fetchOffer(offer.id.toString());
+    } catch (err: any) {
+      console.error(err);
+      toast.error(`Reset Fehler: ${err.message}`);
     } finally {
       setLoading(false);
     }
@@ -206,7 +281,21 @@ export const MocoOffers: React.FC = () => {
         throw new Error(errorData.error || 'Fehler beim Senden.');
       }
 
-      toast.success('Mengen und Preise erfolgreich live in MOCO aktualisiert!');
+      // Automatically sync/save local draft as well to match current database state
+      await fetch(`${API_URL}/api/offers/${offer.id}/draft`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          title: offer.title,
+          projectId: offer.project?.id || null,
+          items: items
+        })
+      });
+
+      toast.success('Mengen, Optionen und Preise erfolgreich live in MOCO & labs_db festgeschrieben!');
       await fetchOffer(offer.id.toString());
     } catch (err: any) {
       console.error(err);
@@ -377,6 +466,29 @@ export const MocoOffers: React.FC = () => {
             </div>
 
             <div className="flex items-center gap-3 flex-wrap">
+              {/* Reset/Fall back button */}
+              {offer.hasLocalDraft && (
+                <button
+                  onClick={deleteLocalDraft}
+                  disabled={loading}
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500/10 hover:bg-red-500/15 text-red-500 rounded-md text-xs font-semibold border border-red-500/35 transition shrink-0"
+                  title="Verwirft den lokalen Entwurf und lädt das original Angebot aus MOCO"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  Entwurf verwerfen (Reset)
+                </button>
+              )}
+
+              {/* Local persistent draft saved in labs_db */}
+              <button
+                onClick={saveLocalDraft}
+                disabled={savingDraft || loading}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-[#161e2e] hover:bg-[#20293a] text-gray-300 rounded-md text-sm font-semibold border border-style transition disabled:opacity-50 shrink-0"
+              >
+                <Save className={`w-4 h-4 ${savingDraft ? 'animate-spin' : ''}`} />
+                {savingDraft ? 'Speichere...' : 'Zwischenspeichern'}
+              </button>
+
               {/* Push modified values to MOCO */}
               <button
                 onClick={pushModifiedOfferToMoco}
@@ -430,7 +542,13 @@ export const MocoOffers: React.FC = () => {
             <div className="bg-card p-4 border border-border rounded-lg shadow-sm">
               <p className="text-xs text-muted-foreground uppercase font-medium">KVA ID & Datum</p>
               <p className="font-semibold text-foreground mt-1">{offer.identifier || 'Entwurf'}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">Erstellt am {new Date(offer.date).toLocaleDateString('de-DE')}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {offer.hasLocalDraft ? (
+                  <span className="text-[#ff26a8] font-semibold">📍 Geladener labs_db Entwurf</span>
+                ) : (
+                  `Erstellt am ${new Date(offer.date).toLocaleDateString('de-DE')}`
+                )}
+              </p>
             </div>
             <div className="bg-card p-4 border border-border rounded-lg shadow-sm">
               <p className="text-xs text-muted-foreground uppercase font-medium">Gesamtsumme (Netto)</p>
