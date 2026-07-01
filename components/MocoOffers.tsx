@@ -134,7 +134,7 @@ export const MocoOffers: React.FC = () => {
     setError(null);
     try {
       const token = getToken();
-      const res = await fetch(`${API_URL}/api/agency/offers/${idToFetch}`, {
+      const res = await fetch(`${API_URL}/api/offers/${idToFetch}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
