@@ -226,15 +226,15 @@
     }
 
     /* Grids */
-    .grid-3 {
+    .grid-4 {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 1.5rem;
+      gap: 1.25rem;
     }
 
     @media (min-width: 768px) {
-      .grid-3 {
-        grid-template-columns: repeat(3, 1fr);
+      .grid-4 {
+        grid-template-columns: repeat(4, 1fr);
       }
     }
 
@@ -312,7 +312,7 @@
 
     .step-desc {
       font-size: 0.75rem;
-      color: #9cb3af;
+      color: #9ca3af;
       margin-top: 0.5rem;
       line-height: 1.5;
     }
@@ -387,7 +387,7 @@
       padding-left: 1.25rem;
       margin-bottom: 0.5rem;
       font-size: 0.75rem;
-      color: #9cb3af;
+      color: #9ca3af;
     }
 
     .styled-list li::before {
@@ -460,7 +460,7 @@
         <div class="status-card">
           <div class="status-dot"></div>
           <div class="status-text">
-            <span style="color: #10b981;">Live in PX-Flow v2.3</span>
+            <span style="color: #10b981;">Live in PX-Flow v2.4</span>
             <span class="status-sub">Letztes Update: Juli 2026</span>
           </div>
         </div>
@@ -497,7 +497,7 @@
         Schritt-für-Schritt-Anleitung
       </h2>
 
-      <div class="grid-3">
+      <div class="grid-4">
         <!-- Step 1 -->
         <div class="step-card">
           <div>
@@ -514,9 +514,9 @@
         <div class="step-card">
           <div>
             <div class="step-badge">Schritt 2</div>
-            <h3 class="step-title">PX-Flow Strukturierung</h3>
+            <h3 class="step-title">PX-Flow Struktur</h3>
             <p class="step-desc">
-              Wechsle in PX-Flow in den Reiter <strong>"Moco Angebote (KVA)"</strong>. Gib die Angebots-ID ein und klicke auf "Laden". Der KVA-Presenter sortiert die Positionen automatisch in die 10 Gruppen. Überprüfe die Zuordnung und passe sie ggf. über die Dropdowns rechts pro Item an.
+              Wechsle in PX-Flow in den Reiter <strong>"Moco Angebote (KVA)"</strong>. Gib die ID ein und klicke auf "Laden". Der KVA-Presenter sortiert die Positionen automatisch in die 10 Gruppen. Überprüfe und verschiebe die Items ggf. über die Dropdowns.
             </p>
           </div>
           <div class="step-footer">Auto-Gruppierung nutzen</div>
@@ -526,12 +526,24 @@
         <div class="step-card">
           <div>
             <div class="step-badge">Schritt 3</div>
-            <h3 class="step-title">Kunden-Vorschau & Druck</h3>
+            <h3 class="step-title">Zwischenspeichern</h3>
             <p class="step-desc">
-              Klicke oben auf <strong>"Drucken / PDF Vorschau"</strong>. Die Steuerungs-UI wird ausgeblendet und du erhältst ein absolut sauberes KVA-PDF im originalen, minimalistischen Pixelschickeria-Layout. Drücke auf "Drucken" zum PDF-Export!
+              Sichere deine Arbeit zwischendurch über den Button <strong>"Zwischenspeichern"</strong>. Deine editierten Mengen, Optionen und Gruppenzuordnungen werden permanent in der <code>labs_db</code> abgelegt, ohne Datenverlust bei Neustarts!
             </p>
           </div>
-          <div class="step-footer">PDF-Export im PX-Style</div>
+          <div class="step-footer">Draft-Sicherung in labs_db</div>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="step-card">
+          <div>
+            <div class="step-badge">Schritt 4</div>
+            <h3 class="step-title">Druck & Live-Sync</h3>
+            <p class="step-desc">
+              Klicke oben auf <strong>"Drucken / PDF"</strong> für das finale KVA-PDF im edlen PX-Stil. Über den Button <strong>"Werte an MOCO senden"</strong> schreibst du deine finalen Mengen und Optionen live zurück in euer MOCO Abrechnungstool.
+            </p>
+          </div>
+          <div class="step-footer">Zwei-Wege-Synchronisation</div>
         </div>
       </div>
     </div>
@@ -646,22 +658,22 @@
 
     <!-- Section 4: Live-Sync -->
     <div class="card card-large relative" id="sync-details">
-      <div class="card-badge card-badge-emerald">Feature in Depth</div>
-      <h2>Das "Werte an MOCO senden" Feature</h2>
+      <div class="card-badge card-badge-emerald">Zwei-Wege-Sync & Sicherheit</div>
+      <h2>Das persistente Entwurfs- und Sync-System im Detail</h2>
       
       <div class="space-y-4 text-sm text-gray">
         <p>
-          Dieses Feature wurde implementiert, um euch lästige händische Doppeleingaben zu ersparen. So verhält sich die Synchronisation:
+          Dieses Feature kombiniert sicheres lokales Arbeiten mit nahtlosem Live-Sync zurück zu MOCO. So arbeiten PJMs ab sofort fehlerfrei:
         </p>
         <ul class="styled-list">
           <li>
-            <strong style="color: #ffffff;">Sicherheits-Puffer (Sandbox):</strong> Solange der PJM im KVA-Presenter Mengen, Preise oder "Optional"-Flags verändert, passiert in MOCO absolut gar nichts. PJMs können das Angebot gefahrlos simulieren und verwerfen.
+            <strong style="color: #ffffff;">Sicherer Draft-State (labs_db):</strong> PJMs können über den Button <span style="background-color: rgba(99,102,241,0.15); color: #6366f1; border: 1px solid rgba(99,102,241,0.25); padding: 0.15rem 0.5rem; border-radius: 0.25rem;">Zwischenspeichern</span> ihren aktuellen Arbeitsstand (eure manuelle Strukturierung in die 10 Gruppen sowie Mengen) in der hauseigenen Postgres-Datenbank sichern. Ein Rechner-Neustart führt ab sofort <strong>nicht</strong> mehr zum Datenverlust!
           </li>
           <li>
-            <strong style="color: #ffffff;">Die Synchronisation:</strong> Erst mit Klick auf den grünen Button <span style="background-color: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.25); padding: 0.15rem 0.5rem; rounded-radius: 0.25rem; font-family: monospace; font-size: 0.625rem; font-weight: 700;">Werte an MOCO senden</span> werden die Mengen, Einzelpreise und der Optional-Status pro Zeile live über die API an das original ausgewählte MOCO-Angebot gesendet und dort festgeschrieben.
+            <strong style="color: #ffffff;">Der Live-Sync (MOCO API):</strong> Ein Klick auf den grünen Button <span style="background-color: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.25); padding: 0.15rem 0.5rem; border-radius: 0.25rem;">Werte an MOCO senden</span> gleicht die editierten Mengen, geänderten Preise und Optional-Flags in Sekundenschnelle per API direkt mit MOCO ab.
           </li>
           <li>
-            <strong style="color: #ffffff;">Visuelle Struktur:</strong> Die hierarchischen Kassenbereiche (Gruppen 1 bis 10) und manuell umgehängten Rubriken verbleiben als visuelles Element in PX-Flow und verändern die Moco-Artikeldatenstruktur nicht (Moco behält seine lineare Struktur bei).
+            <strong style="color: #ffffff;">Intelligenter Revert (Reset):</strong> Mit Klick auf <span style="background-color: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid rgba(239,68,68,0.25); padding: 0.15rem 0.5rem; border-radius: 0.25rem;">Entwurf verwerfen</span> könnt ihr euren lokalen Datenbank-Entwurf jederzeit komplett löschen und die pristine Live-Datenstruktur eures originalen MOCO-Angebots wiederherstellen.
           </li>
         </ul>
         
@@ -670,8 +682,8 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
           </svg>
           <div class="text-xs text-muted">
-            <strong style="color: #f3f4f6; display: block; margin-bottom: 0.25rem;">⚠️ WICHTIGER HINWEIS FÜR PJMs:</strong>
-            Durch Verwerfen des Browser-Tabs (ohne Klick auf "Senden") gehen lokale Mengen- und Preissimulationen verloren. Achtet darauf, die finalisierten Mengen stets zurückzusynchronisieren, wenn das Angebot steht!
+            <strong style="color: #f3f4f6; display: block; margin-bottom: 0.25rem;">⚠️ AUTO-SAVE TIPP FÜR PJMs:</strong>
+            Nutzt den Button "Zwischenspeichern" nach jedem größeren Positionsumbau. So sind eure Gruppenzuordnungen (auch wenn MOCO diese strukturell nicht abspeichern kann) sicher in PX-Flow hinterlegt und gehen nicht verloren, wenn ihr das Browserfenster schließt!
           </div>
         </div>
       </div>
@@ -683,16 +695,16 @@
       
       <div class="space-y-6">
         <div class="faq-block">
-          <h4 class="faq-q">Q: Woher weiß ich, ob eine Position im KVA-Presenter als "Optional" gilt?</h4>
+          <h4 class="faq-q">Q: Woher weiß ich, ob ich an einem lokalen Entwurf oder an Rohdaten arbeite?</h4>
           <p class="faq-a">
-            A: In der Bearbeitungs-Vorschau ist das Element bei "Option" mit "Ja" markiert und verringert seine Deckkraft leicht. In der finalen PDF-Druck-Vorschau wird an der entsprechenden Zeile ein gut sichtbares, elegantes Label <span style="background-color: #ffedd5; color: #9a3412; font-size: 0.55rem; padding: 0.125rem 0.375rem; border-radius: 0.125rem; font-weight: 800; text-transform: uppercase;">Optional</span> ausgegeben und die Position wird vollautomatisch aus euren Zwischen- und Gesamtsummen herausgerechnet.
+            A: Beim Laden eines MOCO-Angebots prüft unser Server im Hintergrund eure DB-Entwürfe. Arbeitet ihr auf einem gesicherten Entwurf, wird euch oben im Quick-Stats-Panel das gut sichtbare, pinke Label <span style="color: #ff26a8; font-weight: 700;">📍 Geladener labs_db Entwurf</span> anstelle des Erstellungsdatums eingeblendet.
           </p>
         </div>
 
         <div class="faq-block">
-          <h4 class="faq-q">Q: Ich erhalte einen "Route not found" oder "Authorization" Fehler beim Laden?</h4>
+          <h4 class="faq-q">Q: Ich habe das Angebot lokal völlig zerwürfelt. Wie fange ich von vorne an?</h4>
           <p class="faq-a">
-            A: Vergewissere dich, dass du ein gültiges MOCO-Angebot mit einer echten ID lädst (z.&nbsp;B. 2310479). Vergewissere dich außerdem, dass du mit einem gültigen Benutzer (Admin/GF) im PX-Flow eingeloggt bist, da Freelancer und Gäste aus Sicherheitsgründen keinen Zugriff auf MOCO-Finanzdaten haben.
+            A: Kein Problem! Klicke in der Steuerungsleiste einfach auf den roten Button <strong style="color: #ef4444;">"Entwurf verwerfen (Reset)"</strong>. Das KVA-Tool löscht den persistenten Entwurf restlos aus der Datenbank, ignoriert alle lokalen Modifikationen und lädt das pristine, unangetastete Original-Angebot live aus MOCO neu.
           </p>
         </div>
 
