@@ -6,16 +6,16 @@ import { Avatar } from './ui/Avatar';
 import { getProfiles } from '../services/api/profiles';
 import type { Profile } from '../types/supabase';
 import { useAuth } from '../lib/AuthContext';
+import { 
+  getKitchenDutyData, 
+  saveKitchenDuties, 
+  saveKitchenParticipants,
+  type WeekDuty 
+} from '../services/api/kitchenDuty';
 
-// Local storage key
+// Local storage key (retained for migration check)
 const STORAGE_KEY = 'px_kitchen_duty_plan';
 const PARTICIPANTS_KEY = 'px_kitchen_duty_participants';
-
-interface WeekDuty {
-  weekNumber: number;
-  year: number;
-  assignedIds: string[]; // Max 4 IDs
-}
 
 // Date helpers
 function getWeekDates(weekNumber: number, year: number) {
@@ -58,6 +58,12 @@ export const KitchenDutyPlanner: React.FC = () => {
     queryFn: getProfiles,
   });
 
+  // Fetch kitchen duty data from database
+  const { data: kdData, isLoading: kdLoading } = useQuery({
+    queryKey: ['kitchen-duty'],
+    queryFn: getKitchenDutyData,
+  });
+
   // State
   const [duties, setDuties] = useState<WeekDuty[]>([]);
   const [participantIds, setParticipantIds] = useState<string[]>([]);
@@ -65,42 +71,85 @@ export const KitchenDutyPlanner: React.FC = () => {
   const [editingWeek, setEditingWeek] = useState<WeekDuty | null>(null);
   const [showConfigModal, setShowConfigModal] = useState(false);
 
-  // Load from local storage on mount/profiles load
+  // Sync state with backend, migrating localStorage if necessary
   useEffect(() => {
-    const savedDuties = localStorage.getItem(STORAGE_KEY);
-    if (savedDuties) {
-      setDuties(JSON.parse(savedDuties));
-    } else {
-      // Seed initial empty duties for current year (52/53 weeks)
-      const initialDuties: WeekDuty[] = Array.from({ length: 52 }, (_, i) => ({
-        weekNumber: i + 1,
-        year: currentYear,
-        assignedIds: [],
-      }));
-      setDuties(initialDuties);
-    }
+    if (!profilesLoading && !kdLoading && kdData) {
+      const dbDuties = kdData.duties || [];
+      const dbParticipants = kdData.participants || [];
+      
+      const localDutiesStr = localStorage.getItem(STORAGE_KEY);
+      const localParticipantsStr = localStorage.getItem(PARTICIPANTS_KEY);
 
-    const savedParticipants = localStorage.getItem(PARTICIPANTS_KEY);
-    if (savedParticipants) {
-      setParticipantIds(JSON.parse(savedParticipants));
-    } else if (profiles.length > 0) {
-      // By default, everyone except clients and guests participate
-      const defaultParticipants = profiles
-        .filter(p => p.role !== 'client' && p.role !== 'guest')
-        .map(p => p.id);
-      setParticipantIds(defaultParticipants);
-    }
-  }, [profiles, currentYear]);
+      let finalDuties = dbDuties;
+      let finalParticipants = dbParticipants;
+      let migrated = false;
 
-  // Save to local storage whenever state changes
-  const saveDuties = (newDuties: WeekDuty[]) => {
+      // 1. If database duties are empty but local storage has duties, migrate them
+      if (dbDuties.length === 0 && localDutiesStr) {
+        try {
+          finalDuties = JSON.parse(localDutiesStr);
+          saveKitchenDuties(finalDuties);
+          migrated = true;
+        } catch (e) {
+          console.error('Failed to parse local kitchen duties', e);
+        }
+      }
+
+      // 2. If database participants are empty but local storage has participants, migrate them
+      if (dbParticipants.length === 0 && localParticipantsStr) {
+        try {
+          finalParticipants = JSON.parse(localParticipantsStr);
+          saveKitchenParticipants(finalParticipants);
+          migrated = true;
+        } catch (e) {
+          console.error('Failed to parse local kitchen participants', e);
+        }
+      }
+
+      // 3. Seed initial empty duties if database and local storage are both empty
+      if (finalDuties.length === 0) {
+        finalDuties = Array.from({ length: 52 }, (_, i) => ({
+          weekNumber: i + 1,
+          year: currentYear,
+          assignedIds: [],
+        }));
+        saveKitchenDuties(finalDuties);
+      }
+
+      // 4. Seed initial participants if database and local storage are both empty
+      if (finalParticipants.length === 0 && profiles.length > 0) {
+        finalParticipants = profiles
+          .filter(p => p.role !== 'client' && p.role !== 'guest')
+          .map(p => p.id);
+        saveKitchenParticipants(finalParticipants);
+      }
+
+      setDuties(finalDuties);
+      setParticipantIds(finalParticipants);
+
+      if (migrated) {
+        console.log('Successfully migrated kitchen duty data from localStorage to DB');
+      }
+    }
+  }, [kdData, profiles, profilesLoading, kdLoading, currentYear]);
+
+  // Save to state and persist to database
+  const saveDuties = async (newDuties: WeekDuty[]) => {
     setDuties(newDuties);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(newDuties));
+    try {
+      await saveKitchenDuties(newDuties);
+    } catch (e) {
+      console.error('Failed to save duties to DB', e);
+    }
   };
 
-  const saveParticipants = (newParticipants: string[]) => {
+  const saveParticipants = async (newParticipants: string[]) => {
     setParticipantIds(newParticipants);
-    localStorage.setItem(PARTICIPANTS_KEY, JSON.stringify(newParticipants));
+    try {
+      await saveKitchenParticipants(newParticipants);
+    } catch (e) {
+      console.error('Failed to save participants to DB', e);
+    }
   };
 
   // Toggle participant
@@ -182,7 +231,7 @@ export const KitchenDutyPlanner: React.FC = () => {
     }
   };
 
-  if (profilesLoading) {
+  if (profilesLoading || kdLoading) {
     return (
       <div className="flex items-center justify-center h-full min-h-[400px]">
         <div className="text-muted-foreground text-xl">Küchendienst-Planer lädt...</div>

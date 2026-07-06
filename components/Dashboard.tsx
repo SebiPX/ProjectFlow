@@ -9,6 +9,7 @@ import { getTasks } from '../services/api/tasks';
 import { getProjects, getProjectsFinancialOverview } from '../services/api/projects';
 import { getTimeEntries } from '../services/api/timeEntries';
 import { getProfiles } from '../services/api/profiles';
+import { getKitchenDutyData } from '../services/api/kitchenDuty';
 import { NewsWidget } from './NewsWidget';
 
 interface DashboardProps {
@@ -73,6 +74,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProject }) => {
     queryKey: ['profiles'],
     queryFn: getProfiles,
   });
+
+  // Fetch kitchen duty data from database
+  const { data: kdData, isLoading: kdLoading } = useQuery({
+    queryKey: ['kitchen-duty'],
+    queryFn: getKitchenDutyData,
+  });
+
 
   // Calculate statistics
   const totalBudget = projects.reduce((sum, p) => sum + (Number(p.budget_total) || 0), 0);
@@ -188,31 +196,27 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProject }) => {
   const currentYearNum = today.getFullYear();
   const { monday: kwStart, sunday: kwEnd } = getWeekDates(currentWeekNum, currentYearNum);
 
-  // Load from local storage
+  // Load from database/API
   const [kitchenTeam, setKitchenTeam] = React.useState<any[]>([]);
 
   React.useEffect(() => {
-    try {
-      const savedDutiesStr = localStorage.getItem('px_kitchen_duty_plan');
-      if (savedDutiesStr) {
-        const savedDuties = JSON.parse(savedDutiesStr);
-        const thisWeekDuty = savedDuties.find(
-          (d: any) => d.weekNumber === currentWeekNum && d.year === currentYearNum
-        );
-        if (thisWeekDuty && thisWeekDuty.assignedIds && thisWeekDuty.assignedIds.length > 0) {
-          const team = thisWeekDuty.assignedIds
-            .map((id: string) => profiles.find((p: any) => p.id === id))
-            .filter(Boolean);
-          setKitchenTeam(team);
-        }
+    if (kdData && kdData.duties) {
+      const thisWeekDuty = kdData.duties.find(
+        (d: any) => d.weekNumber === currentWeekNum && d.year === currentYearNum
+      );
+      if (thisWeekDuty && thisWeekDuty.assignedIds && thisWeekDuty.assignedIds.length > 0) {
+        const team = thisWeekDuty.assignedIds
+          .map((id: string) => profiles.find((p: any) => p.id === id))
+          .filter(Boolean);
+        setKitchenTeam(team);
+      } else {
+        setKitchenTeam([]);
       }
-    } catch (e) {
-      console.error('Failed to parse kitchen duties', e);
     }
-  }, [profiles, currentWeekNum, currentYearNum]);
+  }, [kdData, profiles, currentWeekNum, currentYearNum]);
 
   // Show loading state
-  if (projectsLoading || timeEntriesLoading || tasksLoading || profilesLoading) {
+  if (projectsLoading || timeEntriesLoading || tasksLoading || profilesLoading || kdLoading) {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="text-muted-foreground text-xl">Loading dashboard...</div>
