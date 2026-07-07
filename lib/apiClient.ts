@@ -407,6 +407,8 @@ export interface ApiNote {
     user_id: string;
     title?: string;
     content?: string;
+    due_date?: string | null;
+    due_date_notified?: boolean;
     created_at: string;
     updated_at: string;
 }

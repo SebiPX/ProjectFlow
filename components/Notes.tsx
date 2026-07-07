@@ -349,6 +349,18 @@ export const Notes: React.FC = () => {
                 <div className="text-xs text-muted-foreground mt-1 truncate">
                   {format(new Date(note.updated_at), 'MMM d, yyyy • h:mm a')}
                 </div>
+                {note.due_date && (
+                  <div className={`text-[10px] mt-1.5 flex items-center gap-1.5 ${
+                    new Date(note.due_date) < new Date()
+                      ? 'text-red-400 font-medium'
+                      : 'text-amber-400'
+                  }`}>
+                    <span className="material-icons-round text-[12px]">alarm</span>
+                    <span>
+                      {format(new Date(note.due_date), 'dd.MM.yyyy HH:mm')}
+                    </span>
+                  </div>
+                )}
               </div>
             ))
           )}
@@ -369,6 +381,28 @@ export const Notes: React.FC = () => {
                 className="text-xl font-semibold bg-transparent border-none focus:outline-none focus:ring-0 w-full"
                 disabled={activeAiAction !== null}
               />
+              
+              <div className="flex items-center gap-1.5 mr-4 text-xs bg-muted/30 border border-border rounded-lg p-1.5 px-3 whitespace-nowrap">
+                <span className="material-icons-round text-[16px] text-amber-500">notifications_active</span>
+                <input 
+                  type="datetime-local"
+                  value={activeNote.due_date ? format(new Date(activeNote.due_date), "yyyy-MM-dd'T'HH:mm") : ''}
+                  onChange={(e) => updateActiveNote({ due_date: e.target.value ? new Date(e.target.value).toISOString() : null, due_date_notified: false })}
+                  className="bg-transparent border-none text-foreground focus:outline-none focus:ring-0 text-xs w-36 cursor-pointer"
+                  title="Erinnerung einstellen"
+                  disabled={activeAiAction !== null}
+                />
+                {activeNote.due_date && (
+                  <button 
+                    onClick={() => updateActiveNote({ due_date: null, due_date_notified: false })} 
+                    className="text-muted-foreground hover:text-destructive transition-colors ml-1"
+                    title="Erinnerung löschen"
+                    disabled={activeAiAction !== null}
+                  >
+                    <span className="material-icons-round text-[14px]">cancel</span>
+                  </button>
+                )}
+              </div>
               
               <div className="flex bg-muted/50 p-1 rounded-lg">
                 <button 

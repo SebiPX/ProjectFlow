@@ -43,8 +43,10 @@ export const NotificationsDropdown: React.FC<Props> = ({ onClose, onNavigate }) 
             markReadMutation.mutate(notification.id);
         }
         
-        if (notification.related_entity_id) {
-           onNavigate('project-detail', notification.related_entity_id, 'tasks');
+        if (notification.related_entity_type === 'note') {
+            onNavigate('notes');
+        } else if (notification.related_entity_id) {
+            onNavigate('project-detail', notification.related_entity_id, 'tasks');
         }
         
         onClose();
