@@ -32,7 +32,8 @@ interface TaskSort {
 }
 
 export const TaskList: React.FC<TaskListProps> = ({ onSelectProject, searchQuery = '' }) => {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
+  const isFreelancer = profile?.role === 'freelancer';
   const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
@@ -59,6 +60,18 @@ export const TaskList: React.FC<TaskListProps> = ({ onSelectProject, searchQuery
     queryKey: ['projects'],
     queryFn: getProjects,
   });
+
+  const filteredProjects = React.useMemo(() => {
+    if (!isFreelancer) return projects;
+    return projects.filter(project => 
+      project.project_members?.some(member => 
+        member.profile_id === user?.id || 
+        member.profile_id === profile?.id || 
+        member.user_id === user?.id || 
+        member.user_id === profile?.id
+      )
+    );
+  }, [projects, isFreelancer, user, profile]);
 
   const updateTaskStatusMutation = useMutation({
     mutationFn: ({ id, status }: { id: string; status: any }) =>
@@ -128,6 +141,12 @@ export const TaskList: React.FC<TaskListProps> = ({ onSelectProject, searchQuery
   // Filter Logic
   const filterTasks = (tasks: Task[]): Task[] => {
     return tasks.filter(task => {
+      // Freelancer visibility filter: only see tasks of projects where the freelancer is a member
+      if (isFreelancer) {
+        const allowedProjectIds = new Set(filteredProjects.map(p => p.id));
+        if (!allowedProjectIds.has(task.project_id)) return false;
+      }
+
       const isUnassigned = (!task.assignee_ids || task.assignee_ids.length === 0) && !task.assignee_id && !task.assigned_to;
       const isAssignedToUser = (userId: string) => {
         if (task.assignee_ids?.includes(userId)) return true;
@@ -360,7 +379,7 @@ export const TaskList: React.FC<TaskListProps> = ({ onSelectProject, searchQuery
               className="w-full bg-background border border-input text-foreground text-sm rounded-lg focus:ring-primary focus:border-primary p-2.5"
             >
               <option value="all">All Projects</option>
-              {projects.map(project => (
+              {filteredProjects.map(project => (
                 <option key={project.id} value={project.id}>
                   {project.title}
                 </option>

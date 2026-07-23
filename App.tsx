@@ -55,8 +55,11 @@ const MainApp: React.FC = () => {
   useRealtime();
 
   const renderContent = () => {
-    if (view === 'finances' && profile?.role === 'freelancer') {
-      return <Dashboard onSelectProject={handleSelectProject} />;
+    if (profile?.role === 'freelancer') {
+      const allowedFreelancerViews = ['dashboard', 'projects', 'project-detail', 'tasks', 'assets', 'chat'];
+      if (!allowedFreelancerViews.includes(view)) {
+        return <Dashboard onSelectProject={handleSelectProject} />;
+      }
     }
 
     switch (view) {

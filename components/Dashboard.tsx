@@ -11,6 +11,7 @@ import { getTimeEntries } from '../services/api/timeEntries';
 import { getProfiles } from '../services/api/profiles';
 import { getKitchenDutyData } from '../services/api/kitchenDuty';
 import { NewsWidget } from './NewsWidget';
+import { useAuth } from '../lib/AuthContext';
 
 interface DashboardProps {
   onSelectProject: (project: Project) => void;
@@ -45,11 +46,26 @@ function getWeekNumber(d: Date) {
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({ onSelectProject }) => {
+  const { user, profile } = useAuth();
+  const isFreelancer = profile?.role === 'freelancer';
+
   // Fetch projects from Supabase
   const { data: projects = [], isLoading: projectsLoading, error: projectsError } = useQuery({
     queryKey: ['projects'],
     queryFn: getProjects,
   });
+
+  const userProjects = React.useMemo(() => {
+    if (!isFreelancer) return projects;
+    return projects.filter(project => 
+      project.project_members?.some(member => 
+        member.profile_id === user?.id || 
+        member.profile_id === profile?.id || 
+        member.user_id === user?.id || 
+        member.user_id === profile?.id
+      )
+    );
+  }, [projects, isFreelancer, user, profile]);
 
   // Fetch time entries from Supabase
   const { data: timeEntries = [], isLoading: timeEntriesLoading } = useQuery({
@@ -83,8 +99,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProject }) => {
 
 
   // Calculate statistics
-  const totalBudget = projects.reduce((sum, p) => sum + (Number(p.budget_total) || 0), 0);
-  const activeProjects = projects.filter(p => p.status === 'active').length;
+  const totalBudget = userProjects.reduce((sum, p) => sum + (Number(p.budget_total) || 0), 0);
+  const activeProjects = userProjects.filter(p => p.status === 'active').length;
   const totalHoursTracked = timeEntries.reduce((sum, t) => sum + (Number(t.duration_minutes) || 0), 0) / 60;
 
   const overdueTasksCount = tasks.filter(t => {
@@ -236,7 +252,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProject }) => {
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-8">
       {/* Stat Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className={`grid grid-cols-1 md:grid-cols-2 ${isFreelancer ? 'lg:grid-cols-3' : 'lg:grid-cols-4'} gap-6`}>
         <Card>
           <div className="flex items-center">
             <div className="p-3 rounded-full bg-primary/10 text-primary">
@@ -248,17 +264,19 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProject }) => {
             </div>
           </div>
         </Card>
-        <Card>
-          <div className="flex items-center">
-            <div className="p-3 rounded-full bg-emerald-500/10 text-emerald-600">
-              <Icon path="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01" className="w-6 h-6" />
+        {!isFreelancer && (
+          <Card>
+            <div className="flex items-center">
+              <div className="p-3 rounded-full bg-emerald-500/10 text-emerald-600">
+                <Icon path="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01" className="w-6 h-6" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm text-muted-foreground">Total Budget</p>
+                <p className="text-2xl font-bold text-foreground">€{totalBudget.toLocaleString()}</p>
+              </div>
             </div>
-            <div className="ml-4">
-              <p className="text-sm text-muted-foreground">Total Budget</p>
-              <p className="text-2xl font-bold text-foreground">€{totalBudget.toLocaleString()}</p>
-            </div>
-          </div>
-        </Card>
+          </Card>
+        )}
         <Card>
           <div className="flex items-center">
             <div className="p-3 rounded-full bg-orange-500/10 text-orange-500">

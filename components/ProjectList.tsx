@@ -30,6 +30,8 @@ const ProjectCard: React.FC<{
   financialData?: { costs: number; billableValue: number; total: number };
   marginData?: { profit: number; marginPercentage: number; status: string };
 }> = ({ project, onSelectProject, onStatusChange, financialData, marginData }) => {
+  const { profile } = useAuth();
+  const isFreelancer = profile?.role === 'freelancer';
   const budget = project.budget_total || 0;
   const spent = financialData?.total || 0;
   const progress = budget > 0 ? Math.min((spent / budget) * 100, 100) : 0;
@@ -48,19 +50,25 @@ const ProjectCard: React.FC<{
       <div>
         <div className="flex justify-between items-start">
           <h3 className="text-lg font-bold text-foreground line-clamp-1 pr-2">{project.title}</h3>
-          <select
-            value={project.status || ProjectStatus.Planned}
-            onChange={(e) => onStatusChange && onStatusChange(e.target.value as ProjectStatus)}
-            onClick={(e) => e.stopPropagation()}
-            className={`px-2.5 py-1 text-[10px] uppercase font-bold tracking-wider rounded-full appearance-none outline-none cursor-pointer hover:opacity-80 transition-opacity ${statusColors[project.status || ProjectStatus.Planned]} border-none`}
-            style={{ WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none', textAlign: 'center' }}
-          >
-            <option value={ProjectStatus.Planned} className="bg-background text-foreground text-sm py-1">Planned</option>
-            <option value={ProjectStatus.Active} className="bg-background text-foreground text-sm py-1">Active</option>
-            <option value={ProjectStatus.OnHold} className="bg-background text-foreground text-sm py-1">On Hold</option>
-            <option value={ProjectStatus.Completed} className="bg-background text-foreground text-sm py-1">Completed</option>
-            <option value={ProjectStatus.Cancelled} className="bg-background text-foreground text-sm py-1">Cancelled</option>
-          </select>
+          {isFreelancer ? (
+            <span className={`px-2.5 py-1 text-[10px] uppercase font-bold tracking-wider rounded-full ${statusColors[project.status || ProjectStatus.Planned]}`}>
+              {project.status || ProjectStatus.Planned}
+            </span>
+          ) : (
+            <select
+              value={project.status || ProjectStatus.Planned}
+              onChange={(e) => onStatusChange && onStatusChange(e.target.value as ProjectStatus)}
+              onClick={(e) => e.stopPropagation()}
+              className={`px-2.5 py-1 text-[10px] uppercase font-bold tracking-wider rounded-full appearance-none outline-none cursor-pointer hover:opacity-80 transition-opacity ${statusColors[project.status || ProjectStatus.Planned]} border-none`}
+              style={{ WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none', textAlign: 'center' }}
+            >
+              <option value={ProjectStatus.Planned} className="bg-background text-foreground text-sm py-1">Planned</option>
+              <option value={ProjectStatus.Active} className="bg-background text-foreground text-sm py-1">Active</option>
+              <option value={ProjectStatus.OnHold} className="bg-background text-foreground text-sm py-1">On Hold</option>
+              <option value={ProjectStatus.Completed} className="bg-background text-foreground text-sm py-1">Completed</option>
+              <option value={ProjectStatus.Cancelled} className="bg-background text-foreground text-sm py-1">Cancelled</option>
+            </select>
+          )}
         </div>
         <div className="flex items-center gap-2 mt-2">
           <ClientLogo
@@ -89,47 +97,49 @@ const ProjectCard: React.FC<{
         <p className="text-sm text-muted-foreground mt-3 line-clamp-2">{project.description}</p>
       </div>
 
-      <div className="mt-6">
-        <div className="flex justify-between text-sm text-muted-foreground mb-1 font-medium">
-          <span>Budget Usage</span>
-          <span className={progress > 100 ? 'text-destructive font-bold' : ''}>{Math.round(progress)}%</span>
-        </div>
-        <div className="w-full bg-secondary rounded-full h-2 overflow-hidden">
-          <div
-            className={`h-2 rounded-full transition-all duration-500 ${progress > 100 ? 'bg-destructive' : progress > 80 ? 'bg-orange-500' : 'bg-primary'} text-primary-foreground`}
-            style={{ width: `${Math.min(progress, 100)}%` }}
-          ></div>
-        </div>
-        <div className="flex justify-between text-xs text-muted-foreground mt-2">
-          <span className={spent > budget ? 'text-destructive font-semibold' : ''}>
-            €{spent.toLocaleString(undefined, { maximumFractionDigits: 0 })} spent
-          </span>
-          <span>€{budget.toLocaleString()} budget</span>
-        </div>
-
-        {marginData && marginData.marginPercentage !== 0 && (
-          <div className="mt-4 pt-3 border-t border-border">
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Acc. Margin</span>
-              <span
-                className={`text-xs font-bold px-2 py-1 rounded-md ${marginData.status === 'excellent'
-                  ? 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400'
-                  : marginData.status === 'good'
-                    ? 'bg-blue-100 dark:bg-blue-900/30 text-primary dark:text-blue-400'
-                    : marginData.status === 'acceptable'
-                      ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400'
-                      : marginData.status === 'poor'
-                        ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400'
-                        : 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400'
-                  }`}
-              >
-                {marginData.marginPercentage >= 0 ? '+' : ''}
-                {marginData.marginPercentage.toFixed(1)}%
-              </span>
-            </div>
+      {!isFreelancer && (
+        <div className="mt-6">
+          <div className="flex justify-between text-sm text-muted-foreground mb-1 font-medium">
+            <span>Budget Usage</span>
+            <span className={progress > 100 ? 'text-destructive font-bold' : ''}>{Math.round(progress)}%</span>
           </div>
-        )}
-      </div>
+          <div className="w-full bg-secondary rounded-full h-2 overflow-hidden">
+            <div
+              className={`h-2 rounded-full transition-all duration-500 ${progress > 100 ? 'bg-destructive' : progress > 80 ? 'bg-orange-500' : 'bg-primary'} text-primary-foreground`}
+              style={{ width: `${Math.min(progress, 100)}%` }}
+            ></div>
+          </div>
+          <div className="flex justify-between text-xs text-muted-foreground mt-2">
+            <span className={spent > budget ? 'text-destructive font-semibold' : ''}>
+              €{spent.toLocaleString(undefined, { maximumFractionDigits: 0 })} spent
+            </span>
+            <span>€{budget.toLocaleString()} budget</span>
+          </div>
+
+          {marginData && marginData.marginPercentage !== 0 && (
+            <div className="mt-4 pt-3 border-t border-border">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Acc. Margin</span>
+                <span
+                  className={`text-xs font-bold px-2 py-1 rounded-md ${marginData.status === 'excellent'
+                    ? 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400'
+                    : marginData.status === 'good'
+                      ? 'bg-blue-100 dark:bg-blue-900/30 text-primary dark:text-blue-400'
+                      : marginData.status === 'acceptable'
+                        ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400'
+                        : marginData.status === 'poor'
+                          ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400'
+                          : 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400'
+                    }`}
+                >
+                  {marginData.marginPercentage >= 0 ? '+' : ''}
+                  {marginData.marginPercentage.toFixed(1)}%
+                </span>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };
@@ -181,6 +191,16 @@ export const ProjectList: React.FC<{ onSelectProject: (project: Project) => void
 
     if (profile?.role === 'client' && project.title?.toUpperCase().includes('ADMIN')) {
       return false;
+    }
+
+    if (profile?.role === 'freelancer') {
+      const isTeamMember = project.project_members?.some(member => 
+        member.profile_id === user?.id || 
+        member.profile_id === profile?.id || 
+        member.user_id === user?.id || 
+        member.user_id === profile?.id
+      );
+      if (!isTeamMember) return false;
     }
 
     if (onlyMe) {
@@ -457,19 +477,25 @@ export const ProjectList: React.FC<{ onSelectProject: (project: Project) => void
                               </div>
                             </td>
                             <td className="px-5 py-3">
-                              <select
-                                value={p.status || ProjectStatus.Planned}
-                                onChange={(e) => updateMutation.mutate({ id: p.id, status: e.target.value as ProjectStatus })}
-                                onClick={(e) => e.stopPropagation()}
-                                className={`px-2 py-1 text-[10px] uppercase font-bold tracking-wider rounded-md border appearance-none outline-none cursor-pointer hover:opacity-80 transition-opacity ${statusColors[p.status || ProjectStatus.Planned]}`}
-                                style={{ WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none', textAlign: 'center' }}
-                              >
-                                <option value={ProjectStatus.Planned} className="bg-background text-foreground text-sm py-1">Planned</option>
-                                <option value={ProjectStatus.Active} className="bg-background text-foreground text-sm py-1">Active</option>
-                                <option value={ProjectStatus.OnHold} className="bg-background text-foreground text-sm py-1">On Hold</option>
-                                <option value={ProjectStatus.Completed} className="bg-background text-foreground text-sm py-1">Completed</option>
-                                <option value={ProjectStatus.Cancelled} className="bg-background text-foreground text-sm py-1">Cancelled</option>
-                              </select>
+                              {profile?.role === 'freelancer' ? (
+                                <span className={`px-2.5 py-1 text-[10px] uppercase font-bold tracking-wider rounded-full ${statusColors[p.status || ProjectStatus.Planned]}`}>
+                                  {p.status || ProjectStatus.Planned}
+                                </span>
+                              ) : (
+                                <select
+                                  value={p.status || ProjectStatus.Planned}
+                                  onChange={(e) => updateMutation.mutate({ id: p.id, status: e.target.value as ProjectStatus })}
+                                  onClick={(e) => e.stopPropagation()}
+                                  className={`px-2 py-1 text-[10px] uppercase font-bold tracking-wider rounded-md border appearance-none outline-none cursor-pointer hover:opacity-80 transition-opacity ${statusColors[p.status || ProjectStatus.Planned]}`}
+                                  style={{ WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none', textAlign: 'center' }}
+                                >
+                                  <option value={ProjectStatus.Planned} className="bg-background text-foreground text-sm py-1">Planned</option>
+                                  <option value={ProjectStatus.Active} className="bg-background text-foreground text-sm py-1">Active</option>
+                                  <option value={ProjectStatus.OnHold} className="bg-background text-foreground text-sm py-1">On Hold</option>
+                                  <option value={ProjectStatus.Completed} className="bg-background text-foreground text-sm py-1">Completed</option>
+                                  <option value={ProjectStatus.Cancelled} className="bg-background text-foreground text-sm py-1">Cancelled</option>
+                                </select>
+                              )}
                             </td>
                             <td className="px-5 py-3 text-right text-muted-foreground text-xs font-medium">
                               {p.deadline ? new Date(p.deadline).toLocaleDateString() : '-'}

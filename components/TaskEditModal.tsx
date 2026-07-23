@@ -10,6 +10,7 @@ import type { Task } from '../types/supabase';
 import { Icon } from './ui/Icon';
 import { Avatar } from './ui/Avatar';
 import CreatableSelect from 'react-select/creatable';
+import { useAuth } from '../lib/AuthContext';
 
 interface TaskEditModalProps {
   isOpen: boolean;
@@ -26,6 +27,8 @@ const formatDateTimeLocal = (dateString: string | null) => {
 };
 
 export const TaskEditModal: React.FC<TaskEditModalProps> = ({ isOpen, onClose, task, onTimeTrack }) => {
+  const { profile } = useAuth();
+  const isFreelancer = profile?.role === 'freelancer';
   const queryClient = useQueryClient();
   const [formData, setFormData] = useState({
     title: task.title,
@@ -780,9 +783,8 @@ export const TaskEditModal: React.FC<TaskEditModalProps> = ({ isOpen, onClose, t
                 )}
               </div>
             </div>
-
             {/* Estimated Hours & Rate */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className={`grid grid-cols-1 ${isFreelancer ? '' : 'md:grid-cols-2'} gap-4`}>
               <div>
                 <label htmlFor="estimated_hours" className="block text-sm font-medium text-muted-foreground mb-2">
                   Estimated Hours
@@ -791,7 +793,7 @@ export const TaskEditModal: React.FC<TaskEditModalProps> = ({ isOpen, onClose, t
                   type="number"
                   id="estimated_hours"
                   min="0"
-                  step="0.25"
+                  step="0.1"
                   value={estimatedHours}
                   onChange={(e) => setEstimatedHours(e.target.value)}
                   disabled={!projectServiceId || updateMutation.isPending}
@@ -801,27 +803,29 @@ export const TaskEditModal: React.FC<TaskEditModalProps> = ({ isOpen, onClose, t
                 <p className="text-xs text-muted-foreground mt-1">Planned billable hours</p>
               </div>
 
-              <div>
-                <label htmlFor="estimated_rate" className="block text-sm font-medium text-muted-foreground mb-2 flex items-center gap-1">
-                  Estimated Rate (€/h)
-                </label>
-                <input
-                  type="number"
-                  id="estimated_rate"
-                  min="0"
-                  step="0.01"
-                  value={estimatedRate}
-                  onChange={(e) => setEstimatedRate(e.target.value)}
-                  disabled={!projectServiceId || updateMutation.isPending}
-                  className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
-                  placeholder="0.00"
-                />
-                <p className="text-xs text-muted-foreground mt-1">Override if custom pricing</p>
-              </div>
+              {!isFreelancer && (
+                <div>
+                  <label htmlFor="estimated_rate" className="block text-sm font-medium text-muted-foreground mb-2 flex items-center gap-1">
+                    Estimated Rate (€/h)
+                  </label>
+                  <input
+                    type="number"
+                    id="estimated_rate"
+                    min="0"
+                    step="0.01"
+                    value={estimatedRate}
+                    onChange={(e) => setEstimatedRate(e.target.value)}
+                    disabled={!projectServiceId || updateMutation.isPending}
+                    className="w-full px-4 py-2 bg-muted border border-input rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
+                    placeholder="0.00"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">Override if custom pricing</p>
+                </div>
+              )}
             </div>
 
             {/* Planned Value Preview */}
-            {estimatedHours && estimatedRate && (
+            {!isFreelancer && estimatedHours && estimatedRate && (
               <div className="mt-3 p-3 bg-blue-900/20 border border-blue-700 rounded-lg">
                 <p className="text-sm text-blue-300">
                   <strong>Planned Value:</strong>{' '}

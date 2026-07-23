@@ -72,7 +72,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project: initialPr
       return ['overview', 'tasks', 'assets', 'documents'].includes(tab.id);
     }
     if (isFreelancer) {
-      return ['overview', 'tasks', 'assets', 'team', 'services', 'cases'].includes(tab.id); // hide finances, documents
+      return ['overview', 'tasks', 'assets', 'documents'].includes(tab.id);
     }
     return true;
   });
