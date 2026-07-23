@@ -227,7 +227,10 @@ export const Navigation: React.FC<NavigationProps> = ({ currentView, onNavigate,
         return true;
       })
     };
-  }).filter(cat => cat.items.length > 0);
+  }).filter(cat => {
+    if (profile?.role === 'freelancer' && cat.label === 'PX Desk') return false;
+    return cat.items.length > 0;
+  });
 
   // Find the active category based on current view
   let activeCategory = visibleCategories.find(cat => 
